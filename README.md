@@ -1,175 +1,117 @@
 <div align="center">
 
-<img src="./assets/banner.svg" alt="Recruiter Outreach Automation Banner" width="100%"/>
+<img src="./assets/banner.svg" alt="Recruiter Outreach Automation" width="100%"/>
 
 <br/>
 <br/>
 
-[![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white)](https://n8n.io)
-[![Gmail API](https://img.shields.io/badge/Gmail-OAuth_2.0-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://developers.google.com/gmail/api)
-[![Google Sheets](https://img.shields.io/badge/Google_Sheets-Database-0F9D58?style=for-the-badge&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-38BDF8.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-FF6D5A?style=flat-square&logo=n8n&logoColor=white)](https://n8n.io)
+[![Gmail API](https://img.shields.io/badge/Gmail-OAuth_2.0-EA4335?style=flat-square&logo=gmail&logoColor=white)](https://developers.google.com/gmail/api)
+[![Google Sheets](https://img.shields.io/badge/Google_Sheets-Database-0F9D58?style=flat-square&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-38BDF8.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-<br/>
-<br/>
-
-**A production-ready, intelligent n8n automation suite for high-signal, personalized technical recruiter outreach, dynamic resume attachment, and smart multi-tier Gmail reply tracking.**
-
-[Key Features](#-features) • [System Architecture](#-system-architecture) • [Google Sheets Schema](#-google-sheets-schema) • [Quickstart](#-setup--installation) • [Testing Runbook](#-safety--testing-mode)
+<p align="center">
+  <b>A production-ready, intelligent n8n automation suite for high-signal, personalized recruiter outreach, dynamic resume attachment, and smart multi-tier Gmail reply tracking.</b>
+</p>
 
 </div>
 
 ---
 
-## 📌 Features
+## ⚡ Overview
 
-- **Personalized Email Generation**: Dynamically crafts personalized HTML and plain-text emails based on recruiter name, company focus, and target role—avoiding generic spam-like messaging.
-- **Automated Resume Attachment**: Reads and mounts your resume PDF from a local/Docker volume and attaches it directly to outgoing Gmail messages.
-- **Idempotency & Duplicate Prevention**: Automatically detects previously contacted recruiters and prevents duplicate initial sends across executions.
-- **Gmail Threading**: Follow-up messages (Follow-up 1 & 2) are automatically sent within the **same conversation thread** as the original message for natural communication.
-- **Smart Reply Detection**: Inspects Gmail conversation threads before sending any follow-up, automatically halts the sequence when human replies are detected, and intelligently ignores automated out-of-office responses.
-- **Configurable Rate Limiting & Safety**: Includes a `TEST_MODE` safety switch, max email limits per execution (`MAX_EMAILS_PER_RUN = 15`), configurable delays (`DELAY_BETWEEN_EMAILS_SECONDS = 90s`), and company-level daily caps (`MAX_RECRUITERS_PER_COMPANY_PER_DAY = 2`).
-- **Comprehensive Logging**: Full audit trail recorded to a dedicated Google Sheet tab (`EmailLogs`).
+This suite automates technical recruiter outreach with built-in safety controls, smart reply tracking, and full conversation threading.
+
+- **🎯 Context-Aware Personalization**: Dynamic subject lines and custom focus sentences tailored to each company and role.
+- **📄 Resume Attachment**: Automatically reads and attaches your PDF resume from a mounted volume.
+- **🔄 Gmail Threading**: Follow-up emails are sent inside the **same conversation thread** as the original message.
+- **🛑 Smart Reply Detection**: Inspects Gmail threads before sending follow-ups; halts sequences on human reply and skips out-of-office autoreplies.
+- **🔒 Built-in Guardrails**: Includes `TEST_MODE`, company rate limits (max 2/company/day), per-run caps (max 15/run), and 90s delays between sends.
 
 ---
 
-## 🏗 System Architecture
+## 🏗 Architecture
 
 ```text
-                 RECRUITER OUTREACH WORKFLOW
-                 
-Google Sheets (Recruiters Tab)
-     │
-     ▼
-Validate & Deduplicate ─────── Invalid / Duplicate ───► Skip / Log
-     │
-     ▼
-Rate Limit & Batching (Max 2/company, Max 15/run)
-     │
-     ▼
-Dynamic Personalization (HTML & Plain Text)
-     │
-     ▼
-Attach Resume PDF (/files/Sai_Tarrun_Pitta_Resume.pdf)
-     │
-     ▼
-Gmail Send (Clean formatting, no branding)
-     │
-     ▼
-Update Google Sheet (Status=Sent, FollowUpDate=Now+5d, ThreadID)
-     │
-     ▼
-Log to EmailLogs & Rate Limit Delay (90s)
+┌─────────────────────────────────────────────────────────────┐
+│                 1. RECRUITER OUTREACH                       │
+│                                                             │
+│  [Google Sheets] ──► [Validate & Dedup] ──► [Personalize]   │
+│                             │                       │       │
+│                        (Skip/Log)             [Attach PDF]  │
+│                                                     │       │
+│  [Log to Sheet] ◄── [Update Status] ◄── [Gmail API Send]    │
+└─────────────────────────────────────────────────────────────┘
 
-
-                 FOLLOW-UP & REPLY DETECTION WORKFLOW
-
-Daily Schedule (Mon-Fri 9:30 AM)
-     │
-     ▼
-Find Due Follow-Ups (FollowUpDate <= Today & Count < 2)
-     │
-     ▼
-Inspect Gmail Thread
-     │
-     ├── Recruiter Replied ───► Mark Status=Replied ───► STOP
-     │
-     └── No Reply Found
-              │
-              ├── Follow-up 1 (Sent + 5-7 days)
-              │
-              └── Follow-up 2 (Sent + 14 days, Final)
-              │
-              ▼
-         Send in Existing Thread (GmailThreadID)
-              │
-              ▼
-         Update Google Sheet & Log Action
+┌─────────────────────────────────────────────────────────────┐
+│                 2. FOLLOW-UP & REPLY TRACKING               │
+│                                                             │
+│  [Daily Schedule] ──► [Find Due Follow-Ups]                 │
+│                               │                             │
+│                      [Inspect Gmail Thread]                 │
+│                               │                             │
+│         ┌─────────────────────┴─────────────────────┐       │
+│         ▼                                           ▼       │
+│  [Reply Detected]                            [No Reply]     │
+│         │                                           │       │
+│  [Mark 'Replied' & Stop]                [Send in Same Thread]
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📊 Google Sheets Schema
+## 📊 Google Sheet Schema
 
-### Tab 1: `Recruiters`
-| Header | Type | Description |
-| :--- | :--- | :--- |
-| `RecruiterID` | Text | Unique identifier (e.g., `001`) |
-| `FirstName` | Text | Recruiter's first name |
-| `LastName` | Text | Recruiter's last name |
-| `Company` | Text | Target company name |
-| `Email` | Text | Recruiter's email address |
-| `RecruiterTitle` | Text | Recruiter role title |
-| `JobTitle` | Text | Targeted engineering role (optional) |
-| `JobLink` | Text | Job application URL (optional) |
-| `CompanyFocus` | Text | Custom team/engineering focus for deep personalization |
-| `Location` | Text | Office location |
-| `Status` | Text | `Pending`, `Ready`, `Sent`, `Follow-up 1`, `Follow-up 2`, `Replied`, `Interview`, `Closed`, `Do Not Contact`, `Failed` |
-| `SentDate` | Timestamp | Timestamp of initial outreach |
-| `FollowUpDate` | Date | Next scheduled follow-up date (`YYYY-MM-DD`) |
-| `FollowUpCount` | Number | Number of follow-ups sent (`0`, `1`, `2`) |
-| `LastEmailDate` | Timestamp | Timestamp of latest message |
-| `ReplyStatus` | Text | `No Reply`, `Replied`, `Needs Review` |
-| `ReplyDate` | Timestamp | Timestamp when recruiter reply was detected |
-| `GmailMessageID` | Text | Message ID returned from Gmail API |
-| `GmailThreadID` | Text | Thread ID for conversation continuity |
-| `Notes` | Text | Additional context or timestamped error logs |
+Create a Google Spreadsheet with two tabs:
 
-### Tab 2: `EmailLogs`
-| Header | Type | Description |
-| :--- | :--- | :--- |
-| `Timestamp` | Timestamp | ISO timestamp of event |
-| `RecruiterID` | Text | Associated recruiter ID |
-| `RecruiterName` | Text | Full recruiter name |
-| `Company` | Text | Company name |
-| `Email` | Text | Recruiter email |
-| `Action` | Text | `Initial Email`, `Follow-up 1`, `Follow-up 2`, `Reply Detected`, `Failed` |
-| `Status` | Text | `Sent`, `Replied`, `Failed` |
-| `GmailMessageID` | Text | Gmail message identifier |
-| `GmailThreadID` | Text | Gmail thread identifier |
-| `Error` | Text | Error message (if applicable) |
+### 1. `Recruiters` (Outreach Queue)
+`RecruiterID` • `FirstName` • `LastName` • `Company` • `Email` • `RecruiterTitle` • `JobTitle` • `JobLink` • `CompanyFocus` • `Location` • `Status` • `SentDate` • `FollowUpDate` • `FollowUpCount` • `LastEmailDate` • `ReplyStatus` • `ReplyDate` • `GmailMessageID` • `GmailThreadID` • `Notes`
+
+> **Statuses**: `Pending`, `Ready`, `Sent`, `Follow-up 1`, `Follow-up 2`, `Replied`, `Interview`, `Closed`, `Do Not Contact`, `Failed`
+
+### 2. `EmailLogs` (Audit Trail)
+`Timestamp` • `RecruiterID` • `RecruiterName` • `Company` • `Email` • `Action` • `Status` • `GmailMessageID` • `GmailThreadID` • `Error`
 
 ---
 
-## ⚙️ Setup & Installation
+## 🚀 Quick Start
 
-### 1. Run n8n with Docker Compose
+### 1. Launch n8n
 ```bash
 docker compose up -d
 ```
+Access the editor at **`http://localhost:5678`**.
 
-### 2. Mount Resume PDF
-Place your resume PDF in `./files/Sai_Tarrun_Pitta_Resume.pdf`:
-```bash
-cp /path/to/your/resume.pdf ./files/Sai_Tarrun_Pitta_Resume.pdf
-```
+### 2. Add Resume
+Place your resume PDF at `./files/Sai_Tarrun_Pitta_Resume.pdf`.
 
-### 3. Import Workflows
-In n8n (`http://localhost:5678`), import the JSON workflows located in the `workflows/` directory:
-1. `workflows/1_recruiter_outreach_workflow.json`
-2. `workflows/2_recruiter_followup_workflow.json`
-3. `workflows/test_email_workflow.json`
-
-### 4. Connect Credentials
-1. Add **Google Sheets OAuth2** credential.
-2. Add **Gmail OAuth2** credential.
-3. Link your Google Sheet document in the workflow nodes.
+### 3. Import & Connect
+1. Import `workflows/1_recruiter_outreach_workflow.json` and `workflows/2_recruiter_followup_workflow.json`.
+2. Connect **Google Sheets OAuth2** and **Gmail OAuth2** credentials.
+3. Link your Google Sheet document ID in the nodes.
 
 ---
 
-## 🔒 Safety & Testing Mode
+## 🛡 Safe Testing Mode
 
-By default, `TEST_MODE = true` in the Global Configuration node. All outreach emails are safely redirected to your personal email (`saitarrunpitta@gmail.com`) with the original recipient annotated in the subject line.
+Both workflows default to `TEST_MODE = true` in the **Global Configuration** node. Outreach emails are routed to your test email with the recruiter address annotated in the subject.
 
 To go live:
-1. Change `TEST_MODE` to `false` in both workflows.
-2. Activate the schedules in n8n.
+1. Set `TEST_MODE = false` in the configuration nodes.
+2. Toggle the workflows to **Active**.
 
 ---
 
 ## 👤 Author
+
 **Sai Tarrun Pitta**
-- Portfolio: [saitarrunpitta.vercel.app](https://saitarrunpitta.vercel.app)
-- LinkedIn: [linkedin.com/in/saitarrunpitta](https://linkedin.com/in/saitarrunpitta)
-- GitHub: [github.com/saitarrun](https://github.com/saitarrun)
+- **Portfolio**: [saitarrunpitta.vercel.app](https://saitarrunpitta.vercel.app)
+- **LinkedIn**: [linkedin.com/in/saitarrunpitta](https://linkedin.com/in/saitarrunpitta)
+- **GitHub**: [@saitarrun](https://github.com/saitarrun)
+
+---
+
+## 📄 License
+
+Distributed under the MIT License.
