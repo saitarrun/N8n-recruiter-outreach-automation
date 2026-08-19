@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
+    p { margin: 0 0 16px 0; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }
+  </style>
+</head>
+<body>
+  <p>Hi {{FirstName}},</p>
+  <p>I hope you're doing well.</p>
+  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+  <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+  <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+  <p>I'm currently exploring Software Engineering opportunities at <strong>{{Company}}</strong>.</p>
+  {{#if PersonalizedSentence}}<p>{{PersonalizedSentence}}</p>{{/if}}
+  <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+  <p>I've attached my resume for reference.</p>
+  <p>Thank you for your time and consideration.</p>
+  <p>Best regards,</p>
+  <div class="signature">
+    <strong>Sai Tarrun Pitta</strong><br>
+    Email: <a href="mailto:saitarrunpitta@gmail.com">saitarrunpitta@gmail.com</a><br>
+    LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
+    GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
+    Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+  </div>
+</body>
+</html>

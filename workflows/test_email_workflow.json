@@ -1,0 +1,120 @@
+{
+  "name": "Send Test Email to saitarrun10@gmail.com",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-test-email",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "node-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ],
+      "webhookId": "send-test-email-webhook"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sai_Tarrun_Pitta_Resume.pdf",
+        "options": {}
+      },
+      "id": "node-read-resume",
+      "name": "Read Resume PDF",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\n\nconst firstName = \"Sai Tarrun\";\nconst company = \"Tech Innovations\";\n\nconst htmlBody = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }\n    p { margin: 0 0 16px 0; }\n    a { color: #0066cc; text-decoration: none; }\n    a:hover { text-decoration: underline; }\n    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }\n  </style>\n</head>\n<body>\n  <p>Hi ${firstName},</p>\n  <p>I hope you're doing well.</p>\n  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>\n  <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>\n  <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>\n  <p>I'm currently exploring Software Engineering opportunities at <strong>${company}</strong>.</p>\n  <p>I'm particularly interested in ${company} because of the work your teams are doing in distributed AI infrastructure and backend services, which aligns closely with my experience and interests.</p>\n  <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>\n  <p>I've attached my resume for reference.</p>\n  <p>Thank you for your time and consideration.</p>\n  <p>Best regards,</p>\n  <div class=\"signature\">\n    <strong>Sai Tarrun Pitta</strong><br>\n    Email: <a href=\"mailto:saitarrunpitta@gmail.com\">saitarrunpitta@gmail.com</a><br>\n    LinkedIn: <a href=\"https://linkedin.com/in/saitarrunpitta\" target=\"_blank\">linkedin.com/in/saitarrunpitta</a><br>\n    GitHub: <a href=\"https://github.com/saitarrun\" target=\"_blank\">github.com/saitarrun</a><br>\n    Portfolio: <a href=\"https://saitarrunpitta.vercel.app\" target=\"_blank\">saitarrunpitta.vercel.app</a>\n  </div>\n</body>\n</html>`;\n\nconst binaryData = item.binary ? (item.binary.data || item.binary.resume) : null;\n\nreturn {\n  json: {\n    sendTo: \"saitarrun10@gmail.com\",\n    subject: \"Software Engineering Opportunities at Tech Innovations \u2014 Sai Tarrun Pitta\",\n    htmlBody: htmlBody\n  },\n  binary: binaryData ? { resume: binaryData } : {}\n};"
+      },
+      "id": "node-prep-email",
+      "name": "Prepare Email Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.sendTo }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.htmlBody }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "resume"
+              }
+            ]
+          },
+          "appendAttribution": false
+        }
+      },
+      "id": "node-gmail-send",
+      "name": "Gmail - Send Test Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        760,
+        300
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7fLoFGrSYD2DCo0i",
+          "name": "Gmail OAuth2 account"
+        }
+      },
+      "webhookId": "ee26bd30-0fca-417d-84ba-dbe759263688"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Resume PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Resume PDF": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Content": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Send Test Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

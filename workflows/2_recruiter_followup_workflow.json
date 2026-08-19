@@ -1,0 +1,571 @@
+{
+  "name": "2. Recruiter Follow-Up & Reply Tracking \u2014 Sai Tarrun Pitta",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "node-fu-manual-trigger",
+      "name": "Manual Trigger (Testing)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "node-fu-schedule-trigger",
+      "name": "Schedule (Mon-Fri 9:30AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "TEST_MODE",
+              "value": "true"
+            },
+            {
+              "name": "TEST_EMAIL",
+              "value": "saitarrunpitta@gmail.com"
+            },
+            {
+              "name": "FOLLOW_UP_1_DAYS",
+              "value": "5"
+            },
+            {
+              "name": "FOLLOW_UP_2_DAYS",
+              "value": "7"
+            },
+            {
+              "name": "MAX_FOLLOW_UPS",
+              "value": "2"
+            },
+            {
+              "name": "DELAY_BETWEEN_EMAILS_SECONDS",
+              "value": "90"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-fu-global-config",
+      "name": "Global Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        340,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetName": {
+          "__rl": true,
+          "value": "Recruiters",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "node-fu-get-recruiters",
+      "name": "Google Sheets - Get Recruiters",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        560,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter recruiters eligible for follow-up today\nconst allRows = $input.all();\nconst todayStr = new Date().toISOString().split('T')[0];\nconst eligible = [];\n\nconst terminalStatuses = ['Replied', 'Interview', 'Closed', 'Do Not Contact', 'Failed'];\n\nfor (const item of allRows) {\n  const row = item.json;\n  const status = String(row.Status || '').trim();\n  const replyStatus = String(row.ReplyStatus || '').trim();\n  const followUpDate = String(row.FollowUpDate || '').trim();\n  const followUpCount = parseInt(row.FollowUpCount || '0', 10);\n  const threadId = String(row.GmailThreadID || '').trim();\n\n  // 1. Status Filter\n  if (terminalStatuses.includes(status) || replyStatus === 'Replied') continue;\n  if (status !== 'Sent' && status !== 'Follow-up 1') continue;\n\n  // 2. Count limit\n  if (followUpCount >= 2) continue;\n\n  // 3. Due Date Check (FollowUpDate <= today)\n  if (!followUpDate || followUpDate > todayStr) continue;\n\n  // 4. Must have a valid thread ID\n  if (!threadId) continue;\n\n  eligible.push({\n    json: {\n      ...row,\n      CurrentFollowUpCount: followUpCount,\n      ThreadId: threadId\n    }\n  });\n}\n\nreturn eligible;"
+      },
+      "id": "node-fu-filter-due",
+      "name": "Filter Due Follow-Ups",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "node-fu-loop",
+      "name": "Loop Over Due Recruiters",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "threadId": "={{ $json.ThreadId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "node-fu-check-gmail-thread",
+      "name": "Gmail - Get Thread",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1220,
+        340
+      ],
+      "continueOnFail": true,
+      "webhookId": "e895c8b2-4c6b-4bda-9700-fbae67eb5104",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7fLoFGrSYD2DCo0i",
+          "name": "Gmail OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const threadResult = $input.first().json;\nconst recruiter = $('Loop Over Due Recruiters').first().json;\nconst configNode = $('Global Configuration').first().json;\n\nconst config = {\n  TEST_MODE: configNode.TEST_MODE === 'true' || configNode.TEST_MODE === true,\n  TEST_EMAIL: configNode.TEST_EMAIL || 'saitarrunpitta@gmail.com',\n  FOLLOW_UP_2_DAYS: parseInt(configNode.FOLLOW_UP_2_DAYS || '7', 10),\n  DELAY_BETWEEN_EMAILS_SECONDS: parseInt(configNode.DELAY_BETWEEN_EMAILS_SECONDS || '90', 10)\n};\n\nconst now = new Date();\nconst nowIso = now.toISOString();\n\n// Check for replies in thread\nlet replyDetected = false;\nlet autoResponder = false;\n\nif (threadResult && threadResult.messages && Array.isArray(threadResult.messages)) {\n  for (const msg of threadResult.messages) {\n    const fromHeader = String(msg.from || msg.sender || '').toLowerCase();\n    const snippet = String(msg.snippet || '').toLowerCase();\n    \n    // If message is NOT from Sai Tarrun Pitta\n    if (fromHeader && !fromHeader.includes('saitarrunpitta@gmail.com')) {\n      // Check for common auto-responder / out of office patterns\n      if (snippet.includes('out of office') || snippet.includes('autoreply') || snippet.includes('automatic reply') || snippet.includes('mailer-daemon')) {\n        autoResponder = true;\n      } else {\n        replyDetected = true;\n        break;\n      }\n    }\n  }\n}\n\nif (replyDetected) {\n  return {\n    json: {\n      ...recruiter,\n      ReplyDetected: true,\n      NewStatus: 'Replied',\n      NewReplyStatus: 'Replied',\n      ReplyDate: nowIso,\n      Action: 'Reply Detected'\n    }\n  };\n}\n\n// No reply detected -> Prepare Next Follow-Up\nconst currentCount = parseInt(recruiter.FollowUpCount || '0', 10);\nconst nextCount = currentCount + 1;\nconst firstName = recruiter.FirstName;\nconst company = recruiter.Company;\nconst rawEmail = recruiter.Email;\n\nlet subject = `Re: Software Engineering Opportunities at ${company} \u2014 Sai Tarrun Pitta`;\nlet plainTextBody = '';\nlet htmlBody = '';\nlet nextFollowUpDate = '';\nlet newStatus = `Follow-up ${nextCount}`;\n\nif (currentCount === 0) {\n  // Follow-Up #1\n  plainTextBody = `Hi ${firstName},\n\nI wanted to follow up on my previous message regarding Software Engineering opportunities at ${company}.\n\nI'm still very interested in opportunities with the team and would appreciate it if you could take a look at my background when you have a chance.\n\nIf there are any roles that could be a good fit, I'd be grateful to be considered or connected with the appropriate hiring team.\n\nThank you again for your time.\n\nBest,\nSai Tarrun Pitta`;\n\n  htmlBody = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }\n    p { margin: 0 0 16px 0; }\n    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }\n  </style>\n</head>\n<body>\n  <p>Hi ${firstName},</p>\n  <p>I wanted to follow up on my previous message regarding Software Engineering opportunities at <strong>${company}</strong>.</p>\n  <p>I'm still very interested in opportunities with the team and would appreciate it if you could take a look at my background when you have a chance.</p>\n  <p>If there are any roles that could be a good fit, I'd be grateful to be considered or connected with the appropriate hiring team.</p>\n  <p>Thank you again for your time.</p>\n  <p>Best,</p>\n  <div class=\"signature\">\n    <strong>Sai Tarrun Pitta</strong>\n  </div>\n</body>\n</html>`;\n\n  // Next follow-up in 7 days\n  const fuDate = new Date(now.getTime() + config.FOLLOW_UP_2_DAYS * 24 * 60 * 60 * 1000);\n  nextFollowUpDate = fuDate.toISOString().split('T')[0];\n\n} else {\n  // Follow-Up #2 (Final)\n  plainTextBody = `Hi ${firstName},\n\nI wanted to send one final follow-up regarding Software Engineering opportunities at ${company}.\n\nI remain very interested in potentially joining the team and would appreciate any consideration for current or upcoming engineering positions that align with my background.\n\nThank you for your time.\n\nBest,\nSai Tarrun Pitta`;\n\n  htmlBody = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }\n    p { margin: 0 0 16px 0; }\n    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }\n  </style>\n</head>\n<body>\n  <p>Hi ${firstName},</p>\n  <p>I wanted to send one final follow-up regarding Software Engineering opportunities at <strong>${company}</strong>.</p>\n  <p>I remain very interested in potentially joining the team and would appreciate any consideration for current or upcoming engineering positions that align with my background.</p>\n  <p>Thank you for your time.</p>\n  <p>Best,</p>\n  <div class=\"signature\">\n    <strong>Sai Tarrun Pitta</strong>\n  </div>\n</body>\n</html>`;\n\n  nextFollowUpDate = ''; // No more automated follow-ups\n}\n\nconst targetEmail = config.TEST_MODE ? config.TEST_EMAIL : rawEmail;\nconst emailSubject = config.TEST_MODE ? `[TEST MODE - To: ${rawEmail}] ${subject}` : subject;\n\nreturn {\n  json: {\n    ...recruiter,\n    ReplyDetected: false,\n    AutoResponderDetected: autoResponder,\n    NewStatus: newStatus,\n    NewFollowUpCount: nextCount,\n    LastEmailDate: nowIso,\n    NextFollowUpDate: nextFollowUpDate,\n    TargetEmail: targetEmail,\n    Subject: emailSubject,\n    HtmlBody: htmlBody,\n    PlainTextBody: plainTextBody,\n    Action: `Follow-up ${nextCount}`,\n    DelaySeconds: config.DELAY_BETWEEN_EMAILS_SECONDS\n  }\n};"
+      },
+      "id": "node-fu-analyze-reply",
+      "name": "Analyze Reply or Prepare Follow-Up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-reply-detected",
+              "leftValue": "={{ $json.ReplyDetected }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "node-fu-if-reply",
+      "name": "IF Reply Detected",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1660,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "value": "Recruiters",
+          "mode": "name"
+        },
+        "matchingColumn": "RecruiterID",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Status": "Replied",
+            "ReplyStatus": "Replied",
+            "ReplyDate": "={{ $json.ReplyDate }}",
+            "FollowUpDate": ""
+          }
+        },
+        "options": {}
+      },
+      "id": "node-fu-update-replied",
+      "name": "Google Sheets - Mark Replied",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1900,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "value": "EmailLogs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Timestamp": "={{ $now.toISO() }}",
+            "RecruiterID": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.RecruiterID }}",
+            "RecruiterName": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.FirstName }} {{ $('Analyze Reply or Prepare Follow-Up').item.json.LastName }}",
+            "Company": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.Company }}",
+            "Email": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.Email }}",
+            "Action": "Reply Detected",
+            "Status": "Replied",
+            "GmailMessageID": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.GmailMessageID }}",
+            "GmailThreadID": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.GmailThreadID }}",
+            "Error": ""
+          }
+        },
+        "options": {}
+      },
+      "id": "node-fu-log-replied",
+      "name": "Google Sheets - Log Reply",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2120,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.TargetEmail }}",
+        "subject": "={{ $json.Subject }}",
+        "emailType": "html",
+        "message": "={{ $json.HtmlBody }}",
+        "options": {
+          "threadId": "={{ $json.ThreadId }}",
+          "appendAttribution": false
+        }
+      },
+      "id": "node-fu-send-email",
+      "name": "Gmail - Send Follow-Up in Thread",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1900,
+        440
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "continueOnFail": true,
+      "webhookId": "69e1110b-6240-4a99-90f4-820c75b61ef0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7fLoFGrSYD2DCo0i",
+          "name": "Gmail OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "value": "Recruiters",
+          "mode": "name"
+        },
+        "matchingColumn": "RecruiterID",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Status": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.NewStatus }}",
+            "FollowUpCount": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.NewFollowUpCount }}",
+            "LastEmailDate": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.LastEmailDate }}",
+            "FollowUpDate": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.NextFollowUpDate }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "node-fu-update-sheet-fu",
+      "name": "Google Sheets - Update Follow-Up",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2120,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "value": "EmailLogs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Timestamp": "={{ $now.toISO() }}",
+            "RecruiterID": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.RecruiterID }}",
+            "RecruiterName": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.FirstName }} {{ $('Analyze Reply or Prepare Follow-Up').item.json.LastName }}",
+            "Company": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.Company }}",
+            "Email": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.Email }}",
+            "Action": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.Action }}",
+            "Status": "Sent",
+            "GmailMessageID": "={{ $json.id || '' }}",
+            "GmailThreadID": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.GmailThreadID }}",
+            "Error": ""
+          }
+        },
+        "options": {}
+      },
+      "id": "node-fu-log-fu",
+      "name": "Google Sheets - Log Follow-Up",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2340,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('Analyze Reply or Prepare Follow-Up').item.json.DelaySeconds || 90 }}",
+        "unit": "seconds"
+      },
+      "id": "node-fu-wait",
+      "name": "Wait Rate Limit (90s)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2560,
+        440
+      ],
+      "webhookId": "45e6082c-01fc-49b9-bb89-04426f67c726"
+    }
+  ],
+  "connections": {
+    "Manual Trigger (Testing)": {
+      "main": [
+        [
+          {
+            "node": "Global Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule (Mon-Fri 9:30AM)": {
+      "main": [
+        [
+          {
+            "node": "Global Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global Configuration": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Get Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Get Recruiters": {
+      "main": [
+        [
+          {
+            "node": "Filter Due Follow-Ups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Due Follow-Ups": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Due Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Due Recruiters": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Gmail - Get Thread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Get Thread": {
+      "main": [
+        [
+          {
+            "node": "Analyze Reply or Prepare Follow-Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Reply or Prepare Follow-Up": {
+      "main": [
+        [
+          {
+            "node": "IF Reply Detected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Reply Detected": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Mark Replied",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Send Follow-Up in Thread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Mark Replied": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Log Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Log Reply": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Due Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Send Follow-Up in Thread": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Follow-Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Follow-Up": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Log Follow-Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Log Follow-Up": {
+      "main": [
+        [
+          {
+            "node": "Wait Rate Limit (90s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Rate Limit (90s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Due Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

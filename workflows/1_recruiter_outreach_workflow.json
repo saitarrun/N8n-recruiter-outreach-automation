@@ -1,0 +1,611 @@
+{
+  "name": "1. Recruiter Outreach Automation \u2014 Sai Tarrun Pitta",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "node-manual-trigger",
+      "name": "Manual Trigger (Testing)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "node-schedule-trigger",
+      "name": "Schedule (Mon-Fri 9AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "TEST_MODE",
+              "value": "true"
+            },
+            {
+              "name": "TEST_EMAIL",
+              "value": "saitarrunpitta@gmail.com"
+            },
+            {
+              "name": "RESUME_PATH",
+              "value": "/files/Sai_Tarrun_Pitta_Resume.pdf"
+            },
+            {
+              "name": "MAX_EMAILS_PER_RUN",
+              "value": "15"
+            },
+            {
+              "name": "DELAY_BETWEEN_EMAILS_SECONDS",
+              "value": "90"
+            },
+            {
+              "name": "FOLLOW_UP_1_DAYS",
+              "value": "5"
+            },
+            {
+              "name": "MAX_RECRUITERS_PER_COMPANY_PER_DAY",
+              "value": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-global-config",
+      "name": "Global Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        340,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Global Configuration').item.json.RESUME_PATH }}",
+        "options": {}
+      },
+      "id": "node-read-resume",
+      "name": "Read Resume PDF",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        560,
+        340
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetName": {
+          "__rl": true,
+          "value": "Recruiters",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "node-get-recruiters",
+      "name": "Google Sheets - Get Recruiters",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        780,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Read config values from Global Configuration node\nconst configNode = $('Global Configuration').first().json;\nconst config = {\n  TEST_MODE: configNode.TEST_MODE === 'true' || configNode.TEST_MODE === true,\n  TEST_EMAIL: configNode.TEST_EMAIL || 'saitarrunpitta@gmail.com',\n  MAX_EMAILS_PER_RUN: parseInt(configNode.MAX_EMAILS_PER_RUN || '15', 10),\n  DELAY_BETWEEN_EMAILS_SECONDS: parseInt(configNode.DELAY_BETWEEN_EMAILS_SECONDS || '90', 10),\n  FOLLOW_UP_1_DAYS: parseInt(configNode.FOLLOW_UP_1_DAYS || '5', 10),\n  MAX_RECRUITERS_PER_COMPANY_PER_DAY: parseInt(configNode.MAX_RECRUITERS_PER_COMPANY_PER_DAY || '2', 10)\n};\n\nconst allRows = $input.all();\nconst validRecruiters = [];\nconst companyCountMap = {};\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nconst terminalStatuses = ['Replied', 'Interview', 'Closed', 'Do Not Contact', 'Failed'];\n\nfor (const item of allRows) {\n  const row = item.json;\n  \n  const recruiterId = String(row.RecruiterID || '').trim();\n  const firstName = String(row.FirstName || '').trim();\n  const lastName = String(row.LastName || '').trim();\n  const company = String(row.Company || '').trim();\n  const rawEmail = String(row.Email || '').trim().toLowerCase();\n  const status = String(row.Status || 'Pending').trim();\n  const jobTitle = String(row.JobTitle || '').trim();\n  const jobLink = String(row.JobLink || '').trim();\n  const companyFocus = String(row.CompanyFocus || '').trim();\n  const followUpCount = parseInt(row.FollowUpCount || '0', 10);\n  const existingMessageId = String(row.GmailMessageID || '').trim();\n\n  // 1. Status Filter\n  if (terminalStatuses.includes(status)) continue;\n  if (status !== 'Pending' && status !== 'Ready') continue;\n\n  // 2. Duplicate / Idempotency Check\n  if (existingMessageId !== '' || followUpCount > 0 || status === 'Sent') continue;\n\n  // 3. Field & Email Validation\n  if (!firstName || !company || !rawEmail) continue;\n  if (!emailRegex.test(rawEmail)) continue;\n\n  // 4. Company Daily Limit Check\n  const compKey = company.toLowerCase();\n  companyCountMap[compKey] = (companyCountMap[compKey] || 0) + 1;\n  if (companyCountMap[compKey] > config.MAX_RECRUITERS_PER_COMPANY_PER_DAY) continue;\n\n  // 5. Dynamic Subject Line\n  let subject = `Software Engineering Opportunities at ${company} \u2014 Sai Tarrun Pitta`;\n  if (jobTitle) {\n    if (jobLink || (row.Notes && String(row.Notes).toLowerCase().includes('applied'))) {\n      subject = `Application Follow-Up: ${jobTitle} \u2014 Sai Tarrun Pitta`;\n    } else {\n      subject = `${jobTitle} Opportunities at ${company} \u2014 Sai Tarrun Pitta`;\n    }\n  }\n\n  // 6. Dynamic Personalized Sentence\n  let personalizedSentence = '';\n  if (companyFocus) {\n    personalizedSentence = `I'm particularly interested in ${company} because of the work your teams are doing in ${companyFocus}, which aligns closely with my experience and interests.`;\n  } else if (jobTitle) {\n    personalizedSentence = `I also noticed the ${jobTitle} opportunity and believe my background aligns well with the engineering requirements of the role.`;\n  }\n\n  // 7. Plain Text Body\n  const plainTextBody = `Hi ${firstName},\n\nI hope you're doing well.\n\nMy name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.\n\nI've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.\n\nMy technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.\n\nI'm currently exploring Software Engineering opportunities at ${company}.\n\n${personalizedSentence ? personalizedSentence + '\\n\\n' : ''}If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.\n\nI've attached my resume for reference.\n\nThank you for your time and consideration.\n\nBest regards,\n\nSai Tarrun Pitta\nEmail: saitarrunpitta@gmail.com\nLinkedIn: linkedin.com/in/saitarrunpitta\nGitHub: github.com/saitarrun\nPortfolio: saitarrunpitta.vercel.app`;\n\n  // 8. Clean, Mobile-Friendly HTML Email\n  const htmlBody = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }\n    p { margin: 0 0 16px 0; }\n    a { color: #0066cc; text-decoration: none; }\n    a:hover { text-decoration: underline; }\n    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }\n  </style>\n</head>\n<body>\n  <p>Hi ${firstName},</p>\n  <p>I hope you're doing well.</p>\n  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>\n  <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>\n  <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>\n  <p>I'm currently exploring Software Engineering opportunities at <strong>${company}</strong>.</p>\n  ${personalizedSentence ? `<p>${personalizedSentence}</p>` : ''}\n  <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>\n  <p>I've attached my resume for reference.</p>\n  <p>Thank you for your time and consideration.</p>\n  <p>Best regards,</p>\n  <div class=\"signature\">\n    <strong>Sai Tarrun Pitta</strong><br>\n    Email: <a href=\"mailto:saitarrunpitta@gmail.com\">saitarrunpitta@gmail.com</a><br>\n    LinkedIn: <a href=\"https://linkedin.com/in/saitarrunpitta\" target=\"_blank\">linkedin.com/in/saitarrunpitta</a><br>\n    GitHub: <a href=\"https://github.com/saitarrun\" target=\"_blank\">github.com/saitarrun</a><br>\n    Portfolio: <a href=\"https://saitarrunpitta.vercel.app\" target=\"_blank\">saitarrunpitta.vercel.app</a>\n  </div>\n</body>\n</html>`;\n\n  // Destination Routing\n  const targetEmail = config.TEST_MODE ? config.TEST_EMAIL : rawEmail;\n  const emailSubject = config.TEST_MODE ? `[TEST MODE - To: ${rawEmail}] ${subject}` : subject;\n\n  validRecruiters.push({\n    json: {\n      ...row,\n      RecruiterID: recruiterId,\n      FirstName: firstName,\n      LastName: lastName,\n      Company: company,\n      Email: rawEmail,\n      OriginalRecipient: rawEmail,\n      TargetEmail: targetEmail,\n      Subject: emailSubject,\n      HtmlBody: htmlBody,\n      PlainTextBody: plainTextBody,\n      ConfigTestMode: config.TEST_MODE,\n      DelaySeconds: config.DELAY_BETWEEN_EMAILS_SECONDS,\n      FollowUpDays: config.FOLLOW_UP_1_DAYS\n    }\n  });\n\n  if (validRecruiters.length >= config.MAX_EMAILS_PER_RUN) break;\n}\n\nreturn validRecruiters;"
+      },
+      "id": "node-filter-personalize",
+      "name": "Validate & Personalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "node-loop-recruiters",
+      "name": "Loop Over Recruiters",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1220,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\ntry {\n  const resumeNode = $('Read Resume PDF').first();\n  const binaryData = resumeNode && resumeNode.binary ? (resumeNode.binary.data || resumeNode.binary.resume) : null;\n  if (binaryData) {\n    item.binary = {\n      resume: binaryData\n    };\n  }\n} catch (e) {\n  // Gracefully catch\n}\nreturn item;"
+      },
+      "id": "node-attach-resume-data",
+      "name": "Attach Binary Resume",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.TargetEmail }}",
+        "subject": "={{ $json.Subject }}",
+        "emailType": "html",
+        "message": "={{ $json.HtmlBody }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "resume"
+              }
+            ]
+          },
+          "appendAttribution": false
+        }
+      },
+      "id": "node-gmail-send",
+      "name": "Gmail - Send Initial Outreach",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1660,
+        340
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "continueOnFail": true,
+      "webhookId": "277208ac-34c7-4fb1-86ad-84bffe3bd166",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7fLoFGrSYD2DCo0i",
+          "name": "Gmail OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-gmail-success",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "node-if-send-success",
+      "name": "IF Send Succeeded",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1880,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const gmailResult = $input.first().json;\nconst recruiter = $('Attach Binary Resume').first().json;\n\nconst now = new Date();\nconst nowIso = now.toISOString();\n\n// Calculate FollowUpDate = now + FollowUpDays (e.g. 5 days)\nconst followUpDays = parseInt(recruiter.FollowUpDays || '5', 10);\nconst followUpDate = new Date(now.getTime() + followUpDays * 24 * 60 * 60 * 1000);\nconst followUpIso = followUpDate.toISOString().split('T')[0];\n\nreturn {\n  json: {\n    RecruiterID: recruiter.RecruiterID,\n    FirstName: recruiter.FirstName,\n    LastName: recruiter.LastName,\n    Company: recruiter.Company,\n    Email: recruiter.Email,\n    Status: 'Sent',\n    SentDate: nowIso,\n    LastEmailDate: nowIso,\n    FollowUpDate: followUpIso,\n    FollowUpCount: 0,\n    ReplyStatus: 'No Reply',\n    GmailMessageID: gmailResult.id,\n    GmailThreadID: gmailResult.threadId,\n    Notes: recruiter.Notes || '',\n    DelaySeconds: recruiter.DelaySeconds || 90\n  }\n};"
+      },
+      "id": "node-prep-success-update",
+      "name": "Prepare Success Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "value": "Recruiters",
+          "mode": "name"
+        },
+        "matchingColumn": "RecruiterID",
+        "columns": {
+          "mappingMode": "autoMapInputData"
+        },
+        "options": {}
+      },
+      "id": "node-update-sheet-success",
+      "name": "Google Sheets - Update Row (Sent)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2320,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "value": "EmailLogs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Timestamp": "={{ $now.toISO() }}",
+            "RecruiterID": "={{ $('Prepare Success Update').item.json.RecruiterID }}",
+            "RecruiterName": "={{ $('Prepare Success Update').item.json.FirstName }} {{ $('Prepare Success Update').item.json.LastName }}",
+            "Company": "={{ $('Prepare Success Update').item.json.Company }}",
+            "Email": "={{ $('Prepare Success Update').item.json.Email }}",
+            "Action": "Initial Email",
+            "Status": "Sent",
+            "GmailMessageID": "={{ $('Prepare Success Update').item.json.GmailMessageID }}",
+            "GmailThreadID": "={{ $('Prepare Success Update').item.json.GmailThreadID }}",
+            "Error": ""
+          }
+        },
+        "options": {}
+      },
+      "id": "node-log-success",
+      "name": "Google Sheets - Log Success",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2540,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('Prepare Success Update').item.json.DelaySeconds || 90 }}",
+        "unit": "seconds"
+      },
+      "id": "node-wait-delay",
+      "name": "Wait Rate Limit (90s)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2760,
+        260
+      ],
+      "webhookId": "3495b13c-3635-4239-a242-9f83d16a8d62"
+    },
+    {
+      "parameters": {
+        "jsCode": "const errorInfo = $input.first().json;\nconst recruiter = $('Attach Binary Resume').first().json;\n\nconst now = new Date();\nconst nowStr = now.toISOString().replace('T', ' ').substring(0, 16);\nconst errorMsg = errorInfo.error ? errorInfo.error.message : 'Unknown Gmail error';\n\nconst existingNotes = recruiter.Notes ? recruiter.Notes + '\\n' : '';\nconst updatedNotes = `${existingNotes}[${nowStr}] Gmail send failed: ${errorMsg}`;\n\nreturn {\n  json: {\n    RecruiterID: recruiter.RecruiterID,\n    FirstName: recruiter.FirstName,\n    LastName: recruiter.LastName,\n    Company: recruiter.Company,\n    Email: recruiter.Email,\n    Status: 'Failed',\n    Notes: updatedNotes,\n    Error: errorMsg\n  }\n};"
+      },
+      "id": "node-prep-failure-update",
+      "name": "Prepare Failure Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "value": "Recruiters",
+          "mode": "name"
+        },
+        "matchingColumn": "RecruiterID",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Status": "Failed",
+            "Notes": "={{ $json.Notes }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "node-update-sheet-failed",
+      "name": "Google Sheets - Update Row (Failed)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2320,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "value": "EmailLogs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "Timestamp": "={{ $now.toISO() }}",
+            "RecruiterID": "={{ $json.RecruiterID }}",
+            "RecruiterName": "={{ $json.FirstName }} {{ $json.LastName }}",
+            "Company": "={{ $json.Company }}",
+            "Email": "={{ $json.Email }}",
+            "Action": "Initial Email",
+            "Status": "Failed",
+            "GmailMessageID": "",
+            "GmailThreadID": "",
+            "Error": "={{ $json.Error }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "node-log-failed",
+      "name": "Google Sheets - Log Failed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2540,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xi7pLFxhJFyyQSRJ",
+          "name": "Google Sheets OAuth2 account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger (Testing)": {
+      "main": [
+        [
+          {
+            "node": "Global Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule (Mon-Fri 9AM)": {
+      "main": [
+        [
+          {
+            "node": "Global Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global Configuration": {
+      "main": [
+        [
+          {
+            "node": "Read Resume PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Resume PDF": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Get Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Get Recruiters": {
+      "main": [
+        [
+          {
+            "node": "Validate & Personalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Personalize": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Recruiters": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Attach Binary Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Binary Resume": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Send Initial Outreach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Send Initial Outreach": {
+      "main": [
+        [
+          {
+            "node": "IF Send Succeeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Send Succeeded": {
+      "main": [
+        [
+          {
+            "node": "Prepare Success Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Failure Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Success Update": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Row (Sent)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Row (Sent)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Log Success": {
+      "main": [
+        [
+          {
+            "node": "Wait Rate Limit (90s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Rate Limit (90s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Failure Update": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Row (Failed)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Row (Failed)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Log Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Log Failed": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Recruiters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
