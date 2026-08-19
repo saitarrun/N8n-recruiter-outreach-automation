@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090D16"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#070A10"/>
+    </linearGradient>
+
+    <!-- Glowing Orbs -->
+    <radialGradient id="glowIndigo" cx="20%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowOrange" cx="80%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#FF6D5A" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FF6D5A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowCyan" cx="50%" cy="90%" r="60%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Card Background -->
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.75"/>
+    </linearGradient>
+
+    <!-- Text Gradient -->
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="40%" stop-color="#F8FAFC"/>
+      <stop offset="80%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+
+    <!-- Line Gradients -->
+    <linearGradient id="lineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0F9D58"/>
+      <stop offset="100%" stop-color="#FF6D5A"/>
+    </linearGradient>
+    <linearGradient id="lineGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6D5A"/>
+      <stop offset="100%" stop-color="#EA4335"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-weight: 800; font-size: 44px; fill: url(#titleGrad); letter-spacing: -0.5px; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 400; font-size: 18px; fill: #94A3B8; }
+    .badge-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 13px; fill: #E2E8F0; }
+    .node-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 700; font-size: 14px; fill: #FFFFFF; }
+    .node-sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 400; font-size: 11px; fill: #94A3B8; }
+    .author { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 14px; fill: #38BDF8; }
+    .grid-line { stroke: #1E293B; stroke-opacity: 0.35; stroke-width: 1; }
+  </style>
+
+  <!-- Background Base -->
+  <rect width="1200" height="420" fill="url(#bgGrad)" rx="16"/>
+
+  <!-- Background Grid Pattern -->
+  <line x1="100" y1="0" x2="100" y2="420" class="grid-line"/>
+  <line x1="250" y1="0" x2="250" y2="420" class="grid-line"/>
+  <line x1="400" y1="0" x2="400" y2="420" class="grid-line"/>
+  <line x1="550" y1="0" x2="550" y2="420" class="grid-line"/>
+  <line x1="700" y1="0" x2="700" y2="420" class="grid-line"/>
+  <line x1="850" y1="0" x2="850" y2="420" class="grid-line"/>
+  <line x1="1000" y1="0" x2="1000" y2="420" class="grid-line"/>
+  <line x1="1150" y1="0" x2="1150" y2="420" class="grid-line"/>
+  
+  <line x1="0" y1="80" x2="1200" y2="80" class="grid-line"/>
+  <line x1="0" y1="180" x2="1200" y2="180" class="grid-line"/>
+  <line x1="0" y1="280" x2="1200" y2="280" class="grid-line"/>
+  <line x1="0" y1="380" x2="1200" y2="380" class="grid-line"/>
+
+  <!-- Glowing Aura Backdrops -->
+  <rect width="1200" height="420" fill="url(#glowIndigo)" rx="16"/>
+  <rect width="1200" height="420" fill="url(#glowOrange)" rx="16"/>
+  <rect width="1200" height="420" fill="url(#glowCyan)" rx="16"/>
+
+  <!-- Top Pill / Status -->
+  <g transform="translate(60, 48)">
+    <rect width="210" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <circle cx="16" cy="16" r="5" fill="#10B981" filter="url(#glowFilter)"/>
+    <text x="32" y="21" class="badge-text" fill="#38BDF8">PRODUCTION-READY v1.0</text>
+  </g>
+
+  <!-- Author Badge Top Right -->
+  <g transform="translate(970, 48)">
+    <rect width="170" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="85" y="21" class="author" text-anchor="middle">⚡ Sai Tarrun Pitta</text>
+  </g>
+
+  <!-- Main Title & Description -->
+  <text x="60" y="132" class="title">Recruiter Outreach Automation</text>
+  <text x="60" y="168" class="subtitle">AI-Assisted, Hyper-Personalized Multi-Tier Outreach &amp; Smart Gmail Reply Tracking with n8n</text>
+
+  <!-- Interactive Workflow Visual Pipeline (Bottom Section) -->
+  <g transform="translate(60, 215)">
+    
+    <!-- Connection Lines -->
+    <path d="M 240 55 L 430 55" stroke="url(#lineGrad1)" stroke-width="3" stroke-dasharray="6,4"/>
+    <polygon points="435,55 425,50 425,60" fill="#FF6D5A"/>
+
+    <path d="M 680 55 L 860 55" stroke="url(#lineGrad2)" stroke-width="3" stroke-dasharray="6,4"/>
+    <polygon points="865,55 855,50 855,60" fill="#EA4335"/>
+
+    <!-- Node 1: Google Sheets -->
+    <g transform="translate(0, 0)" filter="url(#dropShadow)">
+      <rect width="240" height="110" rx="12" fill="url(#cardGrad)" stroke="#0F9D58" stroke-width="1.5"/>
+      <!-- Icon Container -->
+      <rect x="16" y="16" width="38" height="38" rx="8" fill="#0F9D58" fill-opacity="0.2"/>
+      <path d="M 26 24 L 44 24 L 44 46 L 26 46 Z M 32 29 L 38 29 M 32 35 L 38 35 M 32 41 L 38 41" stroke="#34D399" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- Node Text -->
+      <text x="66" y="34" class="node-title">Google Sheets</text>
+      <text x="66" y="48" class="node-sub">Recruiters DB &amp; Logs</text>
+      <line x1="16" y1="68" x2="224" y2="68" stroke="#334155" stroke-width="1"/>
+      <text x="16" y="90" class="node-sub" fill="#64748B">✓ Status: Pending / Ready</text>
+      <text x="160" y="90" class="node-sub" fill="#34D399">✓ Auto-Dedup</text>
+    </g>
+
+    <!-- Node 2: n8n Engine Core -->
+    <g transform="translate(440, 0)" filter="url(#dropShadow)">
+      <rect width="240" height="110" rx="12" fill="url(#cardGrad)" stroke="#FF6D5A" stroke-width="1.5"/>
+      <!-- Icon Container -->
+      <rect x="16" y="16" width="38" height="38" rx="8" fill="#FF6D5A" fill-opacity="0.2"/>
+      <circle cx="28" cy="35" r="5" fill="#FF6D5A"/>
+      <circle cx="42" cy="27" r="5" fill="#FF6D5A"/>
+      <circle cx="42" cy="43" r="5" fill="#FF6D5A"/>
+      <line x1="28" y1="35" x2="42" y2="27" stroke="#FF6D5A" stroke-width="2"/>
+      <line x1="28" y1="35" x2="42" y2="43" stroke="#FF6D5A" stroke-width="2"/>
+      <!-- Node Text -->
+      <text x="66" y="34" class="node-title">n8n Engine</text>
+      <text x="66" y="48" class="node-sub">Validation &amp; Personalization</text>
+      <line x1="16" y1="68" x2="224" y2="68" stroke="#334155" stroke-width="1"/>
+      <text x="16" y="90" class="node-sub" fill="#64748B">✓ Dynamic Context</text>
+      <text x="145" y="90" class="node-sub" fill="#F87171">✓ PDF Resume</text>
+    </g>
+
+    <!-- Node 3: Gmail API & Threading -->
+    <g transform="translate(870, 0)" filter="url(#dropShadow)">
+      <rect width="210" height="110" rx="12" fill="url(#cardGrad)" stroke="#EA4335" stroke-width="1.5"/>
+      <!-- Icon Container -->
+      <rect x="16" y="16" width="38" height="38" rx="8" fill="#EA4335" fill-opacity="0.2"/>
+      <path d="M 26 27 L 35 34 L 44 27 M 26 27 L 26 43 L 44 43 L 44 27 Z" stroke="#F87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- Node Text -->
+      <text x="66" y="34" class="node-title">Gmail API</text>
+      <text x="66" y="48" class="node-sub">Threaded Sends &amp; Replies</text>
+      <line x1="16" y1="68" x2="194" y2="68" stroke="#334155" stroke-width="1"/>
+      <text x="16" y="90" class="node-sub" fill="#64748B">✓ Single Threading</text>
+      <text x="130" y="90" class="node-sub" fill="#FBBF24">✓ Follow-ups</text>
+    </g>
+
+  </g>
+
+  <!-- Bottom Pills -->
+  <g transform="translate(60, 355)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="135" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="67" y="18" class="badge-text" font-size="11" text-anchor="middle" fill="#CBD5E1">🔒 TEST_MODE Safety</text>
+    
+    <!-- Pill 2 -->
+    <rect x="145" y="0" width="145" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="217" y="18" class="badge-text" font-size="11" text-anchor="middle" fill="#CBD5E1">⏱️ Rate-Limited (90s)</text>
+
+    <!-- Pill 3 -->
+    <rect x="300" y="0" width="155" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="377" y="18" class="badge-text" font-size="11" text-anchor="middle" fill="#CBD5E1">🎯 Smart Reply Tracking</text>
+
+    <!-- Pill 4 -->
+    <rect x="465" y="0" width="130" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="530" y="18" class="badge-text" font-size="11" text-anchor="middle" fill="#CBD5E1">🐳 Docker &amp; Compose</text>
+  </g>
+
+  <!-- Border Accent Top Gradient -->
+  <rect x="0" y="0" width="1200" height="3" fill="url(#titleGrad)" rx="1"/>
+</svg>

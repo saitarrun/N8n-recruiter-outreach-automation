@@ -1,17 +1,35 @@
-# 🚀 Production Recruiter Outreach Automation System (n8n)
+<div align="center">
 
-A complete, production-ready n8n automation suite designed for high-signal, personalized technical recruiter outreach and automated multi-tier follow-ups.
+<img src="./assets/banner.svg" alt="Recruiter Outreach Automation Banner" width="100%"/>
+
+<br/>
+<br/>
+
+[![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white)](https://n8n.io)
+[![Gmail API](https://img.shields.io/badge/Gmail-OAuth_2.0-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://developers.google.com/gmail/api)
+[![Google Sheets](https://img.shields.io/badge/Google_Sheets-Database-0F9D58?style=for-the-badge&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-38BDF8.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+<br/>
+<br/>
+
+**A production-ready, intelligent n8n automation suite for high-signal, personalized technical recruiter outreach, dynamic resume attachment, and smart multi-tier Gmail reply tracking.**
+
+[Key Features](#-features) • [System Architecture](#-system-architecture) • [Google Sheets Schema](#-google-sheets-schema) • [Quickstart](#-setup--installation) • [Testing Runbook](#-safety--testing-mode)
+
+</div>
 
 ---
 
 ## 📌 Features
 
-- **Personalized Email Generation**: Dynamically crafts personalized HTML and plain-text emails based on recruiter data, company focus, and job title without generic fluff.
-- **Automated Resume Attachment**: Seamlessly mounts and attaches resume PDFs into outgoing Gmail messages.
+- **Personalized Email Generation**: Dynamically crafts personalized HTML and plain-text emails based on recruiter name, company focus, and target role—avoiding generic spam-like messaging.
+- **Automated Resume Attachment**: Reads and mounts your resume PDF from a local/Docker volume and attaches it directly to outgoing Gmail messages.
 - **Idempotency & Duplicate Prevention**: Automatically detects previously contacted recruiters and prevents duplicate initial sends across executions.
-- **Gmail Threading**: Follow-up messages (Follow-up 1 & 2) are automatically sent within the **same conversation thread** as the original message.
-- **Smart Reply Detection**: Inspects Gmail threads before sending any follow-up, automatically stops sequences when human replies are detected, and ignores automated out-of-office responses.
-- **Configurable Rate Limiting & Safety**: Includes a `TEST_MODE` safety switch, max email limits per execution (`MAX_EMAILS_PER_RUN`), configurable delays (`DELAY_BETWEEN_EMAILS_SECONDS`), and company-level daily limits (`MAX_RECRUITERS_PER_COMPANY_PER_DAY`).
+- **Gmail Threading**: Follow-up messages (Follow-up 1 & 2) are automatically sent within the **same conversation thread** as the original message for natural communication.
+- **Smart Reply Detection**: Inspects Gmail conversation threads before sending any follow-up, automatically halts the sequence when human replies are detected, and intelligently ignores automated out-of-office responses.
+- **Configurable Rate Limiting & Safety**: Includes a `TEST_MODE` safety switch, max email limits per execution (`MAX_EMAILS_PER_RUN = 15`), configurable delays (`DELAY_BETWEEN_EMAILS_SECONDS = 90s`), and company-level daily caps (`MAX_RECRUITERS_PER_COMPANY_PER_DAY = 2`).
 - **Comprehensive Logging**: Full audit trail recorded to a dedicated Google Sheet tab (`EmailLogs`).
 
 ---
@@ -75,42 +93,42 @@ Inspect Gmail Thread
 ## 📊 Google Sheets Schema
 
 ### Tab 1: `Recruiters`
-| Header | Description |
-| :--- | :--- |
-| `RecruiterID` | Unique identifier (e.g., `001`) |
-| `FirstName` | Recruiter's first name |
-| `LastName` | Recruiter's last name |
-| `Company` | Target company name |
-| `Email` | Recruiter's email address |
-| `RecruiterTitle` | Recruiter job title |
-| `JobTitle` | Targeted engineering role (optional) |
-| `JobLink` | Job application URL (optional) |
-| `CompanyFocus` | Custom team/engineering focus for deep personalization |
-| `Location` | Office location |
-| `Status` | `Pending`, `Ready`, `Sent`, `Follow-up 1`, `Follow-up 2`, `Replied`, `Interview`, `Closed`, `Do Not Contact`, `Failed` |
-| `SentDate` | Timestamp of initial outreach |
-| `FollowUpDate` | Next scheduled follow-up date (`YYYY-MM-DD`) |
-| `FollowUpCount` | Number of follow-ups sent (`0`, `1`, `2`) |
-| `LastEmailDate` | Timestamp of latest message |
-| `ReplyStatus` | `No Reply`, `Replied`, `Needs Review` |
-| `ReplyDate` | Timestamp when recruiter reply was detected |
-| `GmailMessageID` | Message ID returned from Gmail API |
-| `GmailThreadID` | Thread ID for conversation continuity |
-| `Notes` | Additional context or error logs |
+| Header | Type | Description |
+| :--- | :--- | :--- |
+| `RecruiterID` | Text | Unique identifier (e.g., `001`) |
+| `FirstName` | Text | Recruiter's first name |
+| `LastName` | Text | Recruiter's last name |
+| `Company` | Text | Target company name |
+| `Email` | Text | Recruiter's email address |
+| `RecruiterTitle` | Text | Recruiter role title |
+| `JobTitle` | Text | Targeted engineering role (optional) |
+| `JobLink` | Text | Job application URL (optional) |
+| `CompanyFocus` | Text | Custom team/engineering focus for deep personalization |
+| `Location` | Text | Office location |
+| `Status` | Text | `Pending`, `Ready`, `Sent`, `Follow-up 1`, `Follow-up 2`, `Replied`, `Interview`, `Closed`, `Do Not Contact`, `Failed` |
+| `SentDate` | Timestamp | Timestamp of initial outreach |
+| `FollowUpDate` | Date | Next scheduled follow-up date (`YYYY-MM-DD`) |
+| `FollowUpCount` | Number | Number of follow-ups sent (`0`, `1`, `2`) |
+| `LastEmailDate` | Timestamp | Timestamp of latest message |
+| `ReplyStatus` | Text | `No Reply`, `Replied`, `Needs Review` |
+| `ReplyDate` | Timestamp | Timestamp when recruiter reply was detected |
+| `GmailMessageID` | Text | Message ID returned from Gmail API |
+| `GmailThreadID` | Text | Thread ID for conversation continuity |
+| `Notes` | Text | Additional context or timestamped error logs |
 
 ### Tab 2: `EmailLogs`
-| Header | Description |
-| :--- | :--- |
-| `Timestamp` | ISO timestamp of event |
-| `RecruiterID` | Associated recruiter ID |
-| `RecruiterName` | Full recruiter name |
-| `Company` | Company name |
-| `Email` | Recruiter email |
-| `Action` | `Initial Email`, `Follow-up 1`, `Follow-up 2`, `Reply Detected`, `Failed` |
-| `Status` | `Sent`, `Replied`, `Failed` |
-| `GmailMessageID` | Gmail message identifier |
-| `GmailThreadID` | Gmail thread identifier |
-| `Error` | Error message (if applicable) |
+| Header | Type | Description |
+| :--- | :--- | :--- |
+| `Timestamp` | Timestamp | ISO timestamp of event |
+| `RecruiterID` | Text | Associated recruiter ID |
+| `RecruiterName` | Text | Full recruiter name |
+| `Company` | Text | Company name |
+| `Email` | Text | Recruiter email |
+| `Action` | Text | `Initial Email`, `Follow-up 1`, `Follow-up 2`, `Reply Detected`, `Failed` |
+| `Status` | Text | `Sent`, `Replied`, `Failed` |
+| `GmailMessageID` | Text | Gmail message identifier |
+| `GmailThreadID` | Text | Gmail thread identifier |
+| `Error` | Text | Error message (if applicable) |
 
 ---
 
@@ -121,8 +139,8 @@ Inspect Gmail Thread
 docker compose up -d
 ```
 
-### 2. Place Resume PDF
-Copy your resume PDF to `./files/Sai_Tarrun_Pitta_Resume.pdf`:
+### 2. Mount Resume PDF
+Place your resume PDF in `./files/Sai_Tarrun_Pitta_Resume.pdf`:
 ```bash
 cp /path/to/your/resume.pdf ./files/Sai_Tarrun_Pitta_Resume.pdf
 ```
