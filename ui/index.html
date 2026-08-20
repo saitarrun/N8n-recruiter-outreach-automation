@@ -166,15 +166,32 @@
     .badge-sent { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed var(--card-border);
+      border-radius: 12px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: #0b1120;
+      transition: all 0.2s;
+      margin-top: 14px;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+
     .resume-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
+      gap: 12px;
+      padding: 12px 16px;
       background: #0b1120;
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      margin-top: 10px;
+      border-radius: 10px;
+      margin-top: 12px;
     }
 
     .toast {
@@ -188,6 +205,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: none;
       font-size: 13px;
+      z-index: 999;
     }
 
     .tab-content { display: none; }
@@ -209,7 +227,7 @@
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('queue')">📋 Recruiter Queue</button>
     <button class="tab-btn" onclick="switchTab('template')">✏️ Edit Email Template</button>
-    <button class="tab-btn" onclick="switchTab('resume')">📄 Manage Resume PDF</button>
+    <button class="tab-btn" onclick="switchTab('resume')">📄 Upload / Manage Resume</button>
   </div>
 
   <div class="grid">
@@ -280,32 +298,32 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         </div>
       </div>
 
-      <!-- TAB 3: MANAGE RESUME -->
+      <!-- TAB 3: UPLOAD RESUME -->
       <div id="tab-resume" class="tab-content">
         <div class="card">
           <div class="card-title">
-            <span>Resume PDF Configuration</span>
+            <span>Upload New Resume PDF</span>
           </div>
 
-          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
-            The automation automatically attaches your mounted resume PDF to all outgoing recruiter emails.
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Upload your updated PDF resume. It will immediately replace the mounted resume file and attach to all outgoing emails.
           </p>
 
-          <div class="resume-badge">
-            <span style="font-size: 24px;">📄</span>
-            <div style="flex: 1;">
-              <div style="font-weight: 600; font-size: 13px;">Sai_Tarrun_Pitta_Resume.pdf</div>
-              <div style="font-size: 11px; color: var(--text-muted);">Active Mounted File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (73.4 KB)</div>
-            </div>
-            <span class="badge badge-sent">Active</span>
+          <!-- Drag and Drop Upload Area -->
+          <div class="upload-zone" id="drop-area" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">📤</div>
+            <div style="font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 4px;">Click to Browse or Drag & Drop PDF</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Supports .pdf (Max 10MB)</div>
+            <input type="file" id="file-input" accept=".pdf" style="display: none;" onchange="handleFileUpload(this.files)">
           </div>
 
-          <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--card-border);">
-            <label style="margin-bottom: 8px;">To Replace Resume with a New PDF:</label>
-            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
-              Simply copy your new PDF to <code>/Users/xploit404/n8n-files/Sai_Tarrun_Pitta_Resume.pdf</code> or drop it in terminal:
-            </p>
-            <pre style="background: #070a12; padding: 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); overflow-x: auto;">cp ~/Downloads/Your_New_Resume.pdf /Users/xploit404/n8n-files/Sai_Tarrun_Pitta_Resume.pdf</pre>
+          <div class="resume-badge" id="resume-status">
+            <span style="font-size: 26px;">📄</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 13px;">Sai_Tarrun_Pitta_Resume.pdf</div>
+              <div style="font-size: 11px; color: var(--text-muted);" id="resume-size-text">Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (73.4 KB)</div>
+            </div>
+            <span class="badge badge-sent" id="resume-badge-status">Active</span>
           </div>
         </div>
       </div>
@@ -438,6 +456,50 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         </div>
       `;
     }
+
+    async function handleFileUpload(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      if (!file.name.endsWith('.pdf')) {
+        alert('Please upload a PDF file.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('resumeFile', file);
+
+      document.getElementById('resume-badge-status').innerText = 'Uploading...';
+
+      try {
+        const res = await fetch('/api/upload-resume', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('resume-size-text').innerText = `Active File: /files/Sai_Tarrun_Pitta_Resume.pdf (${data.size})`;
+          document.getElementById('resume-badge-status').innerText = 'Updated & Active';
+          showToast(`✅ Successfully uploaded ${file.name} (${data.size})!`);
+        } else {
+          showToast(`❌ Upload failed: ${data.error}`);
+        }
+      } catch (err) {
+        showToast(`❌ Error uploading resume: ${err.message}`);
+      }
+    }
+
+    // Drag and Drop Listeners
+    const dropArea = document.getElementById('drop-area');
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); dropArea.classList.add('dragover'); }, false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); dropArea.classList.remove('dragover'); }, false);
+    });
+    dropArea.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      handleFileUpload(dt.files);
+    });
 
     async function sendOutreach() {
       const r = recruiters[selectedIndex];
