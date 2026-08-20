@@ -50,7 +50,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         elif parsed.path == "/api/resume-pdf":
             params = urllib.parse.parse_qs(parsed.query)
             target_file = params.get('file', ['Sai_Tarrun_Pitta_Resume.pdf'])[0]
-            # Sanitize filename
             safe_filename = os.path.basename(target_file)
             fp = os.path.join(FILES_DIR, safe_filename)
 
@@ -74,6 +73,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         
+        # 1. Upload Resume
         if parsed.path == "/api/upload-resume":
             content_length = int(self.headers.get('Content-Length', 0))
             if content_length == 0:
@@ -85,7 +85,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             body = self.rfile.read(content_length)
             content_type = self.headers.get('Content-Type', '')
             original_filename = self.headers.get('X-File-Name', 'Sai_Tarrun_Pitta_Resume.pdf')
-            # Clean filename
             safe_filename = os.path.basename(original_filename)
             if not safe_filename.lower().endswith('.pdf'):
                 safe_filename += '.pdf'
@@ -98,7 +97,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 with open(dest_path, "wb") as f:
                     f.write(body)
                 
-                # Also keep default Sai_Tarrun_Pitta_Resume.pdf updated
                 with open(os.path.join(FILES_DIR, "Sai_Tarrun_Pitta_Resume.pdf"), "wb") as f:
                     f.write(body)
 
@@ -147,6 +145,42 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(b'{"success": false, "error": "Failed to parse PDF upload"}')
+            return
+
+        # 2. Delete Resume
+        elif parsed.path == "/api/delete-resume":
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_str = self.rfile.read(content_length).decode('utf-8')
+            try:
+                data = json.loads(body_str)
+                filename = data.get('filename')
+                if not filename:
+                    raise ValueError("Filename missing")
+                
+                safe_filename = os.path.basename(filename)
+                fp = os.path.join(FILES_DIR, safe_filename)
+                
+                if os.path.exists(fp):
+                    os.remove(fp)
+                    print(f"[Multi-Resume] Deleted {safe_filename}")
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(f'{{"success": true, "deleted": "{safe_filename}"}}'.encode('utf-8'))
+                    return
+                else:
+                    self.send_response(404)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(b'{"success": false, "error": "File not found"}')
+                    return
+            except Exception as e:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(f'{{"success": false, "error": "{str(e)}"}}'.encode('utf-8'))
+                return
+
         else:
             self.send_response(404)
             self.end_headers()
@@ -154,5 +188,5 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"UI Multi-Resume Server running at http://localhost:{PORT}")
+        print(f"UI Server with Delete Resume API running at http://localhost:{PORT}")
         httpd.serve_forever()

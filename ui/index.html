@@ -16,6 +16,8 @@
       --primary-hover: #4f46e5;
       --accent: #38bdf8;
       --success: #10b981;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
       --text: #f8fafc;
       --text-muted: #94a3b8;
     }
@@ -113,6 +115,8 @@
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-success { background: #059669; color: #fff; }
     .btn-success:hover { background: #047857; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
     .recruiter-list {
       display: flex;
@@ -166,7 +170,6 @@
     }
     .badge-sent { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-    .badge-blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 
     /* Multi-Resume Library Grid */
     .resume-grid {
@@ -197,7 +200,7 @@
     .upload-zone {
       border: 2px dashed #334155;
       border-radius: 12px;
-      padding: 22px 20px;
+      padding: 20px;
       text-align: center;
       background: #0b1120;
       transition: all 0.2s;
@@ -270,7 +273,7 @@
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('queue', event)">📋 Recruiter Queue</button>
     <button class="tab-btn" onclick="switchTab('template', event)">✏️ Edit Email Template</button>
-    <button class="tab-btn" onclick="switchTab('resume', event)">📄 Resume Library (<span id="resume-count-badge">4</span>)</button>
+    <button class="tab-btn" onclick="switchTab('resume', event)">📄 Resume Library (<span id="resume-count-badge">0</span>)</button>
   </div>
 
   <div class="grid">
@@ -304,7 +307,7 @@
           <div class="form-group">
             <label>📄 Select Resume Version for this Lead</label>
             <select id="recruiter-resume-select" onchange="updateCurrentRecruiter()">
-              <!-- Populated dynamically from API -->
+              <!-- Populated dynamically -->
             </select>
           </div>
 
@@ -352,11 +355,11 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       <div id="tab-resume" class="tab-content">
         <div class="card">
           <div class="card-title">
-            <span>Resume Library (<span id="resume-count-title">4</span> Variants Available)</span>
+            <span>Resume Library (<span id="resume-count-title">0</span> Variants)</span>
           </div>
 
           <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-            Select different specialized resume versions (e.g. Backend, Full-Stack, AI/ML) and choose which one to attach per recruiter or role.
+            Manage and assign different specialized resumes. You can upload new variants or remove outdated versions anytime.
           </p>
 
           <!-- Resume Cards List -->
@@ -377,10 +380,10 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           <!-- Embedded PDF Viewer -->
           <div class="pdf-viewer-container">
             <div class="pdf-viewer-header">
-              <span id="pdf-viewer-title">📄 Viewing: Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
-              <a id="pdf-open-tab" href="/api/resume-pdf?file=Sai_Tarrun_Pitta_Backend_Resume.pdf" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11px;">Open in New Tab ↗</a>
+              <span id="pdf-viewer-title">📄 PDF Preview</span>
+              <a id="pdf-open-tab" href="#" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11px;">Open in New Tab ↗</a>
             </div>
-            <iframe id="pdf-frame" class="pdf-frame" src="/api/resume-pdf?file=Sai_Tarrun_Pitta_Backend_Resume.pdf"></iframe>
+            <iframe id="pdf-frame" class="pdf-frame" src=""></iframe>
           </div>
         </div>
       </div>
@@ -405,7 +408,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
 
   <script>
     let resumeLibrary = [];
-    let selectedResumeFile = "Sai_Tarrun_Pitta_Backend_Resume.pdf";
+    let selectedResumeFile = "";
 
     const recruiters = [
       { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf", status: "Sent" },
@@ -425,6 +428,14 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         document.getElementById('resume-count-badge').innerText = resumeLibrary.length;
         document.getElementById('resume-count-title').innerText = resumeLibrary.length;
 
+        if (resumeLibrary.length > 0) {
+          if (!selectedResumeFile || !resumeLibrary.some(r => r.filename === selectedResumeFile)) {
+            selectedResumeFile = resumeLibrary[0].filename;
+          }
+        } else {
+          selectedResumeFile = "";
+        }
+
         // Populate dropdown in Queue tab
         const selectEl = document.getElementById('recruiter-resume-select');
         selectEl.innerHTML = '';
@@ -435,8 +446,16 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           selectEl.appendChild(opt);
         });
 
-        // Render Resume Library Grid in Resume Tab
+        // Set selected value in dropdown
+        const currentRecruiter = recruiters[selectedIndex];
+        if (currentRecruiter && currentRecruiter.resumeFile) {
+          selectEl.value = currentRecruiter.resumeFile;
+        }
+
         renderResumeGrid();
+        if (selectedResumeFile) {
+          previewResumeFile(selectedResumeFile);
+        }
         renderPreview();
       } catch (e) {
         console.error("Failed to load resumes", e);
@@ -447,26 +466,57 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       const grid = document.getElementById('resume-grid');
       grid.innerHTML = '';
 
+      if (resumeLibrary.length === 0) {
+        grid.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">No resumes uploaded yet. Upload your first PDF below!</div>';
+        return;
+      }
+
       resumeLibrary.forEach(r => {
         const card = document.createElement('div');
         card.className = `resume-card ${r.filename === selectedResumeFile ? 'active' : ''}`;
         card.onclick = () => previewResumeFile(r.filename);
         card.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 20px;">📄</span>
-            <div>
-              <div style="font-weight: 700; font-size: 13px; color: #fff;">${r.filename}</div>
+          <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+            <span style="font-size: 20px; flex-shrink: 0;">📄</span>
+            <div style="overflow: hidden;">
+              <div style="font-weight: 700; font-size: 13px; color: #fff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${r.filename}</div>
               <div style="font-size: 11px; color: var(--text-muted);">${r.size} • ${r.lastModified}</div>
             </div>
           </div>
-          <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
             <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; width: auto;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
               Select for Lead
+            </button>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px; width: auto;" onclick="event.stopPropagation(); deleteResume('${r.filename}')" title="Delete this resume">
+              🗑
             </button>
           </div>
         `;
         grid.appendChild(card);
       });
+    }
+
+    async function deleteResume(filename) {
+      if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/delete-resume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`🗑 Deleted ${filename}!`);
+          await loadResumes();
+        } else {
+          showToast(`❌ Delete failed: ${data.error}`);
+        }
+      } catch (err) {
+        showToast(`❌ Delete error: ${err.message}`);
+      }
     }
 
     function previewResumeFile(filename) {
