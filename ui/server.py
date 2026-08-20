@@ -104,9 +104,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             if body.startswith(b'%PDF'):
                 with open(dest_path, "wb") as f:
                     f.write(body)
-                
-                with open(os.path.join(FILES_DIR, "Sai_Tarrun_Pitta_Resume.pdf"), "wb") as f:
-                    f.write(body)
 
                 file_size_kb = round(len(body) / 1024, 1)
                 self.send_response(200)
@@ -136,9 +133,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 
                             dest_path = os.path.join(FILES_DIR, safe_filename)
                             with open(dest_path, "wb") as f:
-                                f.write(raw_file_data)
-                            
-                            with open(os.path.join(FILES_DIR, "Sai_Tarrun_Pitta_Resume.pdf"), "wb") as f:
                                 f.write(raw_file_data)
 
                             file_size_kb = round(len(raw_file_data) / 1024, 1)
