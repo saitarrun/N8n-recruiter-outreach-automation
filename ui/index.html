@@ -168,43 +168,44 @@
 
     /* Upload Zone */
     .upload-zone {
-      border: 2px dashed var(--card-border);
+      border: 2px dashed #334155;
       border-radius: 12px;
-      padding: 28px 20px;
+      padding: 30px 20px;
       text-align: center;
-      cursor: pointer;
       background: #0b1120;
       transition: all 0.2s;
       margin-top: 14px;
     }
-    .upload-zone:hover, .upload-zone.dragover {
+    .upload-zone.dragover {
       border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.05);
+      background: rgba(56, 189, 248, 0.08);
     }
-    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-icon { font-size: 36px; margin-bottom: 10px; }
 
     .resume-badge {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 14px 16px;
       background: #0b1120;
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      margin-top: 12px;
+      margin-top: 16px;
     }
 
     .toast {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: var(--card-bg);
+      background: #1e293b;
+      color: #fff;
       border: 1px solid var(--success);
-      padding: 12px 18px;
-      border-radius: 8px;
+      padding: 14px 20px;
+      border-radius: 10px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: none;
       font-size: 13px;
+      font-weight: 600;
       z-index: 999;
     }
 
@@ -225,9 +226,9 @@
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('queue')">📋 Recruiter Queue</button>
-    <button class="tab-btn" onclick="switchTab('template')">✏️ Edit Email Template</button>
-    <button class="tab-btn" onclick="switchTab('resume')">📄 Upload / Manage Resume</button>
+    <button class="tab-btn active" onclick="switchTab('queue', event)">📋 Recruiter Queue</button>
+    <button class="tab-btn" onclick="switchTab('template', event)">✏️ Edit Email Template</button>
+    <button class="tab-btn" onclick="switchTab('resume', event)">📄 Upload / Manage Resume</button>
   </div>
 
   <div class="grid">
@@ -306,21 +307,25 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           </div>
 
           <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-            Upload your updated PDF resume. It will immediately replace the mounted resume file and attach to all outgoing emails.
+            Upload your latest PDF resume. It will replace the active resume and attach to all outgoing recruiter emails.
           </p>
 
-          <!-- Drag and Drop Upload Area -->
-          <div class="upload-zone" id="drop-area" onclick="document.getElementById('file-input').click()">
+          <!-- Upload Drop Zone -->
+          <div class="upload-zone" id="drop-area">
             <div class="upload-icon">📤</div>
-            <div style="font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 4px;">Click to Browse or Drag & Drop PDF</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Supports .pdf (Max 10MB)</div>
-            <input type="file" id="file-input" accept=".pdf" style="display: none;" onchange="handleFileUpload(this.files)">
+            <div style="font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 6px;">Drag & Drop your PDF here</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">or choose from your files</div>
+            
+            <input type="file" id="file-input" accept=".pdf" style="display: none;">
+            <button class="btn btn-primary" style="width: auto; padding: 8px 20px;" onclick="document.getElementById('file-input').click()">
+              📁 Browse PDF Resume
+            </button>
           </div>
 
           <div class="resume-badge" id="resume-status">
-            <span style="font-size: 26px;">📄</span>
+            <span style="font-size: 28px;">📄</span>
             <div style="flex: 1;">
-              <div style="font-weight: 600; font-size: 13px;">Sai_Tarrun_Pitta_Resume.pdf</div>
+              <div style="font-weight: 700; font-size: 13px;" id="resume-file-title">Sai_Tarrun_Pitta_Resume.pdf</div>
               <div style="font-size: 11px; color: var(--text-muted);" id="resume-size-text">Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (73.4 KB)</div>
             </div>
             <span class="badge badge-sent" id="resume-badge-status">Active</span>
@@ -356,10 +361,10 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
 
     let selectedIndex = 0;
 
-    function switchTab(tabId) {
+    function switchTab(tabId, evt) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
+      if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
@@ -460,45 +465,61 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
     async function handleFileUpload(files) {
       if (!files || files.length === 0) return;
       const file = files[0];
-      if (!file.name.endsWith('.pdf')) {
-        alert('Please upload a PDF file.');
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        alert('Please select a valid .pdf file.');
         return;
       }
 
-      const formData = new FormData();
-      formData.append('resumeFile', file);
-
       document.getElementById('resume-badge-status').innerText = 'Uploading...';
+      document.getElementById('resume-file-title').innerText = file.name;
 
       try {
+        // Direct binary upload for maximum reliability
         const res = await fetch('/api/upload-resume', {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/pdf'
+          },
+          body: file
         });
         const data = await res.json();
         if (data.success) {
-          document.getElementById('resume-size-text').innerText = `Active File: /files/Sai_Tarrun_Pitta_Resume.pdf (${data.size})`;
-          document.getElementById('resume-badge-status').innerText = 'Updated & Active';
+          document.getElementById('resume-size-text').innerHTML = `Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (${data.size})`;
+          document.getElementById('resume-badge-status').innerText = 'Active';
+          document.getElementById('resume-badge-status').className = 'badge badge-sent';
           showToast(`✅ Successfully uploaded ${file.name} (${data.size})!`);
         } else {
-          showToast(`❌ Upload failed: ${data.error}`);
+          showToast(`❌ Upload failed: ${data.error || 'Unknown error'}`);
+          document.getElementById('resume-badge-status').innerText = 'Failed';
         }
       } catch (err) {
-        showToast(`❌ Error uploading resume: ${err.message}`);
+        showToast(`❌ Upload error: ${err.message}`);
+        document.getElementById('resume-badge-status').innerText = 'Error';
       }
     }
+
+    // Attach File Input Listener
+    const fileInput = document.getElementById('file-input');
+    fileInput.addEventListener('change', function() {
+      handleFileUpload(this.files);
+      this.value = '';
+    });
 
     // Drag and Drop Listeners
     const dropArea = document.getElementById('drop-area');
     ['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); dropArea.classList.add('dragover'); }, false);
+      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); dropArea.classList.add('dragover'); }, false);
     });
     ['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); dropArea.classList.remove('dragover'); }, false);
+      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('dragover'); }, false);
     });
     dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const dt = e.dataTransfer;
-      handleFileUpload(dt.files);
+      if (dt && dt.files) {
+        handleFileUpload(dt.files);
+      }
     });
 
     async function sendOutreach() {
