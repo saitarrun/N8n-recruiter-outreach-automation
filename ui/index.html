@@ -1315,36 +1315,62 @@
     };
 
     const TEMPLATE_PRESETS = {
-      comprehensive: `<p>Hi {RecruiterName},</p>
-<p>I hope you're doing well.</p>
-<p>My name is <strong>{SenderName}</strong>, and I'm a {SenderTitle} with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
-<p>I've previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-<p>My technical background includes <strong>Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems</strong>.</p>
-<p>I'm currently exploring <strong>Software Engineering opportunities at {Company}</strong>.</p>
-<p>I'm particularly interested in <strong>{Company}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>
-<p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-<p>I've attached my resume for reference.</p>
-<p>Thank you for your time and consideration.</p>
-<p>Best regards,</p>
+      comprehensive: `Hi {RecruiterName},
+
+I hope you're doing well.
+
+My name is **{SenderName}**, and I'm a {SenderTitle} with experience across **backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications**.
+
+I've previously worked with **Uber, Pacific Life, Cognizant, and California State University, Fullerton**, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.
+
+My technical background includes **Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems**.
+
+I'm currently exploring **Software Engineering opportunities at {Company}**.
+
+I'm particularly interested in **{Company}** and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.
+
+If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.
+
+I've attached my resume for reference.
+
+Thank you for your time and consideration.
+
+Best regards,
+
 {SignatureBlock}`,
 
-      concise: `<p>Hi {RecruiterName},</p>
-<p>I hope you're having a great week.</p>
-<p>I'm <strong>{SenderName}</strong>, a {SenderTitle} specializing in scalable backend services, distributed systems, and AI/LLM applications.</p>
-<p>I've previously built high-performance microservices and cloud infrastructure at companies like <strong>Uber, Pacific Life, and Cognizant</strong> with a core stack in <strong>Python, Java, TypeScript, AWS, Docker, Kubernetes, and PostgreSQL</strong>.</p>
-<p>I'm currently exploring <strong>Software Engineering roles at {Company}</strong> and would love to connect to discuss how my engineering background aligns with your team's upcoming hiring priorities.</p>
-<p>I've attached my resume for reference. If there is a better person to speak with regarding engineering roles at {Company}, please let me know!</p>
-<p>Best regards,</p>
+      concise: `Hi {RecruiterName},
+
+I hope you're having a great week.
+
+I'm **{SenderName}**, a {SenderTitle} specializing in scalable backend services, distributed systems, and AI/LLM applications.
+
+I've previously built high-performance microservices and cloud infrastructure at companies like **Uber, Pacific Life, and Cognizant** with a core stack in **Python, Java, TypeScript, AWS, Docker, Kubernetes, and PostgreSQL**.
+
+I'm currently exploring **Software Engineering roles at {Company}** and would love to connect to discuss how my engineering background aligns with your team's upcoming hiring priorities.
+
+I've attached my resume for reference. If there is a better person to speak with regarding engineering roles at {Company}, please let me know!
+
+Best regards,
+
 {SignatureBlock}`,
 
-      backend: `<p>Hi {RecruiterName},</p>
-<p>I hope this finds you well.</p>
-<p>My name is <strong>{SenderName}</strong>, and I'm a {SenderTitle} focused on <strong>high-throughput distributed systems, scalable backend infrastructure, and cloud data platforms</strong>.</p>
-<p>Across my work with <strong>Uber, Pacific Life, and Cognizant</strong>, I've designed resilient microservices, optimized SQL/NoSQL data pipelines, and architected cloud-native systems using <strong>Python, Java, Spring Boot, FastAPI, AWS, Redis, Docker, and Kubernetes</strong>.</p>
-<p>I've been following the engineering innovations at <strong>{Company}</strong> and am very interested in contributing to your distributed systems and infrastructure teams.</p>
-<p>I've attached my resume and would welcome the opportunity to connect for an interview or introduction to the relevant engineering manager.</p>
-<p>Thank you for your time and consideration.</p>
-<p>Best regards,</p>
+      backend: `Hi {RecruiterName},
+
+I hope this finds you well.
+
+My name is **{SenderName}**, and I'm a {SenderTitle} focused on **high-throughput distributed systems, scalable backend infrastructure, and cloud data platforms**.
+
+Across my work with **Uber, Pacific Life, and Cognizant**, I've designed resilient microservices, optimized SQL/NoSQL data pipelines, and architected cloud-native systems using **Python, Java, Spring Boot, FastAPI, AWS, Redis, Docker, and Kubernetes**.
+
+I've been following the engineering innovations at **{Company}** and am very interested in contributing to your distributed systems and infrastructure teams.
+
+I've attached my resume and would welcome the opportunity to connect for an interview or introduction to the relevant engineering manager.
+
+Thank you for your time and consideration.
+
+Best regards,
+
 {SignatureBlock}`
     };
 
@@ -1359,6 +1385,43 @@
   GitHub: <a href="${p.github}" target="_blank">${p.github.replace(/^https?:\/\//, '')}</a><br>
   Portfolio: <a href="${p.portfolio}" target="_blank">${p.portfolio.replace(/^https?:\/\//, '')}</a>
 </div>`;
+    }
+
+    function renderTextToHtml(rawText, payload, profile) {
+      let text = rawText || "";
+      const sig = generateSignatureBlock(profile);
+
+      text = text
+        .replace(/<p>Hi\s+[^,<]+,/i, "Hi {RecruiterName},")
+        .replace(/opportunities at\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\.|\s*<|\n)/gi, "opportunities at {Company}")
+        .replace(/interested in\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\s+(?:and|because|the|which))/gi, "interested in {Company}");
+
+      // Markdown bold
+      text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+      // Replace placeholders
+      text = text
+        .replace(/\{SignatureBlock\}|\[SignatureBlock\]/gi, sig)
+        .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${payload.comp}</strong>`)
+        .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?name|name)\s*(?:\}\}|\}|\])/gi, payload.fn)
+        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*name)\s*(?:\}\}|\}|\])/gi, profile.name)
+        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*title|title)\s*(?:\}\}|\}|\])/gi, profile.title)
+        .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, payload.email)
+        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*email)\s*(?:\}\}|\}|\])/gi, profile.email);
+
+      text = text.replace(/<strong><strong>(.*?)<\/strong><\/strong>/gi, "<strong>$1</strong>");
+
+      if (!text.includes("<p>") && !text.includes("<div>")) {
+        const paragraphs = text.split(/\n\s*\n/);
+        text = paragraphs.map(p => {
+          const clean = p.trim();
+          if (!clean) return "";
+          if (clean.includes("<div") || clean.includes("<table")) return clean;
+          return `<p>${clean.replace(/\n/g, "<br>")}</p>`;
+        }).filter(Boolean).join("\n");
+      }
+
+      return text;
     }
 
     function getMasterTemplate() {
@@ -1468,13 +1531,9 @@
 
       const subject = `Software Engineering Opportunities at ${comp} — ${profile.name}`;
 
-      let tpl = getMasterTemplate();
-      tpl = tpl
-        .replace(/<p>Hi\s+[^,<]+,/i, '<p>Hi {RecruiterName},')
-        .replace(/opportunities at\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\.|\s*<)/gi, 'opportunities at {Company}')
-        .replace(/interested in\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\s+(?:and|because|the|which))/gi, 'interested in {Company}');
+      const tpl = getMasterTemplate();
+      const contentHtml = renderTextToHtml(tpl, { fn, comp, email }, profile);
 
-      const sig = generateSignatureBlock(profile);
       const bodyHtml = `<!DOCTYPE html>
 <html>
 <head>
@@ -1486,14 +1545,7 @@
   </style>
 </head>
 <body>
-${tpl
-  .replace(/\{SignatureBlock\}|\[SignatureBlock\]/gi, sig)
-  .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${comp}</strong>`)
-  .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?name|name)\s*(?:\}\}|\}|\])/gi, fn)
-  .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*name)\s*(?:\}\}|\}|\])/gi, profile.name)
-  .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*title|title)\s*(?:\}\}|\}|\])/gi, profile.title)
-  .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, email)
-  .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*email)\s*(?:\}\}|\}|\])/gi, profile.email)}
+${contentHtml}
 </body>
 </html>`;
 
@@ -1580,21 +1632,8 @@ ${tpl
       const attachSize = document.getElementById('prev-attach-size');
       if (attachSize) attachSize.innerText = `(${resumeSize})`;
 
-      let tpl = getMasterTemplate();
-      tpl = tpl
-        .replace(/<p>Hi\s+[^,<]+,/i, '<p>Hi {RecruiterName},')
-        .replace(/opportunities at\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\.|\s*<)/gi, 'opportunities at {Company}')
-        .replace(/interested in\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\s+(?:and|because|the|which))/gi, 'interested in {Company}');
-
-      const sig = generateSignatureBlock(profile);
-      const renderedBody = tpl
-        .replace(/\{SignatureBlock\}|\[SignatureBlock\]/gi, sig)
-        .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${payload.comp}</strong>`)
-        .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?name|name)\s*(?:\}\}|\}|\])/gi, payload.fn)
-        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*name)\s*(?:\}\}|\}|\])/gi, profile.name)
-        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*title|title)\s*(?:\}\}|\}|\])/gi, profile.title)
-        .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, payload.email)
-        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*email)\s*(?:\}\}|\}|\])/gi, profile.email);
+      const tpl = getMasterTemplate();
+      const renderedBody = renderTextToHtml(tpl, payload, profile);
 
       const bodyEl = document.getElementById('prev-body');
       if (bodyEl) bodyEl.innerHTML = renderedBody;
