@@ -944,16 +944,22 @@
     let selectedIndex = 0;
 
     // Fetch leads from Persistent SQLite Database
-    async function loadLeadsFromDatabase() {
+    async function loadLeadsFromDatabase(preserveSelection = false) {
       try {
         const res = await fetch('/api/leads');
         const data = await res.json();
-        if (data.leads && data.leads.length > 0) {
-          recruiters = data.leads;
-        }
+        const prevEmail = (recruiters[selectedIndex] && recruiters[selectedIndex].email) || '';
+        recruiters = data.leads || [];
+        
         renderQueue();
+
         if (recruiters.length > 0) {
-          selectRecruiter(0);
+          if (preserveSelection && prevEmail) {
+            const foundIdx = recruiters.findIndex(r => r.email === prevEmail);
+            selectRecruiter(foundIdx !== -1 ? foundIdx : 0);
+          } else {
+            selectRecruiter(0);
+          }
         }
       } catch (err) {
         console.error('Failed to load leads from database', err);
@@ -1710,7 +1716,7 @@
       }
     }
 
-    // BULK SEND ONLY UNSENT LEADS (Live Progress & Anti-Freeze Guarantee)
+    // BULK SEND ONLY UNSENT LEADS (Deterministic Lead-Array Iteration)
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
@@ -1724,19 +1730,21 @@
       btn.disabled = true;
 
       let sentSuccessCount = 0;
-      let totalToProcess = unsentLeads.length;
-      let processedCount = 0;
+      const totalToProcess = unsentLeads.length;
 
       try {
-        for (let i = 0; i < recruiters.length; i++) {
-          const r = recruiters[i];
-          if (r.status === 'Sent') continue;
+        for (let k = 0; k < unsentLeads.length; k++) {
+          const lead = unsentLeads[k];
+          btn.innerText = `Sending (${k + 1}/${totalToProcess}): ${lead.firstName}...`;
 
-          processedCount++;
-          btn.innerText = `Sending (${processedCount}/${totalToProcess}): ${r.firstName}...`;
-          selectRecruiter(i);
+          // Select this lead on screen
+          const currentIdx = recruiters.findIndex(r => r.email === lead.email);
+          if (currentIdx !== -1) {
+            selectedIndex = currentIdx;
+            selectRecruiter(currentIdx);
+          }
 
-          const payload = buildEmailPayloadForRecruiter(r);
+          const payload = buildEmailPayloadForRecruiter(lead);
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 18000);
 
@@ -1746,12 +1754,12 @@
               headers: { 'Content-Type': 'application/json' },
               signal: controller.signal,
               body: JSON.stringify({
-                firstName: r.firstName,
-                company: r.company,
-                email: r.email,
+                firstName: lead.firstName,
+                company: lead.company,
+                email: lead.email,
                 customSubject: payload.subject,
                 customHtml: payload.bodyHtml,
-                resumeFile: r.resumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf"
+                resumeFile: lead.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf"
               })
             });
             clearTimeout(timeoutId);
@@ -1760,31 +1768,38 @@
             try { data = await res.json(); } catch (e) {}
 
             if (res.ok && (data.id || data.threadId || data.success !== false)) {
-              r.status = 'Sent';
+              lead.status = 'Sent';
+              lead.sentAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              if (currentIdx !== -1) {
+                recruiters[currentIdx].status = 'Sent';
+                recruiters[currentIdx].sentAt = lead.sentAt;
+              }
               sentSuccessCount++;
             } else {
-              r.status = 'Failed';
+              lead.status = 'Failed';
+              if (currentIdx !== -1) recruiters[currentIdx].status = 'Failed';
             }
           } catch (e) {
             clearTimeout(timeoutId);
-            r.status = 'Failed';
+            lead.status = 'Failed';
+            if (currentIdx !== -1) recruiters[currentIdx].status = 'Failed';
           }
 
-          // Live UI update for each lead
+          // Live queue re-render
           renderQueue();
 
           // Spacing pause between emails
-          if (processedCount < totalToProcess) {
-            btn.innerText = `Waiting 3s spacing (${processedCount}/${totalToProcess})...`;
-            await new Promise(res => setTimeout(res, 3000));
+          if (k < unsentLeads.length - 1) {
+            btn.innerText = `Spacing 2s (${k + 1}/${totalToProcess})...`;
+            await new Promise(res => setTimeout(res, 2000));
           }
         }
       } finally {
-        await loadLeadsFromDatabase();
+        await loadLeadsFromDatabase(true);
         btn.disabled = false;
         const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
         btn.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
-        selectRecruiter(selectedIndex);
+        renderQueue();
         showAppleToast(`Bulk dispatch finished: ${sentSuccessCount} sent successfully.`);
       }
     }
