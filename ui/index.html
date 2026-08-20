@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruiter Outreach Dashboard — Sai Tarrun Pitta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #131b2e;
+      --card-border: #1e293b;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #38bdf8;
+      --success: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .header h1 { font-size: 24px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .header-badge { font-size: 12px; background: rgba(99, 102, 241, 0.2); color: var(--accent); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.3); }
+
+    .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    input, textarea, select {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: #059669; color: #fff; }
+    .btn-success:hover { background: #047857; }
+
+    .recruiter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .recruiter-item {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      padding: 12px 16px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .recruiter-item:hover, .recruiter-item.active { border-color: var(--primary); }
+    .recruiter-name { font-weight: 600; font-size: 14px; }
+    .recruiter-sub { font-size: 12px; color: var(--text-muted); }
+
+    .preview-box {
+      background: #ffffff;
+      color: #222222;
+      border-radius: 12px;
+      padding: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 380px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .preview-header {
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-sent { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--success);
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>🚀 Recruiter Outreach Automation <span class="header-badge">n8n Connected</span></h1>
+      <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Candidate: Sai Tarrun Pitta • Software Engineer</p>
+    </div>
+    <div>
+      <span class="badge badge-sent" style="font-size: 13px; padding: 6px 12px;">Active Pipeline: Online</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Left Column: Add / Select Recruiter -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <span>Add Recruiter Lead</span>
+          <span style="font-size: 12px; color: var(--text-muted);">Queued: <b id="queue-count">4</b></span>
+        </div>
+
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="fn" placeholder="e.g. Stephanie" value="Stephanie">
+        </div>
+        <div class="form-group">
+          <label>Company</label>
+          <input type="text" id="comp" placeholder="e.g. TikTok" value="TikTok">
+        </div>
+        <div class="form-group">
+          <label>Recruiter Email</label>
+          <input type="email" id="email" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com">
+        </div>
+        <div class="form-group">
+          <label>Company Engineering Focus (Optional)</label>
+          <input type="text" id="focus" placeholder="e.g. large-scale distributed systems" value="large-scale distributed systems and high-throughput infrastructure">
+        </div>
+
+        <button class="btn btn-primary" onclick="addRecruiter()">+ Add / Update Lead</button>
+
+        <div class="recruiter-list" id="recruiter-list"></div>
+      </div>
+    </div>
+
+    <!-- Right Column: Live Email Preview & Send -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <span>Live Email Preview</span>
+          <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
+            ✉️ Trigger Outreach via n8n
+          </button>
+        </div>
+
+        <div class="preview-box" id="email-preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const recruiters = [
+      { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure", status: "Sent" },
+      { firstName: "Vivian", company: "ByteDance", email: "vivianjiang@bytedance.com", focus: "scalable microservices and distributed platform engineering", status: "Sent" },
+      { firstName: "Emma", company: "TikTok", email: "emma.huo@tiktok.com", focus: "cloud infrastructure and scalable backend services", status: "Sent" },
+      { firstName: "Isis", company: "ByteDance", email: "isis.kcano@bytedance.com", focus: "distributed systems and backend cloud architecture", status: "Sent" }
+    ];
+
+    let selectedIndex = 0;
+
+    function renderList() {
+      const listEl = document.getElementById('recruiter-list');
+      listEl.innerHTML = '';
+      document.getElementById('queue-count').innerText = recruiters.length;
+
+      recruiters.forEach((r, idx) => {
+        const item = document.createElement('div');
+        item.className = `recruiter-item ${idx === selectedIndex ? 'active' : ''}`;
+        item.onclick = () => selectRecruiter(idx);
+        item.innerHTML = `
+          <div>
+            <div class="recruiter-name">${r.firstName} @ ${r.company}</div>
+            <div class="recruiter-sub">${r.email}</div>
+          </div>
+          <span class="badge ${r.status === 'Sent' ? 'badge-sent' : 'badge-pending'}">${r.status || 'Pending'}</span>
+        `;
+        listEl.appendChild(item);
+      });
+      renderPreview();
+    }
+
+    function selectRecruiter(idx) {
+      selectedIndex = idx;
+      const r = recruiters[idx];
+      document.getElementById('fn').value = r.firstName;
+      document.getElementById('comp').value = r.company;
+      document.getElementById('email').value = r.email;
+      document.getElementById('focus').value = r.focus || '';
+      renderList();
+    }
+
+    function addRecruiter() {
+      const fn = document.getElementById('fn').value.trim();
+      const comp = document.getElementById('comp').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const focus = document.getElementById('focus').value.trim();
+
+      if (!fn || !comp || !email) {
+        alert('Please fill in First Name, Company, and Email.');
+        return;
+      }
+
+      recruiters.unshift({ firstName: fn, company: comp, email, focus, status: "Pending" });
+      selectedIndex = 0;
+      renderList();
+      showToast(`Added ${fn} @ ${comp} to queue!`);
+    }
+
+    function renderPreview() {
+      const r = recruiters[selectedIndex] || { firstName: "Recruiter", company: "Company", email: "recruiter@example.com", focus: "" };
+      const focusText = r.focus ? `<p style="margin-bottom: 16px;">I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
+
+      document.getElementById('email-preview').innerHTML = `
+        <div class="preview-header">
+          <div><b>To:</b> ${r.email}</div>
+          <div><b>Subject:</b> Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta</div>
+          <div><b>Attachment:</b> 📄 Sai_Tarrun_Pitta_Resume.pdf (Mounted)</div>
+        </div>
+        <p style="margin-bottom: 16px;">Hi ${r.firstName},</p>
+        <p style="margin-bottom: 16px;">I hope you're doing well.</p>
+        <p style="margin-bottom: 16px;">My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+        <p style="margin-bottom: 16px;">I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+        <p style="margin-bottom: 16px;">My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+        <p style="margin-bottom: 16px;">I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
+        ${focusText}
+        <p style="margin-bottom: 16px;">If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+        <p style="margin-bottom: 16px;">I've attached my resume for reference.</p>
+        <p style="margin-bottom: 16px;">Thank you for your time and consideration.</p>
+        <p style="margin-bottom: 16px;">Best regards,</p>
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; font-size: 13px; color: #4b5563;">
+          <strong>Sai Tarrun Pitta</strong><br>
+          Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0066cc;">saitarrunpitta@gmail.com</a><br>
+          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0066cc;">linkedin.com/in/saitarrunpitta</a><br>
+          GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: #0066cc;">github.com/saitarrun</a><br>
+          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0066cc;">saitarrunpitta.vercel.app</a>
+        </div>
+      `;
+    }
+
+    async function sendOutreach() {
+      const r = recruiters[selectedIndex];
+      if (!r) return;
+
+      const btn = document.getElementById('send-btn');
+      btn.innerText = '⏳ Sending via n8n...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('http://localhost:5678/webhook/send-recruiter-outreach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: r.firstName,
+            company: r.company,
+            email: r.email,
+            companyFocus: r.focus
+          })
+        });
+        const data = await res.json();
+        r.status = 'Sent';
+        renderList();
+        showToast(`✅ Successfully sent outreach to ${r.firstName} (${r.email})! Message ID: ${data.id || 'OK'}`);
+      } catch (err) {
+        showToast(`❌ Error triggering n8n webhook: ${err.message}`);
+      } finally {
+        btn.innerText = '✉️ Trigger Outreach via n8n';
+        btn.disabled = false;
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    renderList();
+  </script>
+</body>
+</html>
