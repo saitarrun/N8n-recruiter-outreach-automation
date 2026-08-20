@@ -780,19 +780,16 @@
 
             <!-- SEPARATED ACTIVE UNSENT VS SENT LEADS -->
             <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div class="queue-subtabs" style="flex: 1; margin-bottom: 0;">
-                  <button class="queue-subtab active" onclick="setQueueFilter('all', event)">
-                    All (<span id="filter-all-count">0</span>)
-                  </button>
-                  <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
-                    Unsent (<span id="filter-unsent-count">0</span>)
-                  </button>
-                  <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
-                    Sent (<span id="filter-sent-count">0</span>)
-                  </button>
-                </div>
-                <button class="apple-btn btn-destruct" style="padding: 4px 8px; font-size: 11px; margin-left: 6px;" onclick="clearAllUnsentLeads()" title="Clear all pending leads from queue">Clear Unsent</button>
+              <div class="queue-subtabs">
+                <button class="queue-subtab active" onclick="setQueueFilter('all', event)">
+                  All (<span id="filter-all-count">0</span>)
+                </button>
+                <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
+                  Unsent (<span id="filter-unsent-count">0</span>)
+                </button>
+                <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
+                  Sent (<span id="filter-sent-count">0</span>)
+                </button>
               </div>
 
               <div class="recruiter-list-group" id="recruiter-list-group"></div>
