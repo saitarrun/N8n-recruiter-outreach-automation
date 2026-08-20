@@ -1,22 +1,26 @@
 Hi {{RecruiterName}},
 
-I hope you’re doing well.
+I hope you're doing well.
 
-My name is Sai Tarrun Pitta, and I’m a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
+My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
 
-I’ve previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, where I contributed to production systems involving scalable backend services, full-stack applications, distributed systems, AI/LLM workflows, RAG systems, cloud infrastructure, and observability.
+I've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.
 
-My technical background includes Python, Java, TypeScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, REST APIs, microservices, and distributed systems.
+My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.
 
-I’m currently exploring Software Engineering opportunities at {{Company}}. If there are any current or upcoming roles that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering positions, I’d also appreciate it if you could connect me with the appropriate person.
+I'm currently exploring Software Engineering opportunities at {{Company}}.
 
-I’ve attached my resume for reference and would be happy to provide any additional information.
+I'm particularly interested in {{Company}} and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.
+
+If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.
+
+I've attached my resume for reference.
 
 Thank you for your time and consideration.
 
 Best regards,  
 Sai Tarrun Pitta  
-saitarrunpitta@gmail.com  
-linkedin.com/in/saitarrunpitta  
-github.com/saitarrun  
-saitarrunpitta.vercel.app
+Email: saitarrunpitta@gmail.com  
+LinkedIn: linkedin.com/in/saitarrunpitta  
+GitHub: github.com/saitarrun  
+Portfolio: saitarrunpitta.vercel.app

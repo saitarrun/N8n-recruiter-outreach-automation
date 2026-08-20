@@ -1000,7 +1000,24 @@
 
         <!-- Mail Body (Directly In-place Editable) -->
         <div class="mail-body-canvas" id="prev-body" contenteditable="true" spellcheck="false">
-          <!-- Dynamic Content Injected in Real Time -->
+          <p>Hi <span id="dyn-lead-name">{RecruiterName}</span>,</p>
+          <p>I hope you're doing well.</p>
+          <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
+          <p>I've previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+          <p>My technical background includes <strong>Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems</strong>.</p>
+          <p>I'm currently exploring <strong>Software Engineering opportunities at <span id="dyn-lead-comp">{Company}</span></strong>.</p>
+          <p>I'm particularly interested in <strong><span id="dyn-lead-comp-2">{Company}</span></strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>
+          <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+          <p>I've attached my resume for reference.</p>
+          <p>Thank you for your time and consideration.</p>
+          <p>Best regards,</p>
+          <div class="mail-signature-block" contenteditable="false">
+            <strong>Sai Tarrun Pitta</strong><br>
+            Email: saitarrunpitta@gmail.com<br>
+            LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
+            GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
+            Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+          </div>
         </div>
       </div>
     </section>
@@ -1284,25 +1301,27 @@
     };
 
     const DEFAULT_MASTER_TEMPLATE = `<p>Hi {RecruiterName},</p>
-<p>I hope you’re doing well.</p>
-<p>My name is <strong>Sai Tarrun Pitta</strong>, and I’m a Software Engineer with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
-<p>I’ve previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, where I contributed to production systems involving scalable backend services, full-stack applications, distributed systems, AI/LLM workflows, RAG systems, cloud infrastructure, and observability.</p>
-<p>My technical background includes <strong>Python, Java, TypeScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, REST APIs, microservices, and distributed systems</strong>.</p>
-<p>I’m currently exploring <strong>Software Engineering opportunities at {Company}</strong>. If there are any current or upcoming roles that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering positions, I’d also appreciate it if you could connect me with the appropriate person.</p>
-<p>I’ve attached my resume for reference and would be happy to provide any additional information.</p>
+<p>I hope you're doing well.</p>
+<p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
+<p>I've previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+<p>My technical background includes <strong>Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems</strong>.</p>
+<p>I'm currently exploring <strong>Software Engineering opportunities at {Company}</strong>.</p>
+<p>I'm particularly interested in <strong>{Company}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>
+<p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+<p>I've attached my resume for reference.</p>
 <p>Thank you for your time and consideration.</p>
 <p>Best regards,</p>
 <div class="mail-signature-block" contenteditable="false">
   <strong>Sai Tarrun Pitta</strong><br>
-  saitarrunpitta@gmail.com<br>
-  <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
-  <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
-  <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+  Email: saitarrunpitta@gmail.com<br>
+  LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
+  GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
+  Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
 </div>`;
 
     function getMasterTemplate() {
       const stored = localStorage.getItem('custom_master_template');
-      if (stored && stored.trim().length > 30) {
+      if (stored && stored.trim().length > 100) {
         return stored;
       }
       return DEFAULT_MASTER_TEMPLATE;
@@ -2048,6 +2067,7 @@ ${tpl
     // Initialize application
     loadSenderProfileToInputs();
     loadResumes();
+    onFormLiveInput();
     loadLeadsFromDatabase();
 
     // Initial check & real-time polling every 4 seconds
