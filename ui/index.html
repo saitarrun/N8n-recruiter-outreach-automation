@@ -1295,7 +1295,11 @@
 </div>`;
 
     function getMasterTemplate() {
-      return localStorage.getItem('custom_master_template') || DEFAULT_MASTER_TEMPLATE;
+      const stored = localStorage.getItem('custom_master_template');
+      if (stored && stored.trim().length > 30) {
+        return stored;
+      }
+      return DEFAULT_MASTER_TEMPLATE;
     }
 
     function insertPlaceholderToken(token) {
@@ -1330,13 +1334,15 @@
       localStorage.setItem('sender_profile', JSON.stringify(updated));
 
       const tplVal = document.getElementById('prof-template').value.trim();
-      if (tplVal) {
+      if (tplVal && tplVal.length > 30) {
         localStorage.setItem('custom_master_template', tplVal);
       }
 
       showAppleToast('Profile & Master Template saved!');
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      } else {
+        updateComposeCanvasForRecruiter(null);
       }
     }
 
@@ -1347,6 +1353,8 @@
       showAppleToast('Reset to platform default profile and templates.');
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      } else {
+        updateComposeCanvasForRecruiter(null);
       }
     }
 
@@ -1400,13 +1408,17 @@ ${tpl
         tpl = tpl.replace(nameRegex, '{RecruiterName}');
       }
 
-      localStorage.setItem('custom_master_template', tpl);
-      const profTpl = document.getElementById('prof-template');
-      if (profTpl) profTpl.value = tpl;
-
-      showAppleToast('Saved! Custom format set with dynamic {Company} placeholders.');
+      if (tpl && tpl.trim().length > 30) {
+        localStorage.setItem('custom_master_template', tpl);
+        const profTpl = document.getElementById('prof-template');
+        if (profTpl) profTpl.value = tpl;
+        showAppleToast('Saved! Custom format set with dynamic {Company} placeholders.');
+      }
+      
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      } else {
+        updateComposeCanvasForRecruiter(null);
       }
     }
 
@@ -1417,37 +1429,45 @@ ${tpl
 
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      } else {
+        updateComposeCanvasForRecruiter(null);
       }
       showAppleToast('Reset to platform default template.');
     }
 
     // Updates right Apple Mail Compose Pane without touching Add Lead Form
     function updateComposeCanvasForRecruiter(r) {
-      if (!r) return;
+      if (!r) {
+        r = { firstName: 'Recruiter', company: 'Company', email: 'recruiter@example.com', status: 'Pending' };
+      }
 
       const noticeBanner = document.getElementById('sent-notice-banner');
       const noticeText = document.getElementById('sent-notice-text');
       const sendBtn = document.getElementById('btn-send-single');
 
       if (r.status === 'Sent') {
-        noticeBanner.style.display = 'flex';
-        noticeText.innerText = `Dispatched to ${r.firstName} (${r.company}) on ${r.sentAt || 'earlier date'}. Saved in persistent local database.`;
-        sendBtn.innerText = 'Sent (Resend)';
+        if (noticeBanner) noticeBanner.style.display = 'flex';
+        if (noticeText) noticeText.innerText = `Dispatched to ${r.firstName} (${r.company}) on ${r.sentAt || 'earlier date'}. Saved in persistent local database.`;
+        if (sendBtn) sendBtn.innerText = 'Sent (Resend)';
       } else {
-        noticeBanner.style.display = 'none';
-        sendBtn.innerText = 'Send Email';
+        if (noticeBanner) noticeBanner.style.display = 'none';
+        if (sendBtn) sendBtn.innerText = 'Send Email';
       }
 
       const payload = buildEmailPayloadForRecruiter(r);
       const profile = payload.profile || getSenderProfile();
-      document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
-      document.getElementById('prev-subject').value = payload.subject;
+      const prevTo = document.getElementById('prev-to');
+      if (prevTo) prevTo.innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
+      const prevSub = document.getElementById('prev-subject');
+      if (prevSub) prevSub.value = payload.subject;
       
       const resumeName = r.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
       const matched = resumeLibrary.find(x => x.filename === resumeName);
       const resumeSize = matched ? matched.size : "60.3 KB";
-      document.getElementById('prev-attach-name').innerText = resumeName;
-      document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
+      const attachName = document.getElementById('prev-attach-name');
+      if (attachName) attachName.innerText = resumeName;
+      const attachSize = document.getElementById('prev-attach-size');
+      if (attachSize) attachSize.innerText = `(${resumeSize})`;
 
       const tpl = getMasterTemplate();
       const renderedBody = tpl
@@ -1458,7 +1478,8 @@ ${tpl
         .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
         .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name);
 
-      document.getElementById('prev-body').innerHTML = renderedBody;
+      const bodyEl = document.getElementById('prev-body');
+      if (bodyEl) bodyEl.innerHTML = renderedBody;
     }
 
     function selectRecruiter(idx) {
