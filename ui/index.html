@@ -6,33 +6,40 @@
   <title>Recruiter Outreach Studio — Sai Tarrun Pitta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-base: #07090e;
+      --bg-dark: #07090e;
       --bg-surface: #0e131f;
-      --bg-elevated: #141b2d;
-      --bg-card: #111728;
-      --border-subtle: #1c263c;
-      --border-focus: #4f46e5;
+      --bg-surface-elevated: #131b2e;
+      --bg-surface-hover: #18223a;
+      --border-main: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --border-focus: #6366f1;
+      
       --primary: #6366f1;
       --primary-hover: #4f46e5;
-      --primary-glow: rgba(99, 102, 241, 0.25);
+      --primary-glow: rgba(99, 102, 241, 0.35);
       --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.2);
+      --accent-glow: rgba(56, 189, 248, 0.3);
       --success: #10b981;
-      --success-glow: rgba(16, 185, 129, 0.2);
+      --success-glow: rgba(16, 185, 129, 0.3);
       --danger: #f43f5e;
+      --warning: #f59e0b;
+      
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
+
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-base);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -40,18 +47,19 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Custom Scrollbar */
+    /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-surface); }
     ::-webkit-scrollbar-thumb { background: #26344f; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #3b4d70; }
 
-    /* Top Navigation Bar */
+    /* Top Glassmorphic Navbar */
     .navbar {
       background: rgba(14, 19, 31, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 14px 28px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-main);
+      padding: 14px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -62,23 +70,23 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
     .brand-icon {
-      width: 34px;
-      height: 34px;
-      background: linear-gradient(135deg, var(--primary), #8b5cf6);
-      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 17px;
-      box-shadow: 0 4px 12px var(--primary-glow);
+      font-size: 19px;
+      box-shadow: 0 4px 16px var(--primary-glow);
     }
     .brand-title {
       font-size: 16px;
       font-weight: 800;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.4px;
       color: #fff;
     }
     .brand-sub {
@@ -87,41 +95,46 @@
       font-weight: 500;
     }
 
-    .nav-stats {
+    .nav-metrics {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
-    .status-pill {
+    .metric-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
+      gap: 8px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
-      background: rgba(16, 185, 129, 0.1);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: rgba(20, 27, 45, 0.7);
+      border: 1px solid var(--border-main);
+      color: var(--text-muted);
     }
-    .status-dot {
-      width: 6px;
-      height: 6px;
+    .status-dot-pulse {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
     }
 
     /* Main Container */
     .app-container {
-      max-width: 1440px;
+      max-width: 1480px;
       width: 100%;
       margin: 0 auto;
-      padding: 24px 28px;
+      padding: 24px 32px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 22px;
     }
 
     /* Segmented Navigation Tabs */
@@ -131,8 +144,9 @@
       align-items: center;
       background: var(--bg-surface);
       padding: 6px;
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      border: 1px solid var(--border-main);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), 0 4px 12px rgba(0,0,0,0.2);
     }
     .nav-tabs {
       display: flex;
@@ -142,15 +156,15 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 18px;
-      border-radius: 10px;
+      padding: 9px 20px;
+      border-radius: 12px;
       font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
-      border: none;
+      border: 1px solid transparent;
       background: transparent;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-item:hover {
       color: #fff;
@@ -158,40 +172,41 @@
     }
     .tab-item.active {
       color: #fff;
-      background: var(--bg-elevated);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-elevated);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      border-color: var(--border-main);
     }
     .tab-item-badge {
       font-size: 11px;
       background: rgba(99, 102, 241, 0.2);
       color: var(--accent);
-      padding: 2px 7px;
-      border-radius: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
     }
 
     /* Studio 2-Column Grid Layout */
     .studio-grid {
       display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 24px;
+      grid-template-columns: 440px 1fr;
+      gap: 26px;
       align-items: start;
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 1080px) {
       .studio-grid { grid-template-columns: 1fr; }
     }
 
-    /* Studio Card Panels */
+    /* Premium Studio Panels */
     .panel {
       background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
+      border: 1px solid var(--border-main);
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.04), 0 12px 32px rgba(0, 0, 0, 0.35);
     }
     .panel-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border-main);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -206,12 +221,12 @@
       gap: 8px;
     }
     .panel-body {
-      padding: 20px;
+      padding: 22px;
     }
 
-    /* Form Design */
+    /* Premium Inputs */
     .form-group {
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .form-label {
       display: flex;
@@ -220,27 +235,29 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
     .form-label-hint {
       font-size: 11px;
       color: var(--text-dim);
     }
-    .form-input, .form-select {
+    .form-input, .form-select, .form-textarea {
       width: 100%;
       background: #090e18;
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      padding: 9px 12px;
+      border: 1px solid var(--border-main);
+      border-radius: 12px;
+      padding: 10px 14px;
       color: #fff;
-      font-size: 13px;
+      font-size: 13.5px;
       font-family: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.15s ease;
     }
-    .form-input:focus, .form-select:focus {
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px var(--primary-glow);
+      background: #0b1220;
     }
 
     /* Buttons */
@@ -249,27 +266,28 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 9px 18px;
-      border-radius: 10px;
+      padding: 10px 20px;
+      border-radius: 12px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-primary {
       background: linear-gradient(135deg, var(--primary), #4f46e5);
       color: #fff;
-      box-shadow: 0 4px 14px var(--primary-glow);
+      box-shadow: 0 4px 16px var(--primary-glow);
     }
     .btn-primary:hover {
       opacity: 0.95;
       transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--primary-glow);
     }
     .btn-success {
       background: linear-gradient(135deg, #10b981, #059669);
       color: #fff;
-      box-shadow: 0 4px 14px var(--success-glow);
+      box-shadow: 0 4px 16px var(--success-glow);
     }
     .btn-success:hover {
       opacity: 0.95;
@@ -278,19 +296,20 @@
     .btn-batch {
       background: linear-gradient(135deg, #8b5cf6, #6366f1);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
     }
     .btn-batch:hover {
       opacity: 0.95;
       transform: translateY(-1px);
     }
     .btn-secondary {
-      background: var(--bg-elevated);
+      background: var(--bg-surface-elevated);
       color: var(--text-muted);
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--border-main);
     }
     .btn-secondary:hover {
       color: #fff;
+      background: var(--bg-surface-hover);
       border-color: #3b4d70;
     }
     .btn-danger {
@@ -307,16 +326,16 @@
     .recruiter-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 9px;
       margin-top: 12px;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
     }
     .recruiter-card {
       background: #090e18;
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border: 1px solid var(--border-main);
+      border-radius: 12px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -325,17 +344,31 @@
     }
     .recruiter-card:hover, .recruiter-card.active {
       border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.06);
+      background: rgba(99, 102, 241, 0.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
-    .rc-name { font-size: 13px; font-weight: 700; color: #fff; }
-    .rc-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .rc-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      color: #38bdf8;
+      border: 1px solid var(--border-main);
+    }
+    .rc-name { font-size: 13.5px; font-weight: 700; color: #fff; }
+    .rc-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
 
     /* macOS / Gmail Email Compose & Direct Edit Window */
     .mail-preview-window {
       background: #ffffff;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.45);
       color: #1e293b;
       display: flex;
       flex-direction: column;
@@ -344,18 +377,18 @@
     .mail-window-bar {
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
-      padding: 12px 18px;
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .window-dots {
       display: flex;
-      gap: 6px;
+      gap: 7px;
     }
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
     }
     .dot-red { background: #ff5f56; }
@@ -363,43 +396,45 @@
     .dot-green { background: #27c93f; }
     
     .editor-pill {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
       color: #4338ca;
       background: #e0e7ff;
       border: 1px solid #c7d2fe;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 20px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
     }
 
     /* Floating / In-window Formatting Toolbar */
     .editor-toolbar {
       background: #f1f5f9;
       border-bottom: 1px solid #e2e8f0;
-      padding: 6px 16px;
+      padding: 7px 18px;
       display: flex;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
     }
     .tool-btn {
       background: #ffffff;
       border: 1px solid #cbd5e1;
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 6px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       color: #334155;
       cursor: pointer;
+      transition: all 0.15s;
     }
     .tool-btn:hover {
       background: #e2e8f0;
+      border-color: #94a3b8;
     }
 
     .mail-header {
-      padding: 16px 20px;
+      padding: 16px 22px;
       border-bottom: 1px solid #e2e8f0;
       background: #fafafa;
       display: flex;
@@ -409,13 +444,13 @@
     .mail-meta-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 13px;
+      gap: 12px;
+      font-size: 13.5px;
     }
     .meta-label {
       font-weight: 700;
       color: #64748b;
-      width: 60px;
+      width: 65px;
       flex-shrink: 0;
     }
     
@@ -424,8 +459,8 @@
       flex: 1;
       border: 1px solid transparent;
       border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 14px;
+      padding: 5px 10px;
+      font-size: 14.5px;
       font-weight: 700;
       color: #0f172a;
       background: transparent;
@@ -434,7 +469,7 @@
     .editable-subject:hover, .editable-subject:focus {
       background: #ffffff;
       border-color: #94a3b8;
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
       outline: none;
     }
 
@@ -444,18 +479,18 @@
       gap: 6px;
       background: #eff6ff;
       border: 1px solid #bfdbfe;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 8px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       color: #1d4ed8;
     }
 
     /* DIRECT EDITABLE EMAIL BODY */
     .mail-body-editable {
-      padding: 24px;
-      font-size: 14.5px;
-      line-height: 1.65;
+      padding: 26px;
+      font-size: 15px;
+      line-height: 1.68;
       color: #1e293b;
       min-height: 440px;
       outline: none;
@@ -463,14 +498,14 @@
       overflow-y: auto;
     }
     .mail-body-editable:focus {
-      background: #fcfeff;
+      background: #fbfdff;
     }
     .mail-body-editable p { margin-bottom: 14px; }
     .mail-signature {
-      margin-top: 24px;
-      padding-top: 14px;
+      margin-top: 26px;
+      padding-top: 16px;
       border-top: 1px solid #e4e4e7;
-      font-size: 13px;
+      font-size: 13.5px;
       color: #52525b;
       line-height: 1.5;
     }
@@ -479,9 +514,9 @@
     .progress-bar-container {
       margin-top: 14px;
       background: #090e18;
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      padding: 12px 16px;
+      border: 1px solid var(--border-main);
+      border-radius: 12px;
+      padding: 14px 18px;
       display: none;
     }
     .progress-bar-bg {
@@ -509,8 +544,8 @@
     }
     .resume-card {
       background: #090e18;
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
+      border: 1px solid var(--border-main);
+      border-radius: 14px;
       padding: 12px 16px;
       display: flex;
       justify-content: space-between;
@@ -520,17 +555,18 @@
     }
     .resume-card:hover, .resume-card.active {
       border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.05);
+      background: rgba(56, 189, 248, 0.06);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
 
     .upload-zone {
       border: 2px dashed #2a374f;
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 14px;
+      padding: 22px;
       text-align: center;
       background: #090e18;
       transition: all 0.2s;
-      margin-top: 12px;
+      margin-top: 14px;
     }
     .upload-zone.dragover {
       border-color: var(--accent);
@@ -539,9 +575,9 @@
 
     .pdf-viewer-container {
       margin-top: 16px;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--border-main);
       background: #1e293b;
     }
     .pdf-viewer-header {
@@ -553,7 +589,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-main);
     }
     .pdf-frame {
       width: 100%;
@@ -565,16 +601,16 @@
     /* Toast Notification */
     .toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--bg-surface);
+      bottom: 28px;
+      right: 28px;
+      background: #111728;
       color: #fff;
       border: 1px solid var(--success);
-      padding: 14px 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      padding: 14px 22px;
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6);
       display: none;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
       z-index: 999;
       animation: slideUp 0.2s ease-out;
@@ -599,10 +635,13 @@
         <div class="brand-sub">Sai Tarrun Pitta • Software Engineer</div>
       </div>
     </div>
-    <div class="nav-stats">
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        <span>n8n Engine Connected</span>
+    <div class="nav-metrics">
+      <div class="metric-pill">
+        <span class="status-dot-pulse"></span>
+        <span style="color: #34d399; font-weight: 700;">n8n Engine Active</span>
+      </div>
+      <div class="metric-pill">
+        <span>Deliverability: <strong style="color: #38bdf8;">100% (OAuth 2.0)</strong></span>
       </div>
     </div>
   </nav>
@@ -671,10 +710,10 @@
 
               <button class="btn btn-primary" style="width: 100%;" onclick="addRecruiter()">+ Save Lead in Queue</button>
 
-              <div style="margin-top: 18px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Active Lead Queue</span>
-                  <button class="btn btn-batch" style="padding: 3px 8px; font-size: 11px;" onclick="sendBulkAllQueue()">🚀 Send All in Queue</button>
+              <div style="margin-top: 20px; border-top: 1px solid var(--border-main); padding-top: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Active Lead Queue</span>
+                  <button class="btn btn-batch" style="padding: 4px 10px; font-size: 11px;" onclick="sendBulkAllQueue()">🚀 Send All in Queue</button>
                 </div>
                 <div class="recruiter-list" id="recruiter-list"></div>
               </div>
@@ -689,12 +728,12 @@
               <span class="panel-title">🚀 Bulk Paste Recruiter Leads</span>
             </div>
             <div class="panel-body">
-              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+              <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
                 Paste multiple recruiters in <code>FirstName, Company, Email</code> format (one per line) or comma-separated:
               </p>
 
               <div class="form-group">
-                <textarea id="bulk-paste-area" class="form-input" style="min-height: 140px; font-family: 'JetBrains Mono', monospace; font-size: 12px;" placeholder="John, Uber, john@uber.com&#10;Sarah, Stripe, sarah@stripe.com&#10;Alex, Meta, alex@meta.com"></textarea>
+                <textarea id="bulk-paste-area" class="form-textarea" style="min-height: 140px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px;" placeholder="John, Uber, john@uber.com&#10;Sarah, Stripe, sarah@stripe.com&#10;Alex, Meta, alex@meta.com"></textarea>
               </div>
 
               <button class="btn btn-primary" style="width: 100%;" onclick="parseBulkLeads()">+ Add All to Queue</button>
@@ -709,7 +748,7 @@
               <span class="panel-title">📄 Resume Library (<span id="resume-count-title">4</span>)</span>
             </div>
             <div class="panel-body">
-              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+              <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
                 Assign specialized resumes per company or role.
               </p>
 
@@ -718,12 +757,12 @@
 
               <!-- Upload Zone -->
               <div class="upload-zone" id="drop-area">
-                <div style="font-size: 24px; margin-bottom: 6px;">📤</div>
-                <div style="font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 4px;">Upload New Resume Variant (PDF)</div>
-                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Drag &amp; drop or browse from disk</div>
+                <div style="font-size: 26px; margin-bottom: 6px;">📤</div>
+                <div style="font-weight: 700; font-size: 13.5px; color: #fff; margin-bottom: 4px;">Upload New Resume Variant (PDF)</div>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px;">Drag &amp; drop or browse from disk</div>
                 
                 <input type="file" id="file-input" accept=".pdf" style="display: none;">
-                <button class="btn btn-primary" style="padding: 6px 16px; font-size: 12px;" onclick="document.getElementById('file-input').click()">
+                <button class="btn btn-primary" style="padding: 7px 18px; font-size: 12px;" onclick="document.getElementById('file-input').click()">
                   📁 Browse PDF Resume
                 </button>
               </div>
@@ -732,7 +771,7 @@
               <div class="pdf-viewer-container">
                 <div class="pdf-viewer-header">
                   <span id="pdf-viewer-title">📄 PDF Preview</span>
-                  <a id="pdf-open-tab" href="#" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11px; font-weight: 600;">Open Full Screen ↗</a>
+                  <a id="pdf-open-tab" href="#" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11.5px; font-weight: 600;">Open Full Screen ↗</a>
                 </div>
                 <iframe id="pdf-frame" class="pdf-frame" src=""></iframe>
               </div>
@@ -756,11 +795,11 @@
               </button>
             </div>
           </div>
-          <div class="panel-body" style="padding: 16px;">
+          <div class="panel-body" style="padding: 18px;">
             
             <!-- Bulk Progress Bar -->
             <div class="progress-bar-container" id="bulk-progress-box">
-              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;">
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700;">
                 <span id="bulk-progress-text" style="color: var(--accent);">🚀 Dispatching bulk batch...</span>
                 <span id="bulk-progress-percent" style="color: #fff;">0%</span>
               </div>
@@ -788,14 +827,14 @@
                 <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
                 <button class="tool-btn" onclick="execCmd('underline')"><u>U</u></button>
                 <span style="border-right: 1px solid #cbd5e1; height: 16px; margin: 0 4px;"></span>
-                <span style="font-size: 11px; color: #64748b; font-weight: 600;">Direct In-place Typing Enabled</span>
+                <span style="font-size: 11.5px; color: #64748b; font-weight: 600;">Direct In-place Typing Enabled</span>
               </div>
 
               <!-- Email Headers -->
               <div class="mail-header">
                 <div class="mail-meta-row">
                   <span class="meta-label">To:</span>
-                  <span class="meta-val" id="prev-to" style="font-weight: 600; color: #0284c7;">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
+                  <span class="meta-val" id="prev-to" style="font-weight: 700; color: #0284c7;">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
                 </div>
                 <div class="mail-meta-row">
                   <span class="meta-label">Subject:</span>
@@ -917,18 +956,18 @@
         card.className = `resume-card ${r.filename === selectedResumeFile ? 'active' : ''}`;
         card.onclick = () => previewResumeFile(r.filename);
         card.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
-            <span style="font-size: 20px; flex-shrink: 0;">📄</span>
+          <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+            <span style="font-size: 22px; flex-shrink: 0;">📄</span>
             <div style="overflow: hidden;">
-              <div style="font-weight: 700; font-size: 13px; color: #fff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${r.filename}</div>
-              <div style="font-size: 11px; color: var(--text-muted);">${r.size} • ${r.lastModified}</div>
+              <div style="font-weight: 700; font-size: 13.5px; color: #fff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${r.filename}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted);">${r.size} • ${r.lastModified}</div>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
-            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
+            <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 11.5px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
               Select
             </button>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')" title="Delete resume">
+            <button class="btn btn-danger" style="padding: 5px 9px; font-size: 11.5px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')" title="Delete resume">
               🗑
             </button>
           </div>
@@ -1012,15 +1051,19 @@
       document.getElementById('bulk-count-label').innerText = recruiters.length;
 
       recruiters.forEach((r, idx) => {
+        const initials = r.company.substring(0, 2).toUpperCase();
         const item = document.createElement('div');
         item.className = `recruiter-card ${idx === selectedIndex ? 'active' : ''}`;
         item.onclick = () => selectRecruiter(idx);
         item.innerHTML = `
-          <div>
-            <div class="rc-name">${r.firstName} @ ${r.company}</div>
-            <div class="rc-sub">${r.email} • <span style="color: var(--accent);">📄 ${r.resumeFile || 'Default'}</span></div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rc-avatar">${initials}</div>
+            <div>
+              <div class="rc-name">${r.firstName} @ ${r.company}</div>
+              <div class="rc-sub">${r.email} • <span style="color: var(--accent);">📄 ${r.resumeFile || 'Default'}</span></div>
+            </div>
           </div>
-          <span class="status-pill" style="font-size: 11px; padding: 2px 8px;">${r.status || 'Pending'}</span>
+          <span class="metric-pill" style="font-size: 11px; padding: 2px 8px; color: ${r.status === 'Sent' ? '#34d399' : '#fbbf24'};">${r.status || 'Pending'}</span>
         `;
         listEl.appendChild(item);
       });
