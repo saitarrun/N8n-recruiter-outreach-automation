@@ -444,17 +444,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
               <div class="form-group">
                 <label>First Name</label>
-                <input type="text" id="fn" placeholder="Stephanie" value="Stephanie" oninput="updateRecipientFromInputs()">
+                <input type="text" id="fn" placeholder="Stephanie" value="Stephanie" oninput="handleLeadInputChange()">
               </div>
               <div class="form-group">
                 <label>Company</label>
-                <input type="text" id="comp" placeholder="TikTok" value="TikTok" oninput="updateRecipientFromInputs()">
+                <input type="text" id="comp" placeholder="Google" value="TikTok" oninput="handleLeadInputChange()">
               </div>
             </div>
 
             <div class="form-group">
               <label>Email</label>
-              <input type="email" id="email" placeholder="stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateRecipientFromInputs()">
+              <input type="email" id="email" placeholder="stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="handleLeadInputChange()">
             </div>
 
             <div class="form-group">
@@ -540,24 +540,7 @@
 
           <!-- DIRECT EDITABLE EMAIL CONTENT -->
           <div class="editable-body" id="prev-body" contenteditable="true" spellcheck="false">
-            <p>Hi Stephanie,</p>
-            <p>I hope you're doing well.</p>
-            <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-            <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-            <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
-            <p>I'm currently exploring Software Engineering opportunities at <strong>TikTok</strong>.</p>
-            <p>I'm particularly interested in <strong>TikTok</strong> because of the work your engineering teams are doing in large-scale distributed systems and high-throughput infrastructure, which aligns closely with my experience and technical interests.</p>
-            <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-            <p>I've attached my resume for reference.</p>
-            <p>Thank you for your time and consideration.</p>
-            <p>Best regards,</p>
-            <div class="signature" contenteditable="false">
-              <strong>Sai Tarrun Pitta</strong><br>
-              Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: var(--blue); text-decoration: none;">saitarrunpitta@gmail.com</a><br>
-              LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: var(--blue); text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
-              GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: var(--blue); text-decoration: none;">github.com/saitarrun</a><br>
-              Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: var(--blue); text-decoration: none;">saitarrunpitta.vercel.app</a>
-            </div>
+            <!-- Dynamically generated with exact First Name & Company replacement -->
           </div>
         </div>
       </div>
@@ -742,34 +725,42 @@
         document.getElementById('resume-select').value = r.resumeFile;
       }
       renderQueue();
-      populateBodyForRecruiter(r);
+      generateBodyHTML(r.firstName, r.company, r.email, r.focus);
     }
 
-    function updateRecipientFromInputs() {
+    // LIVE DYNAMIC UPDATES AS YOU TYPE FIRST NAME OR COMPANY
+    function handleLeadInputChange() {
       const r = recruiters[selectedIndex];
-      if (!r) return;
-      r.firstName = document.getElementById('fn').value.trim() || 'Recruiter';
-      r.company = document.getElementById('comp').value.trim() || 'Company';
-      r.email = document.getElementById('email').value.trim() || 'email@example.com';
-      document.getElementById('prev-to').innerHTML = `${r.firstName} &lt;${r.email}&gt;`;
-      document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta`;
+      const fn = document.getElementById('fn').value.trim() || 'Recruiter';
+      const comp = document.getElementById('comp').value.trim() || 'Company';
+      const email = document.getElementById('email').value.trim() || 'email@example.com';
+      
+      if (r) {
+        r.firstName = fn;
+        r.company = comp;
+        r.email = email;
+      }
+
       renderQueue();
+      generateBodyHTML(fn, comp, email, r ? r.focus : '');
     }
 
-    function populateBodyForRecruiter(r) {
-      document.getElementById('prev-to').innerHTML = `${r.firstName} &lt;${r.email}&gt;`;
-      document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta`;
+    function generateBodyHTML(fn, comp, email, focus) {
+      document.getElementById('prev-to').innerHTML = `${fn} &lt;${email}&gt;`;
+      document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${comp} — Sai Tarrun Pitta`;
       updateAttachmentUI();
       
-      const focusText = r.focus ? `<p>I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
+      const focusText = focus 
+        ? `<p>I'm particularly interested in <strong>${comp}</strong> because of the work your engineering teams are doing in ${focus}, which aligns closely with my experience and technical interests.</p>`
+        : `<p>I'm particularly interested in <strong>${comp}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>`;
 
       document.getElementById('prev-body').innerHTML = `
-        <p>Hi ${r.firstName},</p>
+        <p>Hi ${fn},</p>
         <p>I hope you're doing well.</p>
         <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
         <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
         <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
-        <p>I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
+        <p>I'm currently exploring Software Engineering opportunities at <strong>${comp}</strong>.</p>
         ${focusText}
         <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
         <p>I've attached my resume for reference.</p>
@@ -786,9 +777,12 @@
     }
 
     function resetBodyToDefault() {
-      const r = recruiters[selectedIndex] || { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure" };
-      populateBodyForRecruiter(r);
-      showToast('Template reset.');
+      const fn = document.getElementById('fn').value.trim() || 'Stephanie';
+      const comp = document.getElementById('comp').value.trim() || 'TikTok';
+      const email = document.getElementById('email').value.trim() || 'stephanie.chao@tiktok.com';
+      const r = recruiters[selectedIndex];
+      generateBodyHTML(fn, comp, email, r ? r.focus : '');
+      showToast('Template reset with current lead details.');
     }
 
     function clearForm() {
@@ -990,6 +984,7 @@
 
     loadResumes();
     renderQueue();
+    selectRecruiter(0);
   </script>
 </body>
 </html>
