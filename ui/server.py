@@ -4,61 +4,62 @@ import os
 import re
 import json
 import time
+import urllib.parse
 
 PORT = 3000
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-RESUME_DEST = "/Users/xploit404/n8n-files/Sai_Tarrun_Pitta_Resume.pdf"
-META_FILE = "/Users/xploit404/n8n-files/resume_meta.json"
+FILES_DIR = "/Users/xploit404/n8n-files"
 
 class CustomHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
     def end_headers(self):
-        # Prevent any aggressive browser caching so edits and uploads reflect instantly
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')
         super().end_headers()
 
     def do_GET(self):
-        if self.path == "/api/resume-info":
-            if os.path.exists(RESUME_DEST):
-                stat = os.stat(RESUME_DEST)
-                size_kb = round(stat.st_size / 1024, 1)
-                mod_time = time.strftime('%b %d, %Y at %I:%M %p', time.localtime(stat.st_mtime))
-                
-                original_name = "Sai_Tarrun_Pitta_Resume.pdf"
-                if os.path.exists(META_FILE):
-                    try:
-                        with open(META_FILE, "r") as mf:
-                            meta = json.load(mf)
-                            original_name = meta.get("originalName", original_name)
-                    except Exception:
-                        pass
-                
-                res = {
-                    "exists": True,
-                    "filename": original_name,
-                    "size": f"{size_kb} KB",
-                    "lastModified": mod_time
-                }
-            else:
-                res = {"exists": False}
-
+        parsed = urllib.parse.urlparse(self.path)
+        
+        # 1. List all resumes
+        if parsed.path == "/api/resumes":
+            resumes = []
+            if os.path.exists(FILES_DIR):
+                for f in sorted(os.listdir(FILES_DIR)):
+                    if f.lower().endswith('.pdf'):
+                        fp = os.path.join(FILES_DIR, f)
+                        stat = os.stat(fp)
+                        size_kb = round(stat.st_size / 1024, 1)
+                        mod_time = time.strftime('%b %d, %Y at %I:%M %p', time.localtime(stat.st_mtime))
+                        resumes.append({
+                            "filename": f,
+                            "path": f"/files/{f}",
+                            "size": f"{size_kb} KB",
+                            "lastModified": mod_time
+                        })
+            
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps(res).encode('utf-8'))
+            self.wfile.write(json.dumps({"resumes": resumes}).encode('utf-8'))
             return
 
-        elif self.path.startswith("/api/resume-pdf"):
-            if os.path.exists(RESUME_DEST):
-                with open(RESUME_DEST, "rb") as f:
+        # 2. View specific resume PDF
+        elif parsed.path == "/api/resume-pdf":
+            params = urllib.parse.parse_qs(parsed.query)
+            target_file = params.get('file', ['Sai_Tarrun_Pitta_Resume.pdf'])[0]
+            # Sanitize filename
+            safe_filename = os.path.basename(target_file)
+            fp = os.path.join(FILES_DIR, safe_filename)
+
+            if os.path.exists(fp):
+                with open(fp, "rb") as f:
                     pdf_data = f.read()
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/pdf')
-                self.send_header('Content-Disposition', 'inline; filename="Sai_Tarrun_Pitta_Resume.pdf"')
+                self.send_header('Content-Disposition', f'inline; filename="{safe_filename}"')
                 self.send_header('Content-Length', str(len(pdf_data)))
                 self.end_headers()
                 self.wfile.write(pdf_data)
@@ -71,7 +72,9 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        if self.path == "/api/upload-resume":
+        parsed = urllib.parse.urlparse(self.path)
+        
+        if parsed.path == "/api/upload-resume":
             content_length = int(self.headers.get('Content-Length', 0))
             if content_length == 0:
                 self.send_response(400)
@@ -82,21 +85,29 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             body = self.rfile.read(content_length)
             content_type = self.headers.get('Content-Type', '')
             original_filename = self.headers.get('X-File-Name', 'Sai_Tarrun_Pitta_Resume.pdf')
-            
+            # Clean filename
+            safe_filename = os.path.basename(original_filename)
+            if not safe_filename.lower().endswith('.pdf'):
+                safe_filename += '.pdf'
+
+            dest_path = os.path.join(FILES_DIR, safe_filename)
+            os.makedirs(FILES_DIR, exist_ok=True)
+
             # If raw binary PDF
             if body.startswith(b'%PDF'):
-                os.makedirs(os.path.dirname(RESUME_DEST), exist_ok=True)
-                with open(RESUME_DEST, "wb") as f:
+                with open(dest_path, "wb") as f:
                     f.write(body)
                 
-                with open(META_FILE, "w") as mf:
-                    json.dump({"originalName": original_filename, "updatedAt": time.time()}, mf)
+                # Also keep default Sai_Tarrun_Pitta_Resume.pdf updated
+                with open(os.path.join(FILES_DIR, "Sai_Tarrun_Pitta_Resume.pdf"), "wb") as f:
+                    f.write(body)
 
                 file_size_kb = round(len(body) / 1024, 1)
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(f'{{"success": true, "size": "{file_size_kb} KB", "filename": "{original_filename}"}}'.encode('utf-8'))
+                self.wfile.write(f'{{"success": true, "size": "{file_size_kb} KB", "filename": "{safe_filename}"}}'.encode('utf-8'))
+                print(f"[Multi-Resume] Saved {safe_filename} ({file_size_kb} KB)")
                 return
 
             # If multipart/form-data
@@ -108,31 +119,28 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     if b'filename=' in part:
                         fn_match = re.search(r'filename="([^"]+)"', part.decode('utf-8', errors='ignore'))
                         if fn_match:
-                            original_filename = fn_match.group(1)
+                            safe_filename = os.path.basename(fn_match.group(1))
 
                         header_and_data = part.split(b'\r\n\r\n', 1)
                         if len(header_and_data) == 2:
                             raw_file_data = header_and_data[1]
-                            if raw_file_data.endswith(b'\r\n'):
-                                raw_file_data = raw_file_data[:-2]
-                            if raw_file_data.endswith(b'--'):
-                                raw_file_data = raw_file_data[:-2]
-                            if raw_file_data.endswith(b'\r\n'):
-                                raw_file_data = raw_file_data[:-2]
+                            if raw_file_data.endswith(b'\r\n'): raw_file_data = raw_file_data[:-2]
+                            if raw_file_data.endswith(b'--'): raw_file_data = raw_file_data[:-2]
+                            if raw_file_data.endswith(b'\r\n'): raw_file_data = raw_file_data[:-2]
 
-                            os.makedirs(os.path.dirname(RESUME_DEST), exist_ok=True)
-                            with open(RESUME_DEST, "wb") as f:
+                            dest_path = os.path.join(FILES_DIR, safe_filename)
+                            with open(dest_path, "wb") as f:
                                 f.write(raw_file_data)
-
-                            with open(META_FILE, "w") as mf:
-                                json.dump({"originalName": original_filename, "updatedAt": time.time()}, mf)
+                            
+                            with open(os.path.join(FILES_DIR, "Sai_Tarrun_Pitta_Resume.pdf"), "wb") as f:
+                                f.write(raw_file_data)
 
                             file_size_kb = round(len(raw_file_data) / 1024, 1)
                             self.send_response(200)
                             self.send_header('Content-Type', 'application/json')
                             self.end_headers()
-                            self.wfile.write(f'{{"success": true, "size": "{file_size_kb} KB", "filename": "{original_filename}"}}'.encode('utf-8'))
-                            print(f"[Upload Server] Successfully wrote {file_size_kb} KB ({original_filename}) to {RESUME_DEST}")
+                            self.wfile.write(f'{{"success": true, "size": "{file_size_kb} KB", "filename": "{safe_filename}"}}'.encode('utf-8'))
+                            print(f"[Multi-Resume] Saved {safe_filename} ({file_size_kb} KB)")
                             return
 
             self.send_response(400)
@@ -146,5 +154,5 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"UI Server running at http://localhost:{PORT}")
+        print(f"UI Multi-Resume Server running at http://localhost:{PORT}")
         httpd.serve_forever()

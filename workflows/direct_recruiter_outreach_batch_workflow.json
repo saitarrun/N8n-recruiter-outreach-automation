@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "fileSelector": "/files/Sai_Tarrun_Pitta_Resume.pdf",
+        "fileSelector": "=/files/{{ $('Webhook Trigger').first().json.body.resumeFile || 'Sai_Tarrun_Pitta_Resume.pdf' }}",
         "options": {}
       },
       "id": "node-read-resume",
