@@ -749,29 +749,13 @@
       <div id="tab-queue" class="tab-content active">
         <div class="apple-card">
           <div class="card-head">
-            <span class="card-head-title">Recruiter Queue</span>
+            <span class="card-head-title">Recruiter Details</span>
             <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">Clear Form</button>
           </div>
           <div class="card-content" style="padding: 16px;">
 
-            <!-- QUEUE FILTER SUB-TABS -->
-            <div class="queue-subtabs">
-              <button class="queue-subtab active" data-filter="all" onclick="setQueueFilter('all')">
-                All (<span id="filter-all-count">0</span>)
-              </button>
-              <button class="queue-subtab" data-filter="unsent" onclick="setQueueFilter('unsent')">
-                Unsent (<span id="filter-unsent-count">0</span>)
-              </button>
-              <button class="queue-subtab" data-filter="sent" onclick="setQueueFilter('sent')">
-                Sent (<span id="filter-sent-count">0</span>)
-              </button>
-            </div>
-
-            <!-- RECRUITER LIST GROUP (Always Front and Center) -->
-            <div class="recruiter-list-group" id="recruiter-list-group" style="max-height: 270px; margin-bottom: 14px;"></div>
-
-            <!-- COMPACT ADD LEAD FORM -->
-            <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+            <!-- ADD LEAD TO QUEUE FORM (ON TOP) -->
+            <div style="margin-bottom: 16px;">
               <div style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em;">Add Lead to Queue</div>
               
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
@@ -790,6 +774,23 @@
               <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 12.5px; padding: 7px 12px;" onclick="addRecruiter()">
                 Add Lead to Queue
               </button>
+            </div>
+
+            <!-- RECRUITER QUEUE LIST & TABS (BELOW FORM) -->
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+              <div class="queue-subtabs" style="margin-bottom: 10px;">
+                <button class="queue-subtab active" data-filter="all" onclick="setQueueFilter('all')">
+                  All (<span id="filter-all-count">0</span>)
+                </button>
+                <button class="queue-subtab" data-filter="unsent" onclick="setQueueFilter('unsent')">
+                  Unsent (<span id="filter-unsent-count">0</span>)
+                </button>
+                <button class="queue-subtab" data-filter="sent" onclick="setQueueFilter('sent')">
+                  Sent (<span id="filter-sent-count">0</span>)
+                </button>
+              </div>
+
+              <div class="recruiter-list-group" id="recruiter-list-group" style="max-height: 280px;"></div>
             </div>
 
           </div>
