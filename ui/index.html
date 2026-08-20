@@ -734,7 +734,7 @@
       </div>
 
       <button class="apple-btn btn-blue-primary" onclick="sendBulkUnsentQueue()" id="btn-bulk-send">
-        Send Unsent (<span id="unsent-count-num">0</span>) in Bulk
+        Send Unsent in Bulk
       </button>
     </div>
   </header>
@@ -1111,16 +1111,28 @@
 
     function renderQueue() {
       const listEl = document.getElementById('recruiter-list-group');
+      if (!listEl) return;
       listEl.innerHTML = '';
 
       const unsentCount = recruiters.filter(r => r.status !== 'Sent').length;
       const sentCount = recruiters.filter(r => r.status === 'Sent').length;
 
-      document.getElementById('queue-badge').innerText = recruiters.length;
-      document.getElementById('filter-all-count').innerText = recruiters.length;
-      document.getElementById('filter-unsent-count').innerText = unsentCount;
-      document.getElementById('filter-sent-count').innerText = sentCount;
-      document.getElementById('unsent-count-num').innerText = unsentCount;
+      const qBadge = document.getElementById('queue-badge');
+      if (qBadge) qBadge.innerText = recruiters.length;
+
+      const fAll = document.getElementById('filter-all-count');
+      if (fAll) fAll.innerText = recruiters.length;
+
+      const fUnsent = document.getElementById('filter-unsent-count');
+      if (fUnsent) fUnsent.innerText = unsentCount;
+
+      const fSent = document.getElementById('filter-sent-count');
+      if (fSent) fSent.innerText = sentCount;
+
+      const bulkBtn = document.getElementById('btn-bulk-send');
+      if (bulkBtn && !bulkBtn.disabled) {
+        bulkBtn.innerText = `Send Unsent (${unsentCount}) in Bulk`;
+      }
 
       let filteredRecruiters = recruiters.map((r, originalIdx) => ({ ...r, originalIdx }));
       if (currentQueueFilter === 'unsent') {
