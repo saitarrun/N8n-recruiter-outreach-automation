@@ -31,8 +31,27 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         
-        # 1. List all resumes
-        if parsed.path == "/api/resumes":
+        # 1. Real-time n8n health check
+        if parsed.path == "/api/health":
+            t0 = time.time()
+            try:
+                req = urllib.request.Request("http://127.0.0.1:5678/healthz")
+                with urllib.request.urlopen(req, timeout=3) as resp:
+                    latency_ms = round((time.time() - t0) * 1000)
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"status": "ok", "latency": latency_ms, "engine": "n8n"}).encode('utf-8'))
+                    return
+            except Exception as e:
+                self.send_response(503)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "offline", "error": str(e)}).encode('utf-8'))
+                return
+
+        # 2. List all resumes
+        elif parsed.path == "/api/resumes":
             resumes = []
             if os.path.exists(FILES_DIR):
                 for f in sorted(os.listdir(FILES_DIR)):

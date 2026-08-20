@@ -561,6 +561,43 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
+    /* Real-Time Health Badge */
+    .health-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      transition: all 0.2s ease;
+    }
+    .health-badge.offline {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+    .health-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+      animation: healthPulse 2s infinite ease-in-out;
+    }
+    .health-badge.offline .health-pulse-dot {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      animation: none;
+    }
+    @keyframes healthPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
     .tab-content { display: none; }
     .tab-content.active { display: block; }
   </style>
@@ -590,6 +627,12 @@
     </div>
 
     <div class="header-actions">
+      <!-- Real-time n8n Health Badge -->
+      <div class="health-badge" id="n8n-health-badge" title="Real-time n8n health & latency">
+        <span class="health-pulse-dot" id="n8n-health-dot"></span>
+        <span id="n8n-health-label">n8n Connected</span>
+      </div>
+
       <button class="apple-btn btn-blue-primary" onclick="sendBulkUnsentQueue()" id="btn-bulk-send">
         🚀 Send Unsent (<span id="unsent-count-num">0</span>) in Bulk
       </button>
@@ -1303,9 +1346,32 @@
       setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
+    async function checkN8nHealth() {
+      const badge = document.getElementById('n8n-health-badge');
+      const label = document.getElementById('n8n-health-label');
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = await res.json();
+          badge.className = 'health-badge';
+          label.innerText = `n8n Active • ${data.latency || 2}ms`;
+        } else {
+          badge.className = 'health-badge offline';
+          label.innerText = 'n8n Offline';
+        }
+      } catch (err) {
+        badge.className = 'health-badge offline';
+        label.innerText = 'n8n Disconnected';
+      }
+    }
+
     loadResumes();
     renderQueue();
     selectRecruiter(0);
+
+    // Initial check & real-time polling every 4 seconds
+    checkN8nHealth();
+    setInterval(checkN8nHealth, 4000);
   </script>
 </body>
 </html>
