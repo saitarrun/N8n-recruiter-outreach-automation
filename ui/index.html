@@ -334,6 +334,19 @@
       border: 1px solid #bbf7d0;
     }
 
+    /* Status Banner in Compose Window */
+    .sent-notice-banner {
+      background: #f0fdf4;
+      border-bottom: 1px solid #bbf7d0;
+      padding: 6px 20px;
+      font-size: 12px;
+      color: #166534;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Resume Card in List - Clean & No Horizontal Scroll */
     .resume-list-container {
       display: flex;
@@ -619,7 +632,7 @@
             </div>
 
             <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 4px;" onclick="addRecruiter()">
-              + Add Lead to Queue
+              + Add Lead as Unsent
             </button>
 
             <!-- SEPARATED ACTIVE UNSENT VS SENT LEADS -->
@@ -704,6 +717,11 @@
           </div>
         </div>
 
+        <!-- Dispatched Notice Banner -->
+        <div class="sent-notice-banner" id="sent-notice-banner">
+          <span>✅ This email was already dispatched and is preserved in Sent History. It will not be sent again during automated bulk runs.</span>
+        </div>
+
         <!-- Mail Header Metadata Rows -->
         <div class="mail-header-fields">
           <div class="field-row">
@@ -751,12 +769,31 @@
     let selectedResumeFile = "";
     let currentQueueFilter = "all"; // 'all', 'unsent', 'sent'
 
-    const recruiters = [
+    // Load from LocalStorage or default to sent batch
+    const defaultRecruiters = [
       { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf", status: "Sent" },
       { firstName: "Vivian", company: "ByteDance", email: "vivianjiang@bytedance.com", focus: "scalable microservices and distributed platform engineering", resumeFile: "Sai_Tarrun_Pitta_SoftwareEngineer_Resume.pdf", status: "Sent" },
       { firstName: "Emma", company: "TikTok", email: "emma.huo@tiktok.com", focus: "cloud infrastructure and scalable backend services", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf", status: "Sent" },
       { firstName: "Isis", company: "ByteDance", email: "isis.kcano@bytedance.com", focus: "distributed systems and backend cloud architecture", resumeFile: "Sai_Tarrun_Pitta_General_Resume.pdf", status: "Sent" }
     ];
+
+    let recruiters = [];
+    try {
+      const saved = localStorage.getItem('recruiter_leads_v2');
+      if (saved) {
+        recruiters = JSON.parse(saved);
+      } else {
+        recruiters = defaultRecruiters;
+      }
+    } catch (e) {
+      recruiters = defaultRecruiters;
+    }
+
+    function saveRecruitersState() {
+      try {
+        localStorage.setItem('recruiter_leads_v2', JSON.stringify(recruiters));
+      } catch (e) {}
+    }
 
     let selectedIndex = 0;
 
@@ -860,6 +897,7 @@
       if (r) {
         r.resumeFile = filename;
         document.getElementById('resume-select').value = filename;
+        saveRecruitersState();
         showAppleToast(`Attached ${filename}`);
         renderQueue();
       }
@@ -873,6 +911,7 @@
       const r = recruiters[selectedIndex];
       if (r) {
         r.resumeFile = val;
+        saveRecruitersState();
         renderQueue();
       }
       renderResumeList();
@@ -949,6 +988,18 @@
       if (r.resumeFile) {
         document.getElementById('resume-select').value = r.resumeFile;
       }
+
+      // Check if already sent
+      const noticeBanner = document.getElementById('sent-notice-banner');
+      const sendBtn = document.getElementById('btn-send-single');
+      if (r.status === 'Sent') {
+        noticeBanner.style.display = 'flex';
+        sendBtn.innerText = '✓ Sent (Resend)';
+      } else {
+        noticeBanner.style.display = 'none';
+        sendBtn.innerText = '✉️ Send Email';
+      }
+
       renderQueue();
       generateBodyHTML(r.firstName, r.company, r.email, r.focus);
     }
@@ -963,6 +1014,7 @@
         r.firstName = fn;
         r.company = comp;
         r.email = email;
+        saveRecruitersState();
       }
 
       renderQueue();
@@ -1028,6 +1080,7 @@
       }
 
       recruiters.unshift({ firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" });
+      saveRecruitersState();
       selectedIndex = 0;
       renderQueue();
       selectRecruiter(0);
@@ -1057,6 +1110,7 @@
         }
       });
 
+      saveRecruitersState();
       renderQueue();
       document.getElementById('bulk-text').value = '';
       setStudioTab('queue', null);
@@ -1108,6 +1162,12 @@
       const r = recruiters[selectedIndex];
       if (!r) return;
 
+      if (r.status === 'Sent') {
+        if (!confirm(`An outreach email was ALREADY sent to ${r.firstName} (${r.email}). Do you want to resend?`)) {
+          return;
+        }
+      }
+
       const btn = document.getElementById('btn-send-single');
       btn.innerText = 'Sending...';
       btn.disabled = true;
@@ -1143,12 +1203,13 @@
         });
         const data = await res.json();
         r.status = 'Sent';
+        saveRecruitersState();
         renderQueue();
+        selectRecruiter(selectedIndex);
         showAppleToast(`Sent to ${r.firstName} (${r.company})!`);
       } catch (err) {
         showAppleToast(`Error: ${err.message}`);
       } finally {
-        btn.innerText = '✉️ Send Email';
         btn.disabled = false;
       }
     }
@@ -1157,7 +1218,7 @@
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
-        alert('All leads in your queue have already been sent! Add new leads to send.');
+        alert('All leads in your queue have already been sent! To send again, add new leads.');
         return;
       }
 
@@ -1168,7 +1229,7 @@
 
       for (let i = 0; i < recruiters.length; i++) {
         const r = recruiters[i];
-        if (r.status === 'Sent') continue; // Skip already sent leads
+        if (r.status === 'Sent') continue; // Strict guarantee: Never trigger already sent leads
 
         selectRecruiter(i);
         btn.innerText = `Sending to ${r.firstName}...`;
@@ -1203,6 +1264,7 @@
             })
           });
           r.status = 'Sent';
+          saveRecruitersState();
           renderQueue();
         } catch (e) {
           r.status = 'Failed';
@@ -1213,6 +1275,7 @@
       }
 
       btn.disabled = false;
+      saveRecruitersState();
       renderQueue();
       showAppleToast('🎉 Unsent Leads Outreach Complete!');
     }
