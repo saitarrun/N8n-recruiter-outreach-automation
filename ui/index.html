@@ -1032,7 +1032,8 @@
     // Fetch leads from Persistent SQLite Database
     async function loadLeadsFromDatabase(preserveSelection = false) {
       try {
-        const res = await fetch('/api/leads');
+        const res = await fetch('/api/leads?_t=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         const prevEmail = (recruiters[selectedIndex] && recruiters[selectedIndex].email) || '';
         recruiters = data.leads || [];
@@ -1043,12 +1044,17 @@
           if (preserveSelection && prevEmail) {
             const foundIdx = recruiters.findIndex(r => r.email === prevEmail);
             selectRecruiter(foundIdx !== -1 ? foundIdx : 0);
-          } else {
+          } else if (!recruiters[selectedIndex]) {
             selectRecruiter(0);
+          } else {
+            updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
           }
+        } else {
+          updateComposeCanvasForRecruiter(null);
         }
       } catch (err) {
         console.error('Failed to load leads from database', err);
+        setTimeout(() => loadLeadsFromDatabase(preserveSelection), 2000);
       }
     }
 
