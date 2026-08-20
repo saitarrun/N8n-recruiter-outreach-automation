@@ -1289,23 +1289,21 @@
       portfolio: "https://saitarrunpitta.vercel.app"
     };
 
-    const DEFAULT_MASTER_TEMPLATE = `<p>Hi {firstName},</p>
-<p>I hope you're doing well.</p>
-<p>My name is <strong>{senderName}</strong>, and I'm a {senderTitle} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-<p>I've previously worked with <strong>{pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-<p>My technical background includes {skills}.</p>
-<p>I'm currently exploring Software Engineering opportunities at <strong>{company}</strong>.</p>
-<p>I'm particularly interested in <strong>{company}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>
-<p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-<p>I've attached my resume for reference.</p>
+    const DEFAULT_MASTER_TEMPLATE = `<p>Hi {RecruiterName},</p>
+<p>I hope you’re doing well.</p>
+<p>My name is <strong>Sai Tarrun Pitta</strong>, and I’m a Software Engineer with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
+<p>I’ve previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, where I contributed to production systems involving scalable backend services, full-stack applications, distributed systems, AI/LLM workflows, RAG systems, cloud infrastructure, and observability.</p>
+<p>My technical background includes <strong>Python, Java, TypeScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, REST APIs, microservices, and distributed systems</strong>.</p>
+<p>I’m currently exploring <strong>Software Engineering opportunities at {Company}</strong>. If there are any current or upcoming roles that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering positions, I’d also appreciate it if you could connect me with the appropriate person.</p>
+<p>I’ve attached my resume for reference and would be happy to provide any additional information.</p>
 <p>Thank you for your time and consideration.</p>
 <p>Best regards,</p>
 <div class="mail-signature-block" contenteditable="false">
-  <strong>{senderName}</strong><br>
-  Email: <a href="mailto:{senderEmail}">{senderEmail}</a><br>
-  LinkedIn: <a href="{senderLinkedIn}" target="_blank">{senderLinkedIn}</a><br>
-  GitHub: <a href="{senderGitHub}" target="_blank">{senderGitHub}</a><br>
-  Portfolio: <a href="{senderPortfolio}" target="_blank">{senderPortfolio}</a>
+  <strong>Sai Tarrun Pitta</strong><br>
+  saitarrunpitta@gmail.com<br>
+  <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
+  <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
+  <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
 </div>`;
 
     function getMasterTemplate() {
@@ -1378,10 +1376,7 @@
 
       const subject = `Software Engineering Opportunities at ${comp} — ${profile.name}`;
 
-      const focusText = focus 
-        ? `<p>I'm particularly interested in <strong>${comp}</strong> because of the work your engineering teams are doing in ${focus}, which aligns closely with my experience and technical interests.</p>`
-        : `<p>I'm particularly interested in <strong>${comp}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>`;
-
+      const tpl = getMasterTemplate();
       const bodyHtml = `<!DOCTYPE html>
 <html>
 <head>
@@ -1393,28 +1388,17 @@
   </style>
 </head>
 <body>
-  <p>Hi ${fn},</p>
-  <p>I hope you're doing well.</p>
-  <p>My name is <strong>${profile.name}</strong>, and I'm a ${profile.title} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-  <p>I've previously worked with <strong>${profile.pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-  <p>My technical background includes ${profile.techStack}.</p>
-  <p>I'm currently exploring Software Engineering opportunities at <strong>${comp}</strong>.</p>
-  ${focusText}
-  <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-  <p>I've attached my resume for reference.</p>
-  <p>Thank you for your time and consideration.</p>
-  <p>Best regards,</p>
-  <div class="mail-signature-block">
-    <strong>${profile.name}</strong><br>
-    Email: <a href="mailto:${profile.email}">${profile.email}</a><br>
-    LinkedIn: <a href="${profile.linkedin}" target="_blank">${profile.linkedin}</a><br>
-    GitHub: <a href="${profile.github}" target="_blank">${profile.github}</a><br>
-    Portfolio: <a href="${profile.portfolio}" target="_blank">${profile.portfolio}</a>
-  </div>
+${tpl
+  .replace(/\{\{\s*(company|target_?company)\s*\}\}|\{\s*(company|target_?company)\s*\}/gi, `<strong>${comp}</strong>`)
+  .replace(/\{\{\s*(recruiter_?name|first_?name|name)\s*\}\}|\{\s*(recruiter_?name|first_?name|name)\s*\}/gi, fn)
+  .replace(/\{\{\s*(recruiter_?email|email)\s*\}\}|\{\s*(recruiter_?email|email)\s*\}/gi, email)
+  .replace(/\{\{\s*past_?companies\s*\}\}|\{\s*past_?companies\s*\}/gi, `<strong>${profile.pastCompanies}</strong>`)
+  .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
+  .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name)}
 </body>
 </html>`;
 
-      return { subject, bodyHtml, fn, comp, email, focus, focusText, profile };
+      return { subject, bodyHtml, fn, comp, email, focus, profile };
     }
 
     function saveCurrentCanvasAsTemplate() {
@@ -1425,15 +1409,18 @@
       let tpl = currentBody;
       if (currentRecruiter.company && currentRecruiter.company !== 'Company') {
         const compRegex = new RegExp(currentRecruiter.company, 'g');
-        tpl = tpl.replace(compRegex, '{company}');
+        tpl = tpl.replace(compRegex, '{Company}');
       }
       if (currentRecruiter.firstName && currentRecruiter.firstName !== 'Recruiter') {
         const nameRegex = new RegExp(`\\b${currentRecruiter.firstName}\\b`, 'g');
-        tpl = tpl.replace(nameRegex, '{firstName}');
+        tpl = tpl.replace(nameRegex, '{RecruiterName}');
       }
 
       localStorage.setItem('custom_master_template', tpl);
-      showAppleToast('Saved! Custom format set with dynamic {company} placeholders.');
+      const profTpl = document.getElementById('prof-template');
+      if (profTpl) profTpl.value = tpl;
+
+      showAppleToast('Saved! Custom format set with dynamic {Company} placeholders.');
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       }
@@ -1441,6 +1428,9 @@
 
     function resetBodyToDefault() {
       localStorage.removeItem('custom_master_template');
+      const profTpl = document.getElementById('prof-template');
+      if (profTpl) profTpl.value = DEFAULT_MASTER_TEMPLATE;
+
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       }
@@ -1475,39 +1465,14 @@
       document.getElementById('prev-attach-name').innerText = resumeName;
       document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
 
-      const customTpl = localStorage.getItem('custom_master_template');
-      let renderedBody = "";
-
-      if (customTpl) {
-        renderedBody = customTpl
-          .replace(/\{\{\s*company\s*\}\}|\{\s*company\s*\}/gi, `<strong>${payload.comp}</strong>`)
-          .replace(/\{\{\s*(first_?name|name)\s*\}\}|\{\s*(first_?name|name)\s*\}/gi, payload.fn)
-          .replace(/\{\{\s*past_?companies\s*\}\}|\{\s*past_?companies\s*\}/gi, `<strong>${profile.pastCompanies}</strong>`)
-          .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
-          .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name)
-          .replace(/\{\{\s*focus\s*\}\}|\{\s*focus\s*\}/gi, payload.focusText);
-      } else {
-        renderedBody = `
-          <p>Hi ${payload.fn},</p>
-          <p>I hope you're doing well.</p>
-          <p>My name is <strong>${profile.name}</strong>, and I'm a ${profile.title} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-          <p>I've previously worked with <strong>${profile.pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-          <p>My technical background includes ${profile.techStack}.</p>
-          <p>I'm currently exploring Software Engineering opportunities at <strong>${payload.comp}</strong>.</p>
-          ${payload.focusText}
-          <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-          <p>I've attached my resume for reference.</p>
-          <p>Thank you for your time and consideration.</p>
-          <p>Best regards,</p>
-          <div class="mail-signature-block" contenteditable="false">
-            <strong>${profile.name}</strong><br>
-            Email: <a href="mailto:${profile.email}">${profile.email}</a><br>
-            LinkedIn: <a href="${profile.linkedin}" target="_blank">${profile.linkedin}</a><br>
-            GitHub: <a href="${profile.github}" target="_blank">${profile.github}</a><br>
-            Portfolio: <a href="${profile.portfolio}" target="_blank">${profile.portfolio}</a>
-          </div>
-        `;
-      }
+      const tpl = getMasterTemplate();
+      const renderedBody = tpl
+        .replace(/\{\{\s*(company|target_?company)\s*\}\}|\{\s*(company|target_?company)\s*\}/gi, `<strong>${payload.comp}</strong>`)
+        .replace(/\{\{\s*(recruiter_?name|first_?name|name)\s*\}\}|\{\s*(recruiter_?name|first_?name|name)\s*\}/gi, payload.fn)
+        .replace(/\{\{\s*(recruiter_?email|email)\s*\}\}|\{\s*(recruiter_?email|email)\s*\}/gi, payload.email)
+        .replace(/\{\{\s*past_?companies\s*\}\}|\{\s*past_?companies\s*\}/gi, `<strong>${profile.pastCompanies}</strong>`)
+        .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
+        .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name);
 
       document.getElementById('prev-body').innerHTML = renderedBody;
     }
