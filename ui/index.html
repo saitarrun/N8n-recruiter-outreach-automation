@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
   <style>
     :root {
       --system-bg: #f5f5f7;
@@ -263,7 +265,7 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     }
 
-    /* CLEAN RECRUITER LIST - NO HORIZONTAL SCROLLBAR */
+    /* Clean Recruiter List */
     .recruiter-list-group {
       display: flex;
       flex-direction: column;
@@ -347,7 +349,7 @@
       gap: 6px;
     }
 
-    /* Resume Card in List - Clean & No Horizontal Scroll */
+    /* Resume Card in List */
     .resume-list-container {
       display: flex;
       flex-direction: column;
@@ -408,7 +410,69 @@
       margin-top: 1px;
     }
 
-    /* Apple Mail Compose Window (Right Column) */
+    /* Document Dropzone */
+    .doc-dropzone {
+      border: 2px dashed #d1d1d6;
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      text-align: center;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .doc-dropzone:hover, .doc-dropzone.dragover {
+      border-color: var(--accent-blue);
+      background: var(--accent-blue-tint);
+    }
+    .dropzone-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--label-primary);
+      margin-bottom: 3px;
+    }
+    .dropzone-desc {
+      font-size: 11.5px;
+      color: var(--label-secondary);
+    }
+
+    /* Staged Document Preview Table */
+    .staged-preview-box {
+      margin-top: 14px;
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      display: none;
+    }
+    .staged-preview-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--label-primary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .staged-list {
+      max-height: 140px;
+      overflow-y: auto;
+      font-size: 11.5px;
+      color: var(--label-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .staged-row {
+      background: #ffffff;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Apple Mail Compose Window */
     .mail-window {
       background: #ffffff;
       border: 1px solid var(--border-color);
@@ -730,19 +794,46 @@
         </div>
       </div>
 
-      <!-- TAB 3: BULK IMPORT -->
+      <!-- TAB 3: BULK IMPORT (EXCEL, WORD, & CSV) -->
       <div id="tab-bulk" class="tab-content">
         <div class="apple-card">
           <div class="card-head">
             <span class="card-head-title">Bulk Import Leads</span>
           </div>
           <div class="card-content">
-            <p style="font-size: 12.5px; color: var(--label-secondary); margin-bottom: 10px; line-height: 1.4;">
-              Paste <code>FirstName, Company, Email</code> (one lead per line):
+            
+            <!-- Document Dropzone -->
+            <input type="file" id="doc-upload-input" accept=".xlsx, .xls, .csv, .docx, .doc, .txt" style="display: none;" onchange="handleDocumentUpload(this.files)">
+            <div class="doc-dropzone" id="doc-dropzone" onclick="document.getElementById('doc-upload-input').click()">
+              <div style="font-size: 12px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">EXCEL OR WORD DOCUMENT</div>
+              <div class="dropzone-title">Upload Excel (.xlsx, .csv) or Word (.docx)</div>
+              <div class="dropzone-desc">Click or drag & drop document to auto-extract leads</div>
+            </div>
+
+            <!-- Staged Leads Preview Box -->
+            <div class="staged-preview-box" id="staged-preview-box">
+              <div class="staged-preview-header">
+                <span id="staged-count-label">Parsed 0 Leads</span>
+                <span id="staged-file-name" style="font-weight: 500; color: var(--accent-blue);"></span>
+              </div>
+              <div class="staged-list" id="staged-list"></div>
+              <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 10px;" onclick="confirmStagedImport()">
+                Import All Staged Leads
+              </button>
+            </div>
+
+            <div style="margin: 16px 0 10px 0; display: flex; align-items: center; gap: 8px;">
+              <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase;">Or Paste Plain Text</span>
+              <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+            </div>
+
+            <p style="font-size: 12px; color: var(--label-secondary); margin-bottom: 8px;">
+              Format: <code>FirstName, Company, Email</code> (one per line):
             </p>
-            <textarea id="bulk-text" class="apple-textarea" rows="6" placeholder="Sarah, Stripe, sarah@stripe.com&#10;Alex, Databricks, alex@databricks.com"></textarea>
-            <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 12px;" onclick="parseBulkLeads()">
-              Import Leads as Unsent
+            <textarea id="bulk-text" class="apple-textarea" rows="4" placeholder="Sarah, Stripe, sarah@stripe.com&#10;Alex, Databricks, alex@databricks.com"></textarea>
+            <button class="apple-btn btn-plain" style="width: 100%; margin-top: 10px;" onclick="parseBulkLeads()">
+              Import Text Leads
             </button>
           </div>
         </div>
@@ -823,6 +914,7 @@
     let resumeLibrary = [];
     let selectedResumeFile = "";
     let currentQueueFilter = "all"; // 'all', 'unsent', 'sent'
+    let stagedDocumentLeads = [];
 
     // Load from LocalStorage or default to sent batch
     const defaultRecruiters = [
@@ -1142,27 +1234,200 @@
       showAppleToast(`Added ${fn} @ ${comp} to Unsent Queue.`);
     }
 
+    // ==========================================
+    // EXCEL & WORD DOCUMENT DRAG/DROP & PARSING
+    // ==========================================
+    const dropzone = document.getElementById('doc-dropzone');
+    ['dragenter', 'dragover'].forEach(name => {
+      dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); });
+    });
+    dropzone.addEventListener('drop', (e) => {
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleDocumentUpload(e.dataTransfer.files);
+      }
+    });
+
+    async function handleDocumentUpload(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      const fnLower = file.name.toLowerCase();
+      showAppleToast(`Reading ${file.name}...`);
+
+      stagedDocumentLeads = [];
+
+      try {
+        if (fnLower.endsWith('.xlsx') || fnLower.endsWith('.xls') || fnLower.endsWith('.csv')) {
+          // Parse Excel or CSV via SheetJS
+          const arrayBuffer = await file.arrayBuffer();
+          const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+
+          stagedDocumentLeads = parseTableRowsToLeads(rows);
+
+        } else if (fnLower.endsWith('.docx')) {
+          // Parse Word document via Mammoth
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          const text = result.value || '';
+          stagedDocumentLeads = parseTextContentToLeads(text);
+
+        } else if (fnLower.endsWith('.txt')) {
+          const text = await file.text();
+          stagedDocumentLeads = parseTextContentToLeads(text);
+        } else {
+          alert('Supported formats: Excel (.xlsx, .xls, .csv) or Word (.docx)');
+          return;
+        }
+
+        if (stagedDocumentLeads.length === 0) {
+          alert('Could not find any leads with valid email addresses in ' + file.name);
+          return;
+        }
+
+        // Render Staging Box
+        document.getElementById('staged-count-label').innerText = `Parsed ${stagedDocumentLeads.length} Leads`;
+        document.getElementById('staged-file-name').innerText = file.name;
+        
+        const listEl = document.getElementById('staged-list');
+        listEl.innerHTML = '';
+        stagedDocumentLeads.forEach(lead => {
+          const r = document.createElement('div');
+          r.className = 'staged-row';
+          r.innerText = `${lead.firstName} • ${lead.company} • ${lead.email}`;
+          listEl.appendChild(r);
+        });
+
+        document.getElementById('staged-preview-box').style.display = 'block';
+        showAppleToast(`Found ${stagedDocumentLeads.length} leads in ${file.name}.`);
+
+      } catch (err) {
+        console.error('Parse document error', err);
+        alert('Failed to parse document: ' + err.message);
+      }
+    }
+
+    function parseTableRowsToLeads(rows) {
+      if (!rows || rows.length === 0) return [];
+      const leads = [];
+      
+      // Look for header index
+      let headerIdx = -1;
+      let colName = -1, colComp = -1, colEmail = -1, colFocus = -1;
+
+      for (let i = 0; i < Math.min(rows.length, 5); i++) {
+        const row = rows[i].map(c => String(c).toLowerCase().trim());
+        const emailIdx = row.findIndex(c => c.includes('email') || c.includes('mail'));
+        if (emailIdx !== -1) {
+          headerIdx = i;
+          colEmail = emailIdx;
+          colName = row.findIndex(c => c.includes('name') || c.includes('first') || c.includes('recruiter') || c.includes('contact'));
+          colComp = row.findIndex(c => c.includes('comp') || c.includes('org') || c.includes('company') || c.includes('employer'));
+          colFocus = row.findIndex(c => c.includes('focus') || c.includes('role') || c.includes('team') || c.includes('notes'));
+          break;
+        }
+      }
+
+      // If headers found, extract by columns
+      if (headerIdx !== -1 && colEmail !== -1) {
+        for (let i = headerIdx + 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
+          const email = String(row[colEmail] || '').trim();
+          if (email.includes('@') && email.includes('.')) {
+            let fn = colName !== -1 ? String(row[colName] || '').trim() : '';
+            if (!fn) fn = email.split('@')[0];
+            // If full name, grab first name
+            fn = fn.split(' ')[0];
+            const comp = colComp !== -1 ? String(row[colComp] || '').trim() : 'Company';
+            const focus = colFocus !== -1 ? String(row[colFocus] || '').trim() : '';
+            leads.push({ firstName: fn, company: comp || 'Company', email, focus, status: "Pending" });
+          }
+        }
+      } else {
+        // No header row, scan every row for any cell containing '@'
+        rows.forEach(row => {
+          const rowStr = row.join(' ');
+          const emailMatch = rowStr.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+          if (emailMatch) {
+            const email = emailMatch[0];
+            const parts = row.map(c => String(c).trim()).filter(c => c && !c.includes('@'));
+            const fn = (parts[0] || email.split('@')[0]).split(' ')[0];
+            const comp = parts[1] || 'Company';
+            leads.push({ firstName: fn, company: comp, email, status: "Pending" });
+          }
+        });
+      }
+      return leads;
+    }
+
+    function parseTextContentToLeads(text) {
+      const leads = [];
+      const lines = text.split('\n');
+      lines.forEach(line => {
+        const parts = line.split(/[,;\t|]/).map(p => p.trim());
+        const emailMatch = line.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+        if (emailMatch) {
+          const email = emailMatch[0];
+          const otherParts = parts.filter(p => !p.includes('@'));
+          const fn = (otherParts[0] || email.split('@')[0]).split(' ')[0];
+          const comp = otherParts[1] || 'Company';
+          leads.push({ firstName: fn, company: comp, email, status: "Pending" });
+        }
+      });
+      return leads;
+    }
+
+    function confirmStagedImport() {
+      if (stagedDocumentLeads.length === 0) return;
+      const resFile = selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
+      
+      stagedDocumentLeads.forEach(lead => {
+        recruiters.push({
+          firstName: lead.firstName,
+          company: lead.company,
+          email: lead.email,
+          focus: lead.focus || '',
+          resumeFile: resFile,
+          status: "Pending"
+        });
+      });
+
+      saveRecruitersState();
+      renderQueue();
+
+      const count = stagedDocumentLeads.length;
+      stagedDocumentLeads = [];
+      document.getElementById('staged-preview-box').style.display = 'none';
+      document.getElementById('doc-upload-input').value = '';
+
+      setStudioTab('queue', null);
+      document.querySelectorAll('.segmented-item')[0].classList.add('active');
+      showAppleToast(`Imported ${count} leads to Unsent Queue.`);
+    }
+
     function parseBulkLeads() {
       const text = document.getElementById('bulk-text').value.trim();
       if (!text) return;
 
-      const lines = text.split('\n');
-      let count = 0;
-      lines.forEach(line => {
-        const parts = line.split(/[,;\t]/).map(p => p.trim());
-        if (parts.length >= 3) {
-          const [fn, comp, email] = parts;
-          if (email.includes('@')) {
-            recruiters.push({
-              firstName: fn,
-              company: comp,
-              email: email,
-              resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
-              status: "Pending"
-            });
-            count++;
-          }
-        }
+      const leads = parseTextContentToLeads(text);
+      if (leads.length === 0) {
+        alert('No valid emails found in pasted text.');
+        return;
+      }
+
+      leads.forEach(lead => {
+        recruiters.push({
+          firstName: lead.firstName,
+          company: lead.company,
+          email: lead.email,
+          resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
+          status: "Pending"
+        });
       });
 
       saveRecruitersState();
@@ -1170,7 +1435,7 @@
       document.getElementById('bulk-text').value = '';
       setStudioTab('queue', null);
       document.querySelectorAll('.segmented-item')[0].classList.add('active');
-      showAppleToast(`Imported ${count} unsent leads.`);
+      showAppleToast(`Imported ${leads.length} unsent leads.`);
     }
 
     // Direct Binary File Upload
