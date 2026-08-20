@@ -265,6 +265,25 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     }
 
+    .token-chip {
+      background: #f0f0f5;
+      border: 1px solid #dcdce4;
+      border-radius: 12px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+    .token-chip:hover {
+      background: var(--accent-blue-tint);
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
     /* Clean Recruiter List */
     .recruiter-list-group {
       display: flex;
@@ -917,7 +936,15 @@
               </div>
             </div>
 
-            <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 13px;" onclick="saveSenderProfile()">
+            <div class="form-row" style="margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="form-label-text" style="margin: 0;">Master Email Template Body</label>
+                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 500;">Uses {company} & {firstName}</span>
+              </div>
+              <textarea id="prof-template" class="apple-textarea" rows="7" style="font-family: monospace; font-size: 11.5px; line-height: 1.5;"></textarea>
+            </div>
+
+            <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 13px; margin-top: 10px;" onclick="saveSenderProfile()">
               Save Profile & Update Templates
             </button>
           </div>
@@ -951,6 +978,16 @@
         <!-- Dispatched Notice Banner -->
         <div class="sent-notice-banner" id="sent-notice-banner">
           <span id="sent-notice-text">This email was already dispatched and is preserved in Sent History.</span>
+        </div>
+
+        <!-- Placeholder Helper Bar -->
+        <div style="padding: 6px 16px; background: #fbfbfd; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase; margin-right: 2px;">Placeholders:</span>
+          <button class="token-chip" onclick="insertPlaceholderToken('{company}')" title="Insert Recruiter Company placeholder">+ {company}</button>
+          <button class="token-chip" onclick="insertPlaceholderToken('{firstName}')" title="Insert Recruiter First Name placeholder">+ {firstName}</button>
+          <button class="token-chip" onclick="insertPlaceholderToken('{pastCompanies}')" title="Insert Previous Experience placeholder">+ {pastCompanies}</button>
+          <button class="token-chip" onclick="insertPlaceholderToken('{skills}')" title="Insert Skills Stack placeholder">+ {skills}</button>
+          <button class="token-chip" onclick="insertPlaceholderToken('{senderName}')" title="Insert Your Full Name placeholder">+ {senderName}</button>
         </div>
 
         <!-- Mail Header Metadata Rows -->
@@ -1252,12 +1289,34 @@
       portfolio: "https://saitarrunpitta.vercel.app"
     };
 
-    function getSenderProfile() {
-      const saved = localStorage.getItem('sender_profile');
-      if (saved) {
-        try { return { ...DEFAULT_SENDER_PROFILE, ...JSON.parse(saved) }; } catch (e) {}
-      }
-      return DEFAULT_SENDER_PROFILE;
+    const DEFAULT_MASTER_TEMPLATE = `<p>Hi {firstName},</p>
+<p>I hope you're doing well.</p>
+<p>My name is <strong>{senderName}</strong>, and I'm a {senderTitle} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+<p>I've previously worked with <strong>{pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+<p>My technical background includes {skills}.</p>
+<p>I'm currently exploring Software Engineering opportunities at <strong>{company}</strong>.</p>
+<p>I'm particularly interested in <strong>{company}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>
+<p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+<p>I've attached my resume for reference.</p>
+<p>Thank you for your time and consideration.</p>
+<p>Best regards,</p>
+<div class="mail-signature-block" contenteditable="false">
+  <strong>{senderName}</strong><br>
+  Email: <a href="mailto:{senderEmail}">{senderEmail}</a><br>
+  LinkedIn: <a href="{senderLinkedIn}" target="_blank">{senderLinkedIn}</a><br>
+  GitHub: <a href="{senderGitHub}" target="_blank">{senderGitHub}</a><br>
+  Portfolio: <a href="{senderPortfolio}" target="_blank">{senderPortfolio}</a>
+</div>`;
+
+    function getMasterTemplate() {
+      return localStorage.getItem('custom_master_template') || DEFAULT_MASTER_TEMPLATE;
+    }
+
+    function insertPlaceholderToken(token) {
+      const bodyEl = document.getElementById('prev-body');
+      bodyEl.focus();
+      document.execCommand('insertText', false, token);
+      showAppleToast(`Inserted placeholder: ${token}`);
     }
 
     function loadSenderProfileToInputs() {
@@ -1271,6 +1330,7 @@
       setVal('prof-linkedin', p.linkedin);
       setVal('prof-github', p.github);
       setVal('prof-portfolio', p.portfolio);
+      setVal('prof-template', getMasterTemplate());
     }
 
     function saveSenderProfile() {
@@ -1286,7 +1346,13 @@
         portfolio: getVal('prof-portfolio', DEFAULT_SENDER_PROFILE.portfolio)
       };
       localStorage.setItem('sender_profile', JSON.stringify(updated));
-      showAppleToast('Profile settings saved! Updated templates.');
+
+      const tplVal = document.getElementById('prof-template').value.trim();
+      if (tplVal) {
+        localStorage.setItem('custom_master_template', tplVal);
+      }
+
+      showAppleToast('Profile & Master Template saved!');
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       }
@@ -1294,8 +1360,9 @@
 
     function resetProfileDefaults() {
       localStorage.removeItem('sender_profile');
+      localStorage.removeItem('custom_master_template');
       loadSenderProfileToInputs();
-      showAppleToast('Reset to default profile settings.');
+      showAppleToast('Reset to platform default profile and templates.');
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       }
