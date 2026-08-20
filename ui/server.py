@@ -5,6 +5,7 @@ import re
 import json
 import time
 import urllib.parse
+import urllib.request
 
 PORT = 3000
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +19,14 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, X-File-Name')
         super().end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -181,6 +189,32 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(f'{{"success": false, "error": "{str(e)}"}}'.encode('utf-8'))
                 return
 
+        # 3. Proxy Send Outreach to n8n (Avoids browser CORS & handles timeouts cleanly)
+        elif parsed.path == "/api/send-outreach":
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            
+            try:
+                req = urllib.request.Request(
+                    "http://127.0.0.1:5678/webhook/send-recruiter-outreach",
+                    data=body_bytes,
+                    headers={"Content-Type": "application/json"},
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=25) as resp:
+                    resp_data = resp.read()
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(resp_data)
+                    return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+                return
+
         else:
             self.send_response(404)
             self.end_headers()
@@ -188,5 +222,5 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"UI Server with Delete Resume API running at http://localhost:{PORT}")
+        print(f"UI Server running at http://localhost:{PORT}")
         httpd.serve_forever()
