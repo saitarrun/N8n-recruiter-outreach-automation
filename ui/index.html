@@ -21,9 +21,9 @@
       --accent-blue: #0071e3;
       --accent-blue-hover: #0077ed;
       --accent-blue-tint: #eff6ff;
-      --accent-green: #34c759;
+      --accent-green: #15803d;
       --accent-green-tint: #f0fdf4;
-      --accent-red: #ff3b30;
+      --accent-red: #dc2626;
       
       --radius-sm: 8px;
       --radius-md: 12px;
@@ -229,7 +229,7 @@
     .btn-destruct {
       background: transparent;
       color: var(--accent-red);
-      border-color: rgba(255, 59, 48, 0.2);
+      border-color: rgba(220, 38, 38, 0.2);
     }
     .btn-destruct:hover {
       background: #fff1f0;
@@ -320,17 +320,17 @@
       font-weight: 600;
       flex-shrink: 0;
       margin-left: 8px;
-      padding: 2px 7px;
+      padding: 2px 8px;
       border-radius: 6px;
     }
     .badge-pending {
       background: #fef3c7;
-      color: #b45309;
+      color: #92400e;
       border: 1px solid #fde68a;
     }
     .badge-sent {
       background: #dcfce7;
-      color: #15803d;
+      color: #166534;
       border: 1px solid #bbf7d0;
     }
 
@@ -338,10 +338,10 @@
     .sent-notice-banner {
       background: #f0fdf4;
       border-bottom: 1px solid #bbf7d0;
-      padding: 6px 20px;
-      font-size: 12px;
+      padding: 8px 24px;
+      font-size: 12.5px;
       color: #166534;
-      font-weight: 600;
+      font-weight: 500;
       display: none;
       align-items: center;
       gap: 6px;
@@ -365,7 +365,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
       transition: all 0.15s ease;
       width: 100%;
@@ -377,6 +377,17 @@
     .resume-row-card.selected {
       background: var(--accent-blue-tint);
       border-color: var(--accent-blue);
+    }
+    .file-tag-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
     }
     .resume-info {
       overflow: hidden;
@@ -584,13 +595,13 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 8px #22c55e;
+      background: #16a34a;
+      box-shadow: 0 0 6px #16a34a;
       animation: healthPulse 2s infinite ease-in-out;
     }
     .health-badge.offline .health-pulse-dot {
-      background: #ef4444;
-      box-shadow: 0 0 8px #ef4444;
+      background: #dc2626;
+      box-shadow: 0 0 6px #dc2626;
       animation: none;
     }
     @keyframes healthPulse {
@@ -628,13 +639,13 @@
 
     <div class="header-actions">
       <!-- Real-time n8n Health Badge -->
-      <div class="health-badge" id="n8n-health-badge" title="Real-time n8n health & latency">
+      <div class="health-badge" id="n8n-health-badge" title="Real-time engine status and latency">
         <span class="health-pulse-dot" id="n8n-health-dot"></span>
         <span id="n8n-health-label">n8n Connected</span>
       </div>
 
       <button class="apple-btn btn-blue-primary" onclick="sendBulkUnsentQueue()" id="btn-bulk-send">
-        🚀 Send Unsent (<span id="unsent-count-num">0</span>) in Bulk
+        Send Unsent (<span id="unsent-count-num">0</span>) in Bulk
       </button>
     </div>
   </header>
@@ -650,7 +661,7 @@
         <div class="apple-card">
           <div class="card-head">
             <span class="card-head-title">Recruiter Details</span>
-            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">+ New Lead</button>
+            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">New Lead</button>
           </div>
           <div class="card-content">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -675,7 +686,7 @@
             </div>
 
             <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 4px;" onclick="addRecruiter()">
-              + Add Lead as Unsent
+              Add Lead to Queue
             </button>
 
             <!-- SEPARATED ACTIVE UNSENT VS SENT LEADS -->
@@ -685,10 +696,10 @@
                   All (<span id="filter-all-count">4</span>)
                 </button>
                 <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
-                  📬 Unsent (<span id="filter-unsent-count">0</span>)
+                  Unsent (<span id="filter-unsent-count">0</span>)
                 </button>
                 <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
-                  ✅ Sent (<span id="filter-sent-count">4</span>)
+                  Sent (<span id="filter-sent-count">4</span>)
                 </button>
               </div>
 
@@ -703,7 +714,7 @@
         <div class="apple-card">
           <div class="card-head">
             <span class="card-head-title">Resume Library</span>
-            <button class="apple-btn btn-tint" style="padding: 3px 8px; font-size: 11.5px;" onclick="openQuickLookModal()">👁 Quick Look</button>
+            <button class="apple-btn btn-tint" style="padding: 3px 8px; font-size: 11.5px;" onclick="openQuickLookModal()">Quick Look</button>
           </div>
           <div class="card-content">
             <div class="resume-list-container" id="resume-list-container"></div>
@@ -712,7 +723,7 @@
               <div class="form-label-text">Upload Resume Variant</div>
               <input type="file" id="file-input" accept=".pdf" style="display: none;">
               <button class="apple-btn btn-plain" style="width: 100%;" onclick="document.getElementById('file-input').click()">
-                📁 Upload PDF Document
+                Upload PDF Document
               </button>
             </div>
           </div>
@@ -731,7 +742,7 @@
             </p>
             <textarea id="bulk-text" class="apple-textarea" rows="6" placeholder="Sarah, Stripe, sarah@stripe.com&#10;Alex, Databricks, alex@databricks.com"></textarea>
             <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 12px;" onclick="parseBulkLeads()">
-              + Import All Leads as Unsent
+              Import Leads as Unsent
             </button>
           </div>
         </div>
@@ -749,20 +760,20 @@
             <span class="mac-dot dot-min"></span>
             <span class="mac-dot dot-max"></span>
             <span style="font-size: 12px; color: var(--label-secondary); margin-left: 6px; font-weight: 500;">
-              Click here to edit
+              Click to edit message inline
             </span>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="apple-btn btn-plain" style="font-size: 12.5px;" onclick="resetBodyToDefault()">↺ Reset</button>
+            <button class="apple-btn btn-plain" style="font-size: 12.5px;" onclick="resetBodyToDefault()">Reset</button>
             <button class="apple-btn btn-blue-primary" style="font-size: 12.5px;" onclick="sendOutreach()" id="btn-send-single">
-              ✉️ Send Email
+              Send Email
             </button>
           </div>
         </div>
 
         <!-- Dispatched Notice Banner -->
         <div class="sent-notice-banner" id="sent-notice-banner">
-          <span>✅ This email was already dispatched and is preserved in Sent History. It will not be sent again during automated bulk runs.</span>
+          <span>This email was already dispatched and is preserved in Sent History. It will not be sent again during automated bulk runs.</span>
         </div>
 
         <!-- Mail Header Metadata Rows -->
@@ -778,7 +789,8 @@
           <div class="field-row">
             <span class="field-tag">Attach:</span>
             <span class="attachment-pill" id="prev-attach">
-              📄 <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
+              <span class="file-tag-badge">PDF</span>
+              <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
               <span style="color: var(--label-tertiary); font-size: 11px;" id="prev-attach-size">(73.4 KB)</span>
             </span>
           </div>
@@ -797,7 +809,7 @@
   <div class="pdf-modal" id="pdf-modal" onclick="closeQuickLookModal(event)">
     <div class="pdf-modal-card" onclick="event.stopPropagation()">
       <div class="pdf-modal-head">
-        <span style="font-weight: 600; font-size: 14px;" id="modal-pdf-title">📄 Quick Look Preview</span>
+        <span style="font-weight: 600; font-size: 14px;" id="modal-pdf-title">Quick Look</span>
         <button class="apple-btn btn-plain" onclick="closeQuickLookModal()">Done</button>
       </div>
       <iframe id="pdf-modal-frame" class="pdf-frame-embed" src=""></iframe>
@@ -902,14 +914,14 @@
           updateAttachmentUI();
         };
         item.innerHTML = `
-          <div style="font-size: 18px;">📄</div>
+          <div class="file-tag-badge">PDF</div>
           <div class="resume-info">
             <div class="resume-filename">${r.filename}</div>
             <div class="resume-meta">${r.size} • ${r.lastModified}</div>
           </div>
-          <div style="display: flex; gap: 4px; flex-shrink: 0;">
+          <div style="display: flex; gap: 6px; flex-shrink: 0;">
             <button class="apple-btn btn-tint" style="padding: 4px 8px; font-size: 11.5px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">Attach</button>
-            <button class="apple-btn btn-destruct" style="padding: 4px 6px; font-size: 11.5px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')">🗑</button>
+            <button class="apple-btn btn-destruct" style="padding: 4px 8px; font-size: 11.5px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')">Delete</button>
           </div>
         `;
         list.appendChild(item);
@@ -1009,12 +1021,12 @@
         
         const isSent = r.status === 'Sent';
         const badgeClass = isSent ? 'badge-sent' : 'badge-pending';
-        const badgeText = isSent ? '✓ Sent' : '📬 Ready';
+        const badgeText = isSent ? 'Sent' : 'Ready';
 
         item.innerHTML = `
           <div class="rec-left">
             <div class="rec-name">${r.firstName} @ ${r.company}</div>
-            <div class="rec-sub">${r.email} • 📄 ${r.resumeFile || 'Default'}</div>
+            <div class="rec-sub">${r.email} • ${r.resumeFile || 'Default'}</div>
           </div>
           <span class="rec-badge ${badgeClass}">${badgeText}</span>
         `;
@@ -1037,10 +1049,10 @@
       const sendBtn = document.getElementById('btn-send-single');
       if (r.status === 'Sent') {
         noticeBanner.style.display = 'flex';
-        sendBtn.innerText = '✓ Sent (Resend)';
+        sendBtn.innerText = 'Sent (Resend)';
       } else {
         noticeBanner.style.display = 'none';
-        sendBtn.innerText = '✉️ Send Email';
+        sendBtn.innerText = 'Send Email';
       }
 
       renderQueue();
@@ -1127,7 +1139,7 @@
       selectedIndex = 0;
       renderQueue();
       selectRecruiter(0);
-      showAppleToast(`Added ${fn} @ ${comp} to Unsent Queue!`);
+      showAppleToast(`Added ${fn} @ ${comp} to Unsent Queue.`);
     }
 
     function parseBulkLeads() {
@@ -1158,7 +1170,7 @@
       document.getElementById('bulk-text').value = '';
       setStudioTab('queue', null);
       document.querySelectorAll('.segmented-item')[0].classList.add('active');
-      showAppleToast(`Imported ${count} unsent leads!`);
+      showAppleToast(`Imported ${count} unsent leads.`);
     }
 
     // Direct Binary File Upload
@@ -1180,7 +1192,7 @@
         });
         const data = await res.json();
         if (data.success) {
-          showAppleToast(`Added ${file.name}!`);
+          showAppleToast(`Added ${file.name}.`);
           await loadResumes();
         }
       } catch (err) {
@@ -1191,7 +1203,7 @@
 
     function openQuickLookModal() {
       const file = selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
-      document.getElementById('modal-pdf-title').innerText = `📄 Quick Look: ${file}`;
+      document.getElementById('modal-pdf-title').innerText = `Quick Look: ${file}`;
       document.getElementById('pdf-modal-frame').src = `/api/resume-pdf?file=${encodeURIComponent(file)}&t=${Date.now()}`;
       document.getElementById('pdf-modal').style.display = 'flex';
     }
@@ -1250,18 +1262,18 @@
           saveRecruitersState();
           renderQueue();
           selectRecruiter(selectedIndex);
-          showAppleToast(`Sent to ${r.firstName} (${r.company})!`);
+          showAppleToast(`Sent to ${r.firstName} (${r.company}).`);
         } else {
-          showAppleToast(`❌ Error: ${data.error || 'Send failed'}`);
+          showAppleToast(`Error: ${data.error || 'Send failed'}`);
         }
       } catch (err) {
         showAppleToast(`Error: ${err.message}`);
       } finally {
         btn.disabled = false;
         if (r.status === 'Sent') {
-          btn.innerText = '✓ Sent (Resend)';
+          btn.innerText = 'Sent (Resend)';
         } else {
-          btn.innerText = '✉️ Send Email';
+          btn.innerText = 'Send Email';
         }
       }
     }
@@ -1270,7 +1282,7 @@
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
-        alert('All leads in your queue have already been sent! To send again, add new leads.');
+        alert('All leads in your queue have already been sent. To send again, add new leads.');
         return;
       }
 
@@ -1334,8 +1346,8 @@
         renderQueue();
         selectRecruiter(selectedIndex);
         const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
-        btn.innerText = `🚀 Send Unsent (${remainingUnsent}) in Bulk`;
-        showAppleToast('🎉 Outreach Batch Complete!');
+        btn.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
+        showAppleToast('Outreach batch complete.');
       }
     }
 
