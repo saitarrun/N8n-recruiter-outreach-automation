@@ -696,10 +696,10 @@
     <!-- Apple Segmented Navigation -->
     <div class="segmented-control">
       <button class="segmented-item active" onclick="setStudioTab('queue', event)">
-        Leads (<span id="queue-badge">4</span>)
+        Leads (<span id="queue-badge">0</span>)
       </button>
       <button class="segmented-item" onclick="setStudioTab('resumes', event)">
-        Resumes (<span id="resume-badge">4</span>)
+        Resumes (<span id="resume-badge">0</span>)
       </button>
       <button class="segmented-item" onclick="setStudioTab('bulk', event)">
         Bulk Import
@@ -736,17 +736,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div class="form-row">
                 <label class="form-label-text">First Name</label>
-                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="Stephanie" oninput="handleLeadInputChange()">
+                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="" oninput="handleLeadInputChange()">
               </div>
               <div class="form-row">
                 <label class="form-label-text">Company</label>
-                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="TikTok" oninput="handleLeadInputChange()">
+                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="" oninput="handleLeadInputChange()">
               </div>
             </div>
 
             <div class="form-row">
               <label class="form-label-text">Email Address</label>
-              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="handleLeadInputChange()">
+              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="" oninput="handleLeadInputChange()">
             </div>
 
             <div class="form-row">
@@ -762,13 +762,13 @@
             <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
               <div class="queue-subtabs">
                 <button class="queue-subtab active" onclick="setQueueFilter('all', event)">
-                  All (<span id="filter-all-count">4</span>)
+                  All (<span id="filter-all-count">0</span>)
                 </button>
                 <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
                   Unsent (<span id="filter-unsent-count">0</span>)
                 </button>
                 <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
-                  Sent (<span id="filter-sent-count">4</span>)
+                  Sent (<span id="filter-sent-count">0</span>)
                 </button>
               </div>
 
@@ -869,18 +869,18 @@
 
         <!-- Dispatched Notice Banner -->
         <div class="sent-notice-banner" id="sent-notice-banner">
-          <span>This email was already dispatched and is preserved in Sent History. It will not be sent again during automated bulk runs.</span>
+          <span id="sent-notice-text">This email was already dispatched and is preserved in Sent History.</span>
         </div>
 
         <!-- Mail Header Metadata Rows -->
         <div class="mail-header-fields">
           <div class="field-row">
             <span class="field-tag">To:</span>
-            <span id="prev-to" style="font-weight: 600; color: var(--accent-blue);">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
+            <span id="prev-to" style="font-weight: 600; color: var(--accent-blue);">Recruiter &lt;email@example.com&gt;</span>
           </div>
           <div class="field-row">
             <span class="field-tag">Subject:</span>
-            <input type="text" id="prev-subject" class="field-subject-input" value="Software Engineering Opportunities at TikTok — Sai Tarrun Pitta">
+            <input type="text" id="prev-subject" class="field-subject-input" value="Software Engineering Opportunities — Sai Tarrun Pitta">
           </div>
           <div class="field-row">
             <span class="field-tag">Attach:</span>
@@ -920,34 +920,38 @@
     let selectedResumeFile = "";
     let currentQueueFilter = "all"; // 'all', 'unsent', 'sent'
     let stagedDocumentLeads = [];
-
-    // Default recruiter list
-    const defaultRecruiters = [
-      { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf", status: "Sent" },
-      { firstName: "Vivian", company: "ByteDance", email: "vivianjiang@bytedance.com", focus: "scalable microservices and distributed platform engineering", resumeFile: "Sai_Tarrun_Pitta_SoftwareEngineer_Resume.pdf", status: "Sent" },
-      { firstName: "Emma", company: "TikTok", email: "emma.huo@tiktok.com", focus: "cloud infrastructure and scalable backend services", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf", status: "Sent" },
-      { firstName: "Isis", company: "ByteDance", email: "isis.kcano@bytedance.com", focus: "distributed systems and backend cloud architecture", resumeFile: "Sai_Tarrun_Pitta_General_Resume.pdf", status: "Sent" }
-    ];
-
     let recruiters = [];
-    try {
-      const saved = localStorage.getItem('recruiter_leads_v3');
-      if (saved) {
-        recruiters = JSON.parse(saved);
-      } else {
-        recruiters = defaultRecruiters;
-      }
-    } catch (e) {
-      recruiters = defaultRecruiters;
-    }
-
-    function saveRecruitersState() {
-      try {
-        localStorage.setItem('recruiter_leads_v3', JSON.stringify(recruiters));
-      } catch (e) {}
-    }
-
     let selectedIndex = 0;
+
+    // Fetch leads from Persistent SQLite Database
+    async function loadLeadsFromDatabase() {
+      try {
+        const res = await fetch('/api/leads');
+        const data = await res.json();
+        if (data.leads && data.leads.length > 0) {
+          recruiters = data.leads;
+        }
+        renderQueue();
+        if (recruiters.length > 0) {
+          selectRecruiter(0);
+        }
+      } catch (err) {
+        console.error('Failed to load leads from database', err);
+      }
+    }
+
+    // Persist leads to SQLite Database
+    async function saveRecruitersState(leadsToSave) {
+      try {
+        await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leads: leadsToSave || recruiters })
+        });
+      } catch (err) {
+        console.error('Failed to persist leads to database', err);
+      }
+    }
 
     function setQueueFilter(filter, evt) {
       currentQueueFilter = filter;
@@ -1049,7 +1053,7 @@
       if (r) {
         r.resumeFile = filename;
         document.getElementById('resume-select').value = filename;
-        saveRecruitersState();
+        saveRecruitersState([r]);
         showAppleToast(`Attached ${filename}`);
         renderQueue();
       }
@@ -1063,7 +1067,7 @@
       const r = recruiters[selectedIndex];
       if (r) {
         r.resumeFile = val;
-        saveRecruitersState();
+        saveRecruitersState([r]);
         renderQueue();
       }
       renderResumeList();
@@ -1118,9 +1122,12 @@
         
         let badgeClass = 'badge-pending';
         let badgeText = 'Ready';
+        let subText = `${r.email} • ${r.resumeFile || 'Default'}`;
+
         if (r.status === 'Sent') {
           badgeClass = 'badge-sent';
           badgeText = 'Sent';
+          subText = `${r.email} • Sent ${r.sentAt || 'Recorded in DB'}`;
         } else if (r.status === 'Failed') {
           badgeClass = 'badge-failed';
           badgeText = 'Failed';
@@ -1129,7 +1136,7 @@
         item.innerHTML = `
           <div class="rec-left">
             <div class="rec-name">${r.firstName} @ ${r.company}</div>
-            <div class="rec-sub">${r.email} • ${r.resumeFile || 'Default'}</div>
+            <div class="rec-sub">${subText}</div>
           </div>
           <span class="rec-badge ${badgeClass}">${badgeText}</span>
         `;
@@ -1137,7 +1144,7 @@
       });
     }
 
-    // PURE HELPER: Synchronously builds the exact subject & HTML payload for any recruiter lead
+    // PURE HELPER: Synchronously builds subject & HTML payload
     function buildEmailPayloadForRecruiter(r) {
       const fn = (r && r.firstName) ? r.firstName : 'Recruiter';
       const comp = (r && r.company) ? r.company : 'Company';
@@ -1201,9 +1208,12 @@
 
       // 2. Sync Status Banner & Single Send Button
       const noticeBanner = document.getElementById('sent-notice-banner');
+      const noticeText = document.getElementById('sent-notice-text');
       const sendBtn = document.getElementById('btn-send-single');
+
       if (r.status === 'Sent') {
         noticeBanner.style.display = 'flex';
+        noticeText.innerText = `Dispatched to ${r.firstName} (${r.company}) on ${r.sentAt || 'earlier date'}. Saved in persistent local database.`;
         sendBtn.innerText = 'Sent (Resend)';
       } else {
         noticeBanner.style.display = 'none';
@@ -1252,14 +1262,14 @@
       r.firstName = fn;
       r.company = comp;
       r.email = email;
-      saveRecruitersState();
+      saveRecruitersState([r]);
 
       // Live update right compose pane
       const payload = buildEmailPayloadForRecruiter(r);
       document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
       document.getElementById('prev-subject').value = payload.subject;
 
-      // Update salutation and company inline
+      // Update salutation inline
       const bodyEl = document.getElementById('prev-body');
       const firstP = bodyEl.querySelector('p');
       if (firstP) firstP.innerText = `Hi ${payload.fn},`;
@@ -1282,7 +1292,7 @@
       showAppleToast('Ready for new lead entry');
     }
 
-    function addRecruiter() {
+    async function addRecruiter() {
       const fn = document.getElementById('fn').value.trim();
       const comp = document.getElementById('comp').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -1293,12 +1303,14 @@
         return;
       }
 
-      recruiters.unshift({ firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" });
-      saveRecruitersState();
+      const newLead = { firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" };
+      recruiters.unshift(newLead);
+      await saveRecruitersState([newLead]);
+
       selectedIndex = 0;
       renderQueue();
       selectRecruiter(0);
-      showAppleToast(`Added ${fn} @ ${comp} to Unsent Queue.`);
+      showAppleToast(`Added ${fn} @ ${comp} to Persistent Queue.`);
     }
 
     // ==========================================
@@ -1327,17 +1339,14 @@
 
       try {
         if (fnLower.endsWith('.xlsx') || fnLower.endsWith('.xls') || fnLower.endsWith('.csv')) {
-          // Parse Excel or CSV via SheetJS
           const arrayBuffer = await file.arrayBuffer();
           const workbook = XLSX.read(arrayBuffer, { type: 'array' });
           const firstSheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[firstSheetName];
           const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-
           stagedDocumentLeads = parseTableRowsToLeads(rows);
 
         } else if (fnLower.endsWith('.docx')) {
-          // Parse Word document via Mammoth
           const arrayBuffer = await file.arrayBuffer();
           const result = await mammoth.extractRawText({ arrayBuffer });
           const text = result.value || '';
@@ -1356,7 +1365,6 @@
           return;
         }
 
-        // Render Staging Box
         document.getElementById('staged-count-label').innerText = `Parsed ${stagedDocumentLeads.length} Leads`;
         document.getElementById('staged-file-name').innerText = file.name;
         
@@ -1381,7 +1389,6 @@
     function parseTableRowsToLeads(rows) {
       if (!rows || rows.length === 0) return [];
       const leads = [];
-      
       let headerIdx = -1;
       let colName = -1, colComp = -1, colEmail = -1, colFocus = -1;
 
@@ -1445,38 +1452,36 @@
       return leads;
     }
 
-    function confirmStagedImport() {
+    async function confirmStagedImport() {
       if (stagedDocumentLeads.length === 0) return;
       const resFile = selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
       const startIdx = recruiters.length;
 
-      stagedDocumentLeads.forEach(lead => {
-        recruiters.push({
-          firstName: lead.firstName,
-          company: lead.company,
-          email: lead.email,
-          focus: lead.focus || '',
-          resumeFile: resFile,
-          status: "Pending"
-        });
-      });
+      const leadsToSave = stagedDocumentLeads.map(lead => ({
+        firstName: lead.firstName,
+        company: lead.company,
+        email: lead.email,
+        focus: lead.focus || '',
+        resumeFile: resFile,
+        status: "Pending"
+      }));
 
-      saveRecruitersState();
+      leadsToSave.forEach(l => recruiters.push(l));
+      await saveRecruitersState(leadsToSave);
 
       const count = stagedDocumentLeads.length;
       stagedDocumentLeads = [];
       document.getElementById('staged-preview-box').style.display = 'none';
       document.getElementById('doc-upload-input').value = '';
 
-      // Switch to queue tab and select the first new lead
       setStudioTab('queue', null);
       document.querySelectorAll('.segmented-item')[0].classList.add('active');
       renderQueue();
       selectRecruiter(startIdx);
-      showAppleToast(`Imported ${count} leads to Unsent Queue.`);
+      showAppleToast(`Saved ${count} leads to SQLite Database.`);
     }
 
-    function parseBulkLeads() {
+    async function parseBulkLeads() {
       const text = document.getElementById('bulk-text').value.trim();
       if (!text) return;
 
@@ -1487,23 +1492,23 @@
       }
 
       const startIdx = recruiters.length;
-      leads.forEach(lead => {
-        recruiters.push({
-          firstName: lead.firstName,
-          company: lead.company,
-          email: lead.email,
-          resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
-          status: "Pending"
-        });
-      });
+      const leadsToSave = leads.map(lead => ({
+        firstName: lead.firstName,
+        company: lead.company,
+        email: lead.email,
+        resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
+        status: "Pending"
+      }));
 
-      saveRecruitersState();
+      leadsToSave.forEach(l => recruiters.push(l));
+      await saveRecruitersState(leadsToSave);
+
       document.getElementById('bulk-text').value = '';
       setStudioTab('queue', null);
       document.querySelectorAll('.segmented-item')[0].classList.add('active');
       renderQueue();
       selectRecruiter(startIdx);
-      showAppleToast(`Imported ${leads.length} unsent leads.`);
+      showAppleToast(`Saved ${leads.length} leads to SQLite Database.`);
     }
 
     // Direct Binary File Upload
@@ -1561,7 +1566,6 @@
       btn.innerText = 'Sending...';
       btn.disabled = true;
 
-      // Extract subject and HTML directly from current WYSIWYG editor
       const currentSubject = document.getElementById('prev-subject').value;
       const currentHtmlBody = `<!DOCTYPE html>
 <html>
@@ -1594,16 +1598,14 @@
         const data = await res.json();
         if (data.id || data.threadId || res.ok) {
           r.status = 'Sent';
-          saveRecruitersState();
-          showAppleToast(`Sent to ${r.firstName} (${r.company}).`);
+          await loadLeadsFromDatabase();
+          showAppleToast(`Sent to ${r.firstName} (${r.company}) & saved to DB.`);
         } else {
           r.status = 'Failed';
-          saveRecruitersState();
           showAppleToast(`Delivery failed for ${r.email}.`);
         }
       } catch (err) {
         r.status = 'Failed';
-        saveRecruitersState();
         showAppleToast(`Error: ${err.message}`);
       } finally {
         btn.disabled = false;
@@ -1615,11 +1617,11 @@
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
-        alert('All leads in your queue have already been sent. To send again, add new leads.');
+        alert('All leads in your database have already been sent.');
         return;
       }
 
-      if (!confirm(`Dispatch personalized emails to all ${unsentLeads.length} unsent recruiters in your queue?`)) return;
+      if (!confirm(`Dispatch personalized emails to all ${unsentLeads.length} unsent recruiters?`)) return;
 
       const btn = document.getElementById('btn-bulk-send');
       btn.disabled = true;
@@ -1627,12 +1629,11 @@
       try {
         for (let i = 0; i < recruiters.length; i++) {
           const r = recruiters[i];
-          if (r.status === 'Sent') continue; // Strict guarantee: Never trigger already sent leads
+          if (r.status === 'Sent') continue;
 
           selectRecruiter(i);
           btn.innerText = `Sending to ${r.firstName}...`;
 
-          // Generate dedicated subject and body for recruiter `r`
           const payload = buildEmailPayloadForRecruiter(r);
 
           try {
@@ -1654,23 +1655,19 @@
             } else {
               r.status = 'Failed';
             }
-            saveRecruitersState();
-            renderQueue();
           } catch (e) {
             r.status = 'Failed';
-            saveRecruitersState();
-            renderQueue();
           }
 
           await new Promise(res => setTimeout(res, 2000));
         }
       } finally {
         btn.disabled = false;
-        saveRecruitersState();
+        await loadLeadsFromDatabase();
         selectRecruiter(selectedIndex);
         const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
         btn.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
-        showAppleToast('Outreach batch complete.');
+        showAppleToast('Outreach batch complete and recorded in Database.');
       }
     }
 
@@ -1700,9 +1697,9 @@
       }
     }
 
+    // Initialize application
     loadResumes();
-    renderQueue();
-    selectRecruiter(0);
+    loadLeadsFromDatabase();
 
     // Initial check & real-time polling every 4 seconds
     checkN8nHealth();
