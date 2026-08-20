@@ -1,117 +1,103 @@
-<div align="center">
+# Recruiter Outreach Platform & Automation Engine
 
-<img src="./assets/banner.svg" alt="Recruiter Outreach Automation" width="100%"/>
+An autonomous, end-to-end recruitment outreach and cold email platform powered by **n8n** and an **Apple-inspired UI Studio**.
 
-<br/>
-<br/>
-
-[![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-FF6D5A?style=flat-square&logo=n8n&logoColor=white)](https://n8n.io)
-[![Gmail API](https://img.shields.io/badge/Gmail-OAuth_2.0-EA4335?style=flat-square&logo=gmail&logoColor=white)](https://developers.google.com/gmail/api)
-[![Google Sheets](https://img.shields.io/badge/Google_Sheets-Database-0F9D58?style=flat-square&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-38BDF8.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-
-<p align="center">
-  <b>A production-ready, intelligent n8n automation suite for high-signal, personalized recruiter outreach, dynamic resume attachment, and smart multi-tier Gmail reply tracking.</b>
-</p>
-
-</div>
+Features live WYSIWYG email composing, real-time personalization, bulk Excel/Word lead parsing, dynamic resume PDF attachments, and automated anti-spam deliverability spacing.
 
 ---
 
-## ⚡ Overview
+## ⚡ 3-Minute Quickstart
 
-This suite automates technical recruiter outreach with built-in safety controls, smart reply tracking, and full conversation threading.
-
-- **🎯 Context-Aware Personalization**: Dynamic subject lines and custom focus sentences tailored to each company and role.
-- **📄 Resume Attachment**: Automatically reads and attaches your PDF resume from a mounted volume.
-- **🔄 Gmail Threading**: Follow-up emails are sent inside the **same conversation thread** as the original message.
-- **🛑 Smart Reply Detection**: Inspects Gmail threads before sending follow-ups; halts sequences on human reply and skips out-of-office autoreplies.
-- **🔒 Built-in Guardrails**: Includes `TEST_MODE`, company rate limits (max 2/company/day), per-run caps (max 15/run), and 90s delays between sends.
-
----
-
-## 🏗 Architecture
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                 1. RECRUITER OUTREACH                       │
-│                                                             │
-│  [Google Sheets] ──► [Validate & Dedup] ──► [Personalize]   │
-│                             │                       │       │
-│                        (Skip/Log)             [Attach PDF]  │
-│                                                     │       │
-│  [Log to Sheet] ◄── [Update Status] ◄── [Gmail API Send]    │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                 2. FOLLOW-UP & REPLY TRACKING               │
-│                                                             │
-│  [Daily Schedule] ──► [Find Due Follow-Ups]                 │
-│                               │                             │
-│                      [Inspect Gmail Thread]                 │
-│                               │                             │
-│         ┌─────────────────────┴─────────────────────┐       │
-│         ▼                                           ▼       │
-│  [Reply Detected]                            [No Reply]     │
-│         │                                           │       │
-│  [Mark 'Replied' & Stop]                [Send in Same Thread]
-└─────────────────────────────────────────────────────────────┘
+### 1. Clone the Repository
+```bash
+git clone https://github.com/saitarrun/n8n-recruiter-outreach-automation.git
+cd n8n-recruiter-outreach-automation
 ```
 
----
-
-## 📊 Google Sheet Schema
-
-Create a Google Spreadsheet with two tabs:
-
-### 1. `Recruiters` (Outreach Queue)
-`RecruiterID` • `FirstName` • `LastName` • `Company` • `Email` • `RecruiterTitle` • `JobTitle` • `JobLink` • `CompanyFocus` • `Location` • `Status` • `SentDate` • `FollowUpDate` • `FollowUpCount` • `LastEmailDate` • `ReplyStatus` • `ReplyDate` • `GmailMessageID` • `GmailThreadID` • `Notes`
-
-> **Statuses**: `Pending`, `Ready`, `Sent`, `Follow-up 1`, `Follow-up 2`, `Replied`, `Interview`, `Closed`, `Do Not Contact`, `Failed`
-
-### 2. `EmailLogs` (Audit Trail)
-`Timestamp` • `RecruiterID` • `RecruiterName` • `Company` • `Email` • `Action` • `Status` • `GmailMessageID` • `GmailThreadID` • `Error`
-
----
-
-## 🚀 Quick Start
-
-### 1. Launch n8n
+### 2. Start the Platform
+Run the turnkey startup script:
+```bash
+./start.sh
+```
+*Or using Docker Compose directly:*
 ```bash
 docker compose up -d
 ```
-Access the editor at **`http://localhost:5678`**.
 
-### 2. Add Resume
-Place your resume PDF at `./files/Sai_Tarrun_Pitta_Resume.pdf`.
-
-### 3. Import & Connect
-1. Import `workflows/1_recruiter_outreach_workflow.json` and `workflows/2_recruiter_followup_workflow.json`.
-2. Connect **Google Sheets OAuth2** and **Gmail OAuth2** credentials.
-3. Link your Google Sheet document ID in the nodes.
+### 3. Open the Applications
+* **🖥️ Outreach UI Studio**: [http://localhost:3000](http://localhost:3000)
+* **⚙️ n8n Automation Engine**: [http://localhost:5678](http://localhost:5678)
 
 ---
 
-## 🛡 Safe Testing Mode
+## 🔑 One-Time API & Gmail Setup
 
-Both workflows default to `TEST_MODE = true` in the **Global Configuration** node. Outreach emails are routed to your test email with the recruiter address annotated in the subject.
+To send emails through your own Gmail account:
 
-To go live:
-1. Set `TEST_MODE = false` in the configuration nodes.
-2. Toggle the workflows to **Active**.
+### Step 1: Create OAuth Credentials in Google Cloud
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project (e.g. `Recruiter Outreach`).
+3. Enable the **Gmail API** (and optionally **Google Sheets API** if using Google Sheets tracking).
+4. Navigate to **APIs & Services** $\rightarrow$ **OAuth consent screen**:
+   * User Type: **External** $\rightarrow$ Add your email address as a Test User.
+5. Navigate to **Credentials** $\rightarrow$ **Create Credentials** $\rightarrow$ **OAuth client ID**:
+   * Application type: **Web application**
+   * Name: `n8n Integration`
+   * Authorized Redirect URI: `http://localhost:5678/rest/oauth2-credential/callback`
+6. Copy your **Client ID** and **Client Secret**.
+
+### Step 2: Connect in n8n
+1. Open **[http://localhost:5678](http://localhost:5678)**.
+2. Go to **Credentials** $\rightarrow$ **Add Credential** $\rightarrow$ Search for **Gmail OAuth2**.
+3. Paste your **Client ID** and **Client Secret**, click **Connect my account**, and approve permissions.
+4. Save the credential as `Gmail OAuth2 account`.
 
 ---
 
-## 👤 Author
+## 🖥️ UI Studio Features
 
-**Sai Tarrun Pitta**
-- **Portfolio**: [saitarrunpitta.vercel.app](https://saitarrunpitta.vercel.app)
-- **LinkedIn**: [linkedin.com/in/saitarrunpitta](https://linkedin.com/in/saitarrunpitta)
-- **GitHub**: [@saitarrun](https://github.com/saitarrun)
+### 1. Direct WYSIWYG Inline Compose
+* Type directly inside the email body or subject line.
+* Changing First Name or Company immediately updates both the subject line and every mention in the email body in real time.
+
+### 2. Excel (.xlsx, .csv) & Word (.docx) Bulk Import
+* Drag & drop any `.xlsx`, `.xls`, `.csv`, or `.docx` document onto the **Bulk Import** tab.
+* Automatic column header recognition (`Name`, `Company`, `Email`, `Focus/Role`).
+* 1-click import directly into your **Unsent** leads queue.
+
+### 3. Safe Bulk Dispatching
+* **`Send Unsent in Bulk`** exclusively loops through pending leads with a 4-second anti-spam spacing.
+* Sent leads automatically receive a `Sent` badge and are protected in **Sent History** so they are never accidentally emailed twice.
+
+### 4. Resume Variant Manager & Quick Look
+* Upload and switch between multiple resume variants (e.g. *Backend*, *Software Engineer*, *General*).
+* Preview attachments directly in the browser via the built-in **Quick Look** modal.
+
+### 5. Real-Time Engine Health
+* Displays a live header status badge (`n8n Active • 2ms`) with automatic latency heartbeat monitoring.
 
 ---
 
-## 📄 License
+## 📁 Repository Structure
 
-Distributed under the MIT License.
+```
+n8n-recruiter-outreach-automation/
+├── ui/
+│   ├── index.html         # Apple HIG Outreach Studio UI
+│   └── server.py          # Local web server & n8n relay proxy
+├── workflows/
+│   ├── direct_recruiter_outreach_batch_workflow.json  # Webhook email sender
+│   ├── recruiter_outreach_orchestrator.json           # Daily automated runner
+│   └── recruiter_reply_followup_tracker.json         # Follow-up tracker
+├── files/                 # Persistent resume PDF storage directory
+├── sample_recruiter_leads.csv    # Sample test CSV file
+├── sample_recruiter_leads.docx   # Sample test Word document
+├── docker-compose.yml     # Complete Docker container orchestration
+├── start.sh               # Turnkey 1-command startup script
+└── README.md
+```
+
+---
+
+## 🛡️ License & Attribution
+Distributed under the MIT License. Commits and setup scripts are fully open-source and modular for any job seeker or recruitment team.

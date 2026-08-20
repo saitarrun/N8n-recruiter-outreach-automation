@@ -3,7 +3,7 @@ version: '3.8'
 services:
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
-    container_name: n8n
+    container_name: n8n-recruiter-outreach
     restart: unless-stopped
     ports:
       - "5678:5678"
@@ -11,6 +11,19 @@ services:
       - N8N_RESTRICT_FILE_ACCESS_TO=/files;/home/node/.n8n
       - GENERIC_TIMEZONE=America/Los_Angeles
       - TZ=America/Los_Angeles
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
     volumes:
-      - ~/.n8n:/home/node/.n8n
-      - ./files:/files:ro
+      - ./n8n_data:/home/node/.n8n
+      - ./files:/files:rw
+
+  ui-studio:
+    image: python:3.11-alpine
+    container_name: recruiter-ui-studio
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    volumes:
+      - ./ui:/app/ui
+      - ./files:/Users/xploit404/n8n-files:rw
+    command: python3 /app/ui/server.py
