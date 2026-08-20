@@ -6,230 +6,501 @@
   <title>Recruiter Outreach Studio — Sai Tarrun Pitta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: #111827;
-      --card-border: #1f293d;
+      --bg-base: #07090e;
+      --bg-surface: #0e131f;
+      --bg-elevated: #141b2d;
+      --bg-card: #111728;
+      --border-subtle: #1c263c;
+      --border-focus: #4f46e5;
       --primary: #6366f1;
       --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
       --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
       --success: #10b981;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --text: #f8fafc;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --danger: #f43f5e;
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
+      --text-dim: #64748b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
       min-height: 100vh;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .header {
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-surface); }
+    ::-webkit-scrollbar-thumb { background: #26344f; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4d70; }
+
+    /* Top Navigation Bar */
+    .navbar {
+      background: rgba(14, 19, 31, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header h1 { font-size: 22px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
-    .header-badge { font-size: 12px; background: rgba(99, 102, 241, 0.2); color: var(--accent); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.3); }
-
-    .tabs {
+    .brand {
       display: flex;
+      align-items: center;
       gap: 12px;
-      margin-bottom: 20px;
     }
-    .tab-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 12px;
       color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Main Container */
+    .app-container {
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Segmented Navigation Tabs */
+    .nav-tabs-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .tab-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       padding: 8px 18px;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
+      color: var(--text-muted);
       cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all 0.2s ease;
+    }
+    .tab-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tab-item.active {
+      color: #fff;
+      background: var(--bg-elevated);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 1px solid var(--border-subtle);
+    }
+    .tab-item-badge {
+      font-size: 11px;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--accent);
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    /* Studio 2-Column Grid Layout */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.25fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .studio-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Studio Card Panels */
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(20, 27, 45, 0.5);
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s;
     }
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
-    .grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; }
-    @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
+    .panel-body {
       padding: 20px;
-      margin-bottom: 18px;
     }
-    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-    input, textarea, select {
+    /* Form Design */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-label-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .form-input, .form-textarea, .form-select {
       width: 100%;
-      background: #0b1120;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 9px 12px;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 14px;
       color: #fff;
       font-size: 13px;
       font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input:focus, textarea:focus, select:focus {
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.5;
     }
 
+    /* Variable Insertion Chips */
+    .chip-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+    }
+    .var-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      background: rgba(99, 102, 241, 0.12);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .var-chip:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 9px 16px;
-      border-radius: 8px;
-      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: 10px;
       font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       border: none;
       transition: all 0.15s ease;
     }
-    .btn-primary { background: var(--primary); color: #fff; width: 100%; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-success { background: #059669; color: #fff; }
-    .btn-success:hover { background: #047857; }
-    .btn-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--success-glow);
+    }
+    .btn-success:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover {
+      color: #fff;
+      border-color: #3b4d70;
+    }
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.12);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #fff;
+    }
 
+    /* Recruiter List Cards */
     .recruiter-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin-top: 14px;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
     }
-    .recruiter-item {
-      background: #0b1120;
-      border: 1px solid var(--card-border);
+    .recruiter-card {
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
       padding: 10px 14px;
-      border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
-    .recruiter-item:hover, .recruiter-item.active { border-color: var(--primary); }
-    .recruiter-name { font-weight: 600; font-size: 13px; }
-    .recruiter-sub { font-size: 11px; color: var(--text-muted); }
+    .recruiter-card:hover, .recruiter-card.active {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.06);
+    }
+    .rc-name { font-size: 13px; font-weight: 700; color: #fff; }
+    .rc-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-    .preview-box {
+    /* macOS / Gmail Email Preview Window */
+    .mail-preview-window {
       background: #ffffff;
-      color: #222222;
       border-radius: 12px;
-      padding: 22px;
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 440px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .preview-header {
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 12px;
-      color: #4b5563;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      color: #1e293b;
       display: flex;
       flex-direction: column;
-      gap: 4px;
     }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
+    .mail-window-bar {
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .mail-window-title {
+      font-size: 12px;
       font-weight: 600;
+      color: #64748b;
+      margin-left: 4px;
     }
-    .badge-sent { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
-    /* Multi-Resume Library Grid */
+    .mail-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mail-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .meta-label {
+      font-weight: 600;
+      color: #64748b;
+      width: 60px;
+      flex-shrink: 0;
+    }
+    .meta-val {
+      color: #0f172a;
+      font-weight: 500;
+    }
+    
+    .attachment-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1d4ed8;
+    }
+
+    .mail-body {
+      padding: 24px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #27272a;
+      min-height: 380px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .mail-body p { margin-bottom: 14px; }
+    .mail-signature {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid #e4e4e7;
+      font-size: 13px;
+      color: #52525b;
+      line-height: 1.5;
+    }
+
+    /* Resume Library Cards */
     .resume-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 10px;
-      margin-top: 14px;
+      margin-top: 10px;
       max-height: 240px;
       overflow-y: auto;
     }
     .resume-card {
-      background: #0b1120;
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
       padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: all 0.15s ease;
       cursor: pointer;
-      transition: all 0.15s;
     }
     .resume-card:hover, .resume-card.active {
       border-color: var(--accent);
       background: rgba(56, 189, 248, 0.05);
     }
 
-    /* Upload Zone */
     .upload-zone {
-      border: 2px dashed #334155;
+      border: 2px dashed #2a374f;
       border-radius: 12px;
       padding: 20px;
       text-align: center;
-      background: #0b1120;
+      background: #090e18;
       transition: all 0.2s;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .upload-zone.dragover {
       border-color: var(--accent);
       background: rgba(56, 189, 248, 0.08);
     }
-    .upload-icon { font-size: 28px; margin-bottom: 6px; }
 
-    /* Embedded PDF Container */
     .pdf-viewer-container {
       margin-top: 16px;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--border-subtle);
       background: #1e293b;
     }
     .pdf-viewer-header {
-      padding: 8px 14px;
-      background: #0b1120;
+      padding: 10px 16px;
+      background: #090e18;
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--border-subtle);
     }
     .pdf-frame {
       width: 100%;
@@ -238,169 +509,266 @@
       background: #525659;
     }
 
+    /* Toast Notification */
     .toast {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: #1e293b;
+      background: var(--bg-surface);
       color: #fff;
       border: 1px solid var(--success);
       padding: 14px 20px;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       display: none;
       font-size: 13px;
       font-weight: 600;
       z-index: 999;
+      animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div>
-      <h1>🚀 Recruiter Outreach Studio <span class="header-badge">n8n Connected</span></h1>
-      <p style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">Candidate: Sai Tarrun Pitta • Software Engineer</p>
-    </div>
-    <div>
-      <span class="badge badge-sent" style="font-size: 12px; padding: 5px 10px;">Pipeline: Online</span>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('queue', event)">📋 Recruiter Queue</button>
-    <button class="tab-btn" onclick="switchTab('template', event)">✏️ Edit Email Template</button>
-    <button class="tab-btn" onclick="switchTab('resume', event)">📄 Resume Library (<span id="resume-count-badge">0</span>)</button>
-  </div>
-
-  <div class="grid">
-    <!-- Left Column: Dynamic Panels -->
-    <div>
-      <!-- TAB 1: QUEUE -->
-      <div id="tab-queue" class="tab-content active">
-        <div class="card">
-          <div class="card-title">
-            <span>Add / Edit Recruiter Lead</span>
-            <span style="font-size: 11px; color: var(--text-muted);">Queue: <b id="queue-count">4</b></span>
-          </div>
-
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" id="fn" placeholder="e.g. Stephanie" value="Stephanie" oninput="updateCurrentRecruiter()">
-          </div>
-          <div class="form-group">
-            <label>Company</label>
-            <input type="text" id="comp" placeholder="e.g. TikTok" value="TikTok" oninput="updateCurrentRecruiter()">
-          </div>
-          <div class="form-group">
-            <label>Recruiter Email</label>
-            <input type="email" id="email" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateCurrentRecruiter()">
-          </div>
-          <div class="form-group">
-            <label>Company Engineering Focus</label>
-            <input type="text" id="focus" placeholder="e.g. distributed systems" value="large-scale distributed systems and high-throughput infrastructure" oninput="updateCurrentRecruiter()">
-          </div>
-
-          <div class="form-group">
-            <label>📄 Select Resume Version for this Lead</label>
-            <select id="recruiter-resume-select" onchange="updateCurrentRecruiter()">
-              <!-- Populated dynamically -->
-            </select>
-          </div>
-
-          <button class="btn btn-primary" onclick="addRecruiter()">+ Add New Lead</button>
-
-          <div class="recruiter-list" id="recruiter-list"></div>
-        </div>
+  <!-- Top App Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-title">Recruiter Outreach Studio</div>
+        <div class="brand-sub">Sai Tarrun Pitta • Software Engineer</div>
       </div>
+    </div>
+    <div class="nav-stats">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>n8n Engine Connected</span>
+      </div>
+    </div>
+  </nav>
 
-      <!-- TAB 2: EDIT TEMPLATE -->
-      <div id="tab-template" class="tab-content">
-        <div class="card">
-          <div class="card-title">
-            <span>Edit Email Template</span>
-            <button class="btn btn-success" style="padding: 4px 10px; font-size: 11px;" onclick="resetTemplate()">Reset Default</button>
+  <div class="app-container">
+
+    <!-- Segmented Studio Tabs -->
+    <div class="nav-tabs-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-item active" onclick="switchTab('queue', event)">
+          <span>📋 Recruiter Queue</span>
+          <span class="tab-item-badge" id="queue-count-badge">4</span>
+        </button>
+        <button class="tab-item" onclick="switchTab('template', event)">
+          <span>✏️ Email Template Studio</span>
+        </button>
+        <button class="tab-item" onclick="switchTab('resume', event)">
+          <span>📄 Resume Library</span>
+          <span class="tab-item-badge" id="resume-count-badge">4</span>
+        </button>
+      </div>
+      <div>
+        <span style="font-size: 12px; color: var(--text-dim);">OAuth 2.0 • Live Delivery</span>
+      </div>
+    </div>
+
+    <!-- Main Two-Column Layout -->
+    <div class="studio-grid">
+
+      <!-- LEFT COLUMN: CONTROLS & EDITORS -->
+      <div>
+
+        <!-- TAB 1: RECRUITER QUEUE -->
+        <div id="tab-queue" class="tab-panel active">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">👥 Recruiter Lead Details</span>
+              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="clearRecruiterForm()">+ New Blank</button>
+            </div>
+            <div class="panel-body">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label class="form-label">First Name</label>
+                  <input type="text" id="fn" class="form-input" placeholder="e.g. Stephanie" value="Stephanie" oninput="updateCurrentRecruiter()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Company Name</label>
+                  <input type="text" id="comp" class="form-input" placeholder="e.g. TikTok" value="TikTok" oninput="updateCurrentRecruiter()">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Recruiter Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateCurrentRecruiter()">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <span>Company Engineering Focus (Personalization)</span>
+                </label>
+                <input type="text" id="focus" class="form-input" placeholder="e.g. large-scale distributed systems" value="large-scale distributed systems and high-throughput infrastructure" oninput="updateCurrentRecruiter()">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <span>Attached Resume Version</span>
+                  <span class="form-label-hint">Matched to role</span>
+                </label>
+                <select id="recruiter-resume-select" class="form-select" onchange="updateCurrentRecruiter()"></select>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%;" onclick="addRecruiter()">+ Add / Update Lead in Queue</button>
+
+              <div style="margin-top: 18px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Active Lead Queue</div>
+                <div class="recruiter-list" id="recruiter-list"></div>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label>Subject Line Format</label>
-            <input type="text" id="tpl-subject" value="Software Engineering Opportunities at {{Company}} — Sai Tarrun Pitta" oninput="renderPreview()">
-          </div>
+        <!-- TAB 2: EMAIL TEMPLATE STUDIO -->
+        <div id="tab-template" class="tab-panel">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">✉️ Email Template Studio</span>
+              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="resetTemplate()">Reset Default</button>
+            </div>
+            <div class="panel-body">
+              
+              <div class="form-group">
+                <label class="form-label">
+                  <span>Subject Line</span>
+                  <span class="form-label-hint">Click variable chip to insert</span>
+                </label>
+                <input type="text" id="tpl-subject" class="form-input" value="Software Engineering Opportunities at {{Company}} — Sai Tarrun Pitta" oninput="renderPreview()">
+              </div>
 
-          <div class="form-group">
-            <label>Introduction & Background Paragraphs</label>
-            <textarea id="tpl-intro" rows="4" oninput="renderPreview()">My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
+              <div class="chip-bar">
+                <span class="var-chip" onclick="insertVar('tpl-subject', '{{Company}}')">+ {{Company}}</span>
+                <span class="var-chip" onclick="insertVar('tpl-subject', '{{FirstName}}')">+ {{FirstName}}</span>
+                <span class="var-chip" onclick="insertVar('tpl-subject', 'Software Engineer')">+ Software Engineer</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <span>Intro &amp; Experience Paragraphs</span>
+                  <span class="form-label-hint">Highlight key work</span>
+                </label>
+                <textarea id="tpl-intro" class="form-textarea" rows="4" oninput="renderPreview()">My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
 
 I've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</textarea>
-          </div>
+              </div>
 
-          <div class="form-group">
-            <label>Technical Stack String</label>
-            <input type="text" id="tpl-stack" value="Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems." oninput="renderPreview()">
-          </div>
+              <div class="form-group">
+                <label class="form-label">Technical Stack Line</label>
+                <input type="text" id="tpl-stack" class="form-input" value="Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems." oninput="renderPreview()">
+              </div>
 
-          <div class="form-group">
-            <label>Call to Action / Closing</label>
-            <textarea id="tpl-cta" rows="3" oninput="renderPreview()">If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</textarea>
-          </div>
+              <div class="form-group">
+                <label class="form-label">Call to Action &amp; Closing</label>
+                <textarea id="tpl-cta" class="form-textarea" rows="3" oninput="renderPreview()">If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</textarea>
+              </div>
 
-          <button class="btn btn-primary" onclick="showToast('Template updated & saved!')">💾 Save Template</button>
+              <button class="btn btn-primary" style="width: 100%;" onclick="showToast('✅ Template saved &amp; applied!')">💾 Save &amp; Apply Template</button>
+            </div>
+          </div>
         </div>
+
+        <!-- TAB 3: RESUME LIBRARY -->
+        <div id="tab-resume" class="tab-panel">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">📄 Resume Library (<span id="resume-count-title">4</span> Variants)</span>
+            </div>
+            <div class="panel-body">
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+                Manage your specialized resume variants. Assign different resumes to backend, AI/ML, or full-stack opportunities.
+              </p>
+
+              <!-- Resume List -->
+              <div class="resume-grid" id="resume-grid"></div>
+
+              <!-- Upload Zone -->
+              <div class="upload-zone" id="drop-area">
+                <div style="font-size: 24px; margin-bottom: 6px;">📤</div>
+                <div style="font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 4px;">Upload New Resume Variant (PDF)</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Drag &amp; drop or browse from disk</div>
+                
+                <input type="file" id="file-input" accept=".pdf" style="display: none;">
+                <button class="btn btn-primary" style="padding: 6px 16px; font-size: 12px;" onclick="document.getElementById('file-input').click()">
+                  📁 Browse PDF Resume
+                </button>
+              </div>
+
+              <!-- PDF Viewer -->
+              <div class="pdf-viewer-container">
+                <div class="pdf-viewer-header">
+                  <span id="pdf-viewer-title">📄 PDF Preview</span>
+                  <a id="pdf-open-tab" href="#" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11px; font-weight: 600;">Open Full Screen ↗</a>
+                </div>
+                <iframe id="pdf-frame" class="pdf-frame" src=""></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- TAB 3: RESUME LIBRARY -->
-      <div id="tab-resume" class="tab-content">
-        <div class="card">
-          <div class="card-title">
-            <span>Resume Library (<span id="resume-count-title">0</span> Variants)</span>
-          </div>
-
-          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-            Manage and assign different specialized resumes. You can upload new variants or remove outdated versions anytime.
-          </p>
-
-          <!-- Resume Cards List -->
-          <div class="resume-grid" id="resume-grid"></div>
-
-          <!-- Upload Drop Zone -->
-          <div class="upload-zone" id="drop-area">
-            <div class="upload-icon">📤</div>
-            <div style="font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 4px;">Upload New Resume Variant (PDF)</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">e.g. SaiTarrunPitta_AIML_Resume.pdf</div>
-            
-            <input type="file" id="file-input" accept=".pdf" style="display: none;">
-            <button class="btn btn-primary" style="width: auto; padding: 7px 18px; font-size: 12px;" onclick="document.getElementById('file-input').click()">
-              📁 Browse &amp; Add Resume Variant
+      <!-- RIGHT COLUMN: LIVE REAL-TIME EMAIL PREVIEW -->
+      <div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">✉️ Live Outgoing Message Preview</span>
+            <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
+              ⚡ Trigger Outreach via n8n
             </button>
           </div>
+          <div class="panel-body" style="padding: 16px;">
+            
+            <div class="mail-preview-window">
+              <!-- Window Chrome -->
+              <div class="mail-window-bar">
+                <div class="window-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+                <span class="mail-window-title">New Message — Gmail API</span>
+              </div>
 
-          <!-- Embedded PDF Viewer -->
-          <div class="pdf-viewer-container">
-            <div class="pdf-viewer-header">
-              <span id="pdf-viewer-title">📄 PDF Preview</span>
-              <a id="pdf-open-tab" href="#" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11px;">Open in New Tab ↗</a>
+              <!-- Email Headers -->
+              <div class="mail-header">
+                <div class="mail-meta-row">
+                  <span class="meta-label">To:</span>
+                  <span class="meta-val" id="prev-to">stephanie.chao@tiktok.com</span>
+                </div>
+                <div class="mail-meta-row">
+                  <span class="meta-label">Subject:</span>
+                  <span class="meta-val" id="prev-subject" style="font-weight: 700;">Software Engineering Opportunities at TikTok — Sai Tarrun Pitta</span>
+                </div>
+                <div class="mail-meta-row">
+                  <span class="meta-label">Attach:</span>
+                  <span class="attachment-pill" id="prev-attach">
+                    <span>📄</span>
+                    <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
+                    <span style="font-size: 11px; opacity: 0.8;" id="prev-attach-size">(73.4 KB)</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Email Body -->
+              <div class="mail-body" id="prev-body"></div>
             </div>
-            <iframe id="pdf-frame" class="pdf-frame" src=""></iframe>
+
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Right Column: Live Email Preview & Send -->
-    <div>
-      <div class="card">
-        <div class="card-title">
-          <span>Live Email Preview</span>
-          <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
-            ✉️ Trigger Outreach via n8n
-          </button>
-        </div>
-
-        <div class="preview-box" id="email-preview"></div>
-      </div>
     </div>
   </div>
 
@@ -436,7 +804,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           selectedResumeFile = "";
         }
 
-        // Populate dropdown in Queue tab
+        // Populate dropdown
         const selectEl = document.getElementById('recruiter-resume-select');
         selectEl.innerHTML = '';
         resumeLibrary.forEach(r => {
@@ -446,7 +814,6 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           selectEl.appendChild(opt);
         });
 
-        // Set selected value in dropdown
         const currentRecruiter = recruiters[selectedIndex];
         if (currentRecruiter && currentRecruiter.resumeFile) {
           selectEl.value = currentRecruiter.resumeFile;
@@ -467,7 +834,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       grid.innerHTML = '';
 
       if (resumeLibrary.length === 0) {
-        grid.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">No resumes uploaded yet. Upload your first PDF below!</div>';
+        grid.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">No resumes uploaded yet. Upload a PDF below!</div>';
         return;
       }
 
@@ -483,11 +850,11 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
               <div style="font-size: 11px; color: var(--text-muted);">${r.size} • ${r.lastModified}</div>
             </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; width: auto;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
-              Select for Lead
+          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
+              Select
             </button>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px; width: auto;" onclick="event.stopPropagation(); deleteResume('${r.filename}')" title="Delete this resume">
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')" title="Delete resume">
               🗑
             </button>
           </div>
@@ -497,10 +864,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
     }
 
     async function deleteResume(filename) {
-      if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
-        return;
-      }
-
+      if (!confirm(`Delete "${filename}"?`)) return;
       try {
         const res = await fetch('/api/delete-resume', {
           method: 'POST',
@@ -533,34 +897,40 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       if (r) {
         r.resumeFile = filename;
         document.getElementById('recruiter-resume-select').value = filename;
-        showToast(`Assigned ${filename} to ${r.firstName} @ ${r.company}`);
+        showToast(`Assigned ${filename} to ${r.firstName}`);
         renderList();
       }
       previewResumeFile(filename);
     }
 
     function switchTab(tabId, evt) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(c => c.classList.remove('active'));
       if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    function insertVar(inputId, varText) {
+      const el = document.getElementById(inputId);
+      el.value += ' ' + varText;
+      renderPreview();
     }
 
     function renderList() {
       const listEl = document.getElementById('recruiter-list');
       listEl.innerHTML = '';
-      document.getElementById('queue-count').innerText = recruiters.length;
+      document.getElementById('queue-count-badge').innerText = recruiters.length;
 
       recruiters.forEach((r, idx) => {
         const item = document.createElement('div');
-        item.className = `recruiter-item ${idx === selectedIndex ? 'active' : ''}`;
+        item.className = `recruiter-card ${idx === selectedIndex ? 'active' : ''}`;
         item.onclick = () => selectRecruiter(idx);
         item.innerHTML = `
           <div>
-            <div class="recruiter-name">${r.firstName} @ ${r.company}</div>
-            <div class="recruiter-sub">${r.email} • <span style="color: var(--accent);">📄 ${r.resumeFile || 'Default Resume'}</span></div>
+            <div class="rc-name">${r.firstName} @ ${r.company}</div>
+            <div class="rc-sub">${r.email} • <span style="color: var(--accent);">📄 ${r.resumeFile || 'Default'}</span></div>
           </div>
-          <span class="badge ${r.status === 'Sent' ? 'badge-sent' : 'badge-pending'}">${r.status || 'Pending'}</span>
+          <span class="status-pill" style="font-size: 11px; padding: 2px 8px;">${r.status || 'Pending'}</span>
         `;
         listEl.appendChild(item);
       });
@@ -591,6 +961,14 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       renderPreview();
     }
 
+    function clearRecruiterForm() {
+      document.getElementById('fn').value = '';
+      document.getElementById('comp').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('focus').value = '';
+      showToast('Ready for new lead entry!');
+    }
+
     function addRecruiter() {
       const fn = document.getElementById('fn').value.trim();
       const comp = document.getElementById('comp').value.trim();
@@ -609,42 +987,50 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       showToast(`Added ${fn} @ ${comp} to queue!`);
     }
 
+    function resetTemplate() {
+      document.getElementById('tpl-subject').value = "Software Engineering Opportunities at {{Company}} — Sai Tarrun Pitta";
+      document.getElementById('tpl-intro').value = `My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.\n\nI've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.`;
+      document.getElementById('tpl-stack').value = "Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.";
+      document.getElementById('tpl-cta').value = "If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.";
+      renderPreview();
+      showToast('Template reset to default.');
+    }
+
     function renderPreview() {
       const r = recruiters[selectedIndex] || { firstName: "Recruiter", company: "Company", email: "recruiter@example.com", focus: "", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf" };
       const resumeName = r.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Resume.pdf";
-
       const matchedResume = resumeLibrary.find(x => x.filename === resumeName);
       const resumeSize = matchedResume ? matchedResume.size : "73.4 KB";
       
-      const subjectTpl = document.getElementById('tpl-subject').value.replace('{{Company}}', r.company);
-      const introText = document.getElementById('tpl-intro').value.split('\n\n').map(p => `<p style="margin-bottom: 14px;">${p.replace('Uber', '<strong>Uber</strong>').replace('Pacific Life', '<strong>Pacific Life</strong>').replace('Cognizant', '<strong>Cognizant</strong>').replace('California State University, Fullerton', '<strong>California State University, Fullerton</strong>')}</p>`).join('');
+      const subjectTpl = document.getElementById('tpl-subject').value.replace(/{{Company}}/g, r.company).replace(/{{FirstName}}/g, r.firstName);
+      const introText = document.getElementById('tpl-intro').value.split('\n\n').map(p => `<p>${p.replace(/Uber/g, '<strong>Uber</strong>').replace(/Pacific Life/g, '<strong>Pacific Life</strong>').replace(/Cognizant/g, '<strong>Cognizant</strong>').replace(/California State University, Fullerton/g, '<strong>California State University, Fullerton</strong>')}</p>`).join('');
       const stackText = document.getElementById('tpl-stack').value;
       const ctaText = document.getElementById('tpl-cta').value;
       
-      const focusHtml = r.focus ? `<p style="margin-bottom: 14px;">I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
+      const focusHtml = r.focus ? `<p>I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
 
-      document.getElementById('email-preview').innerHTML = `
-        <div class="preview-header">
-          <div><b>To:</b> ${r.email}</div>
-          <div><b>Subject:</b> ${subjectTpl}</div>
-          <div><b>Attachment:</b> 📄 <span style="color: #0066cc; font-weight: 700;">${resumeName}</span> (${resumeSize} • Dynamic Mount)</div>
-        </div>
-        <p style="margin-bottom: 14px;">Hi ${r.firstName},</p>
-        <p style="margin-bottom: 14px;">I hope you're doing well.</p>
+      document.getElementById('prev-to').innerText = `${r.firstName} (${r.email})`;
+      document.getElementById('prev-subject').innerText = subjectTpl;
+      document.getElementById('prev-attach-name').innerText = resumeName;
+      document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
+
+      document.getElementById('prev-body').innerHTML = `
+        <p>Hi ${r.firstName},</p>
+        <p>I hope you're doing well.</p>
         ${introText}
-        <p style="margin-bottom: 14px;">My technical background includes ${stackText}</p>
-        <p style="margin-bottom: 14px;">I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
+        <p>My technical background includes ${stackText}</p>
+        <p>I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
         ${focusHtml}
-        <p style="margin-bottom: 14px;">${ctaText}</p>
-        <p style="margin-bottom: 14px;">I've attached my resume for reference.</p>
-        <p style="margin-bottom: 14px;">Thank you for your time and consideration.</p>
-        <p style="margin-bottom: 14px;">Best regards,</p>
-        <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; font-size: 13px; color: #4b5563;">
+        <p>${ctaText}</p>
+        <p>I've attached my resume for reference.</p>
+        <p>Thank you for your time and consideration.</p>
+        <p>Best regards,</p>
+        <div class="mail-signature">
           <strong>Sai Tarrun Pitta</strong><br>
-          Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0066cc;">saitarrunpitta@gmail.com</a><br>
-          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0066cc;">linkedin.com/in/saitarrunpitta</a><br>
-          GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: #0066cc;">github.com/saitarrun</a><br>
-          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0066cc;">saitarrunpitta.vercel.app</a>
+          Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0284c7; text-decoration: none;">saitarrunpitta@gmail.com</a><br>
+          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0284c7; text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
+          GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: #0284c7; text-decoration: none;">github.com/saitarrun</a><br>
+          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0284c7; text-decoration: none;">saitarrunpitta.vercel.app</a>
         </div>
       `;
     }
@@ -670,7 +1056,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`✅ Successfully added ${file.name} to Resume Library!`);
+          showToast(`✅ Added ${file.name} to library!`);
           await loadResumes();
           previewResumeFile(file.name);
         } else {
@@ -681,14 +1067,12 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       }
     }
 
-    // Attach File Input Listener
     const fileInput = document.getElementById('file-input');
     fileInput.addEventListener('change', function() {
       handleFileUpload(this.files);
       this.value = '';
     });
 
-    // Drag and Drop Listeners
     const dropArea = document.getElementById('drop-area');
     ['dragenter', 'dragover'].forEach(eventName => {
       dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); dropArea.classList.add('dragover'); }, false);
@@ -728,18 +1112,18 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         const data = await res.json();
         r.status = 'Sent';
         renderList();
-        showToast(`✅ Successfully sent outreach to ${r.firstName} (${r.email}) with ${r.resumeFile || 'resume'}!`);
+        showToast(`✅ Successfully sent to ${r.firstName} (${r.email})! Message ID: ${data.id || 'OK'}`);
       } catch (err) {
-        showToast(`❌ Error triggering n8n webhook: ${err.message}`);
+        showToast(`❌ Error: ${err.message}`);
       } finally {
-        btn.innerText = '✉️ Trigger Outreach via n8n';
+        btn.innerText = '⚡ Trigger Outreach via n8n';
         btn.disabled = false;
       }
     }
 
     function showToast(msg) {
       const t = document.getElementById('toast');
-      t.innerText = msg;
+      t.innerHTML = msg;
       t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 4000);
     }
