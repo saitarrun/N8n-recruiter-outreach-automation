@@ -335,6 +335,11 @@
       color: #166534;
       border: 1px solid #bbf7d0;
     }
+    .badge-failed {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
 
     /* Status Banner in Compose Window */
     .sent-notice-banner {
@@ -916,7 +921,7 @@
     let currentQueueFilter = "all"; // 'all', 'unsent', 'sent'
     let stagedDocumentLeads = [];
 
-    // Load from LocalStorage or default to sent batch
+    // Default recruiter list
     const defaultRecruiters = [
       { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf", status: "Sent" },
       { firstName: "Vivian", company: "ByteDance", email: "vivianjiang@bytedance.com", focus: "scalable microservices and distributed platform engineering", resumeFile: "Sai_Tarrun_Pitta_SoftwareEngineer_Resume.pdf", status: "Sent" },
@@ -926,7 +931,7 @@
 
     let recruiters = [];
     try {
-      const saved = localStorage.getItem('recruiter_leads_v2');
+      const saved = localStorage.getItem('recruiter_leads_v3');
       if (saved) {
         recruiters = JSON.parse(saved);
       } else {
@@ -938,7 +943,7 @@
 
     function saveRecruitersState() {
       try {
-        localStorage.setItem('recruiter_leads_v2', JSON.stringify(recruiters));
+        localStorage.setItem('recruiter_leads_v3', JSON.stringify(recruiters));
       } catch (e) {}
     }
 
@@ -1111,9 +1116,15 @@
         item.className = `recruiter-row ${r.originalIdx === selectedIndex ? 'selected' : ''}`;
         item.onclick = () => selectRecruiter(r.originalIdx);
         
-        const isSent = r.status === 'Sent';
-        const badgeClass = isSent ? 'badge-sent' : 'badge-pending';
-        const badgeText = isSent ? 'Sent' : 'Ready';
+        let badgeClass = 'badge-pending';
+        let badgeText = 'Ready';
+        if (r.status === 'Sent') {
+          badgeClass = 'badge-sent';
+          badgeText = 'Sent';
+        } else if (r.status === 'Failed') {
+          badgeClass = 'badge-failed';
+          badgeText = 'Failed';
+        }
 
         item.innerHTML = `
           <div class="rec-left">
@@ -1126,17 +1137,69 @@
       });
     }
 
+    // PURE HELPER: Synchronously builds the exact subject & HTML payload for any recruiter lead
+    function buildEmailPayloadForRecruiter(r) {
+      const fn = (r && r.firstName) ? r.firstName : 'Recruiter';
+      const comp = (r && r.company) ? r.company : 'Company';
+      const email = (r && r.email) ? r.email : 'recruiter@example.com';
+      const focus = (r && r.focus) ? r.focus : '';
+
+      const subject = `Software Engineering Opportunities at ${comp} — Sai Tarrun Pitta`;
+
+      const focusText = focus 
+        ? `<p>I'm particularly interested in <strong>${comp}</strong> because of the work your engineering teams are doing in ${focus}, which aligns closely with my experience and technical interests.</p>`
+        : `<p>I'm particularly interested in <strong>${comp}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>`;
+
+      const bodyHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
+    p { margin: 0 0 14px 0; }
+    a { color: #0071e3; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <p>Hi ${fn},</p>
+  <p>I hope you're doing well.</p>
+  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+  <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+  <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+  <p>I'm currently exploring Software Engineering opportunities at <strong>${comp}</strong>.</p>
+  ${focusText}
+  <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+  <p>I've attached my resume for reference.</p>
+  <p>Thank you for your time and consideration.</p>
+  <p>Best regards,</p>
+  <div class="mail-signature-block">
+    <strong>Sai Tarrun Pitta</strong><br>
+    Email: <a href="mailto:saitarrunpitta@gmail.com">saitarrunpitta@gmail.com</a><br>
+    LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
+    GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
+    Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+  </div>
+</body>
+</html>`;
+
+      return { subject, bodyHtml, fn, comp, email, focus, focusText };
+    }
+
     function selectRecruiter(idx) {
+      if (idx < 0 || idx >= recruiters.length) idx = 0;
       selectedIndex = idx;
       const r = recruiters[idx];
-      document.getElementById('fn').value = r.firstName;
-      document.getElementById('comp').value = r.company;
-      document.getElementById('email').value = r.email;
+      if (!r) return;
+
+      // 1. Sync Left Form Inputs
+      document.getElementById('fn').value = r.firstName || '';
+      document.getElementById('comp').value = r.company || '';
+      document.getElementById('email').value = r.email || '';
       if (r.resumeFile) {
         document.getElementById('resume-select').value = r.resumeFile;
       }
 
-      // Check if already sent
+      // 2. Sync Status Banner & Single Send Button
       const noticeBanner = document.getElementById('sent-notice-banner');
       const sendBtn = document.getElementById('btn-send-single');
       if (r.status === 'Sent') {
@@ -1147,44 +1210,20 @@
         sendBtn.innerText = 'Send Email';
       }
 
-      renderQueue();
-      generateBodyHTML(r.firstName, r.company, r.email, r.focus);
-    }
-
-    function handleLeadInputChange() {
-      const r = recruiters[selectedIndex];
-      const fn = document.getElementById('fn').value.trim() || 'Recruiter';
-      const comp = document.getElementById('comp').value.trim() || 'Company';
-      const email = document.getElementById('email').value.trim() || 'email@example.com';
-      
-      if (r) {
-        r.firstName = fn;
-        r.company = comp;
-        r.email = email;
-        saveRecruitersState();
-      }
-
-      renderQueue();
-      generateBodyHTML(fn, comp, email, r ? r.focus : '');
-    }
-
-    function generateBodyHTML(fn, comp, email, focus) {
-      document.getElementById('prev-to').innerHTML = `${fn} &lt;${email}&gt;`;
-      document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${comp} — Sai Tarrun Pitta`;
+      // 3. Sync Right Compose Pane
+      const payload = buildEmailPayloadForRecruiter(r);
+      document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
+      document.getElementById('prev-subject').value = payload.subject;
       updateAttachmentUI();
-      
-      const focusText = focus 
-        ? `<p>I'm particularly interested in <strong>${comp}</strong> because of the work your engineering teams are doing in ${focus}, which aligns closely with my experience and technical interests.</p>`
-        : `<p>I'm particularly interested in <strong>${comp}</strong> and the innovative work your engineering teams are delivering across scalable systems and modern infrastructure.</p>`;
 
       document.getElementById('prev-body').innerHTML = `
-        <p>Hi ${fn},</p>
+        <p>Hi ${payload.fn},</p>
         <p>I hope you're doing well.</p>
         <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
         <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
         <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
-        <p>I'm currently exploring Software Engineering opportunities at <strong>${comp}</strong>.</p>
-        ${focusText}
+        <p>I'm currently exploring Software Engineering opportunities at <strong>${payload.comp}</strong>.</p>
+        ${payload.focusText}
         <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
         <p>I've attached my resume for reference.</p>
         <p>Thank you for your time and consideration.</p>
@@ -1197,15 +1236,43 @@
           Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
         </div>
       `;
+
+      // 4. Update Queue Highlights
+      renderQueue();
+    }
+
+    function handleLeadInputChange() {
+      const r = recruiters[selectedIndex];
+      if (!r) return;
+
+      const fn = document.getElementById('fn').value.trim() || 'Recruiter';
+      const comp = document.getElementById('comp').value.trim() || 'Company';
+      const email = document.getElementById('email').value.trim() || 'email@example.com';
+      
+      r.firstName = fn;
+      r.company = comp;
+      r.email = email;
+      saveRecruitersState();
+
+      // Live update right compose pane
+      const payload = buildEmailPayloadForRecruiter(r);
+      document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
+      document.getElementById('prev-subject').value = payload.subject;
+
+      // Update salutation and company inline
+      const bodyEl = document.getElementById('prev-body');
+      const firstP = bodyEl.querySelector('p');
+      if (firstP) firstP.innerText = `Hi ${payload.fn},`;
+
+      renderQueue();
     }
 
     function resetBodyToDefault() {
-      const fn = document.getElementById('fn').value.trim() || 'Stephanie';
-      const comp = document.getElementById('comp').value.trim() || 'TikTok';
-      const email = document.getElementById('email').value.trim() || 'stephanie.chao@tiktok.com';
       const r = recruiters[selectedIndex];
-      generateBodyHTML(fn, comp, email, r ? r.focus : '');
-      showAppleToast('Template reset with current lead details.');
+      if (r) {
+        selectRecruiter(selectedIndex);
+        showAppleToast('Template reset to lead defaults.');
+      }
     }
 
     function clearForm() {
@@ -1315,7 +1382,6 @@
       if (!rows || rows.length === 0) return [];
       const leads = [];
       
-      // Look for header index
       let headerIdx = -1;
       let colName = -1, colComp = -1, colEmail = -1, colFocus = -1;
 
@@ -1332,7 +1398,6 @@
         }
       }
 
-      // If headers found, extract by columns
       if (headerIdx !== -1 && colEmail !== -1) {
         for (let i = headerIdx + 1; i < rows.length; i++) {
           const row = rows[i];
@@ -1341,7 +1406,6 @@
           if (email.includes('@') && email.includes('.')) {
             let fn = colName !== -1 ? String(row[colName] || '').trim() : '';
             if (!fn) fn = email.split('@')[0];
-            // If full name, grab first name
             fn = fn.split(' ')[0];
             const comp = colComp !== -1 ? String(row[colComp] || '').trim() : 'Company';
             const focus = colFocus !== -1 ? String(row[colFocus] || '').trim() : '';
@@ -1349,7 +1413,6 @@
           }
         }
       } else {
-        // No header row, scan every row for any cell containing '@'
         rows.forEach(row => {
           const rowStr = row.join(' ');
           const emailMatch = rowStr.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
@@ -1385,7 +1448,8 @@
     function confirmStagedImport() {
       if (stagedDocumentLeads.length === 0) return;
       const resFile = selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
-      
+      const startIdx = recruiters.length;
+
       stagedDocumentLeads.forEach(lead => {
         recruiters.push({
           firstName: lead.firstName,
@@ -1398,15 +1462,17 @@
       });
 
       saveRecruitersState();
-      renderQueue();
 
       const count = stagedDocumentLeads.length;
       stagedDocumentLeads = [];
       document.getElementById('staged-preview-box').style.display = 'none';
       document.getElementById('doc-upload-input').value = '';
 
+      // Switch to queue tab and select the first new lead
       setStudioTab('queue', null);
       document.querySelectorAll('.segmented-item')[0].classList.add('active');
+      renderQueue();
+      selectRecruiter(startIdx);
       showAppleToast(`Imported ${count} leads to Unsent Queue.`);
     }
 
@@ -1420,6 +1486,7 @@
         return;
       }
 
+      const startIdx = recruiters.length;
       leads.forEach(lead => {
         recruiters.push({
           firstName: lead.firstName,
@@ -1431,10 +1498,11 @@
       });
 
       saveRecruitersState();
-      renderQueue();
       document.getElementById('bulk-text').value = '';
       setStudioTab('queue', null);
       document.querySelectorAll('.segmented-item')[0].classList.add('active');
+      renderQueue();
+      selectRecruiter(startIdx);
       showAppleToast(`Imported ${leads.length} unsent leads.`);
     }
 
@@ -1478,6 +1546,7 @@
       document.getElementById('pdf-modal-frame').src = '';
     }
 
+    // SINGLE SEND OUTREACH
     async function sendOutreach() {
       const r = recruiters[selectedIndex];
       if (!r) return;
@@ -1492,6 +1561,7 @@
       btn.innerText = 'Sending...';
       btn.disabled = true;
 
+      // Extract subject and HTML directly from current WYSIWYG editor
       const currentSubject = document.getElementById('prev-subject').value;
       const currentHtmlBody = `<!DOCTYPE html>
 <html>
@@ -1525,21 +1595,19 @@
         if (data.id || data.threadId || res.ok) {
           r.status = 'Sent';
           saveRecruitersState();
-          renderQueue();
-          selectRecruiter(selectedIndex);
           showAppleToast(`Sent to ${r.firstName} (${r.company}).`);
         } else {
-          showAppleToast(`Error: ${data.error || 'Send failed'}`);
+          r.status = 'Failed';
+          saveRecruitersState();
+          showAppleToast(`Delivery failed for ${r.email}.`);
         }
       } catch (err) {
+        r.status = 'Failed';
+        saveRecruitersState();
         showAppleToast(`Error: ${err.message}`);
       } finally {
         btn.disabled = false;
-        if (r.status === 'Sent') {
-          btn.innerText = 'Sent (Resend)';
-        } else {
-          btn.innerText = 'Send Email';
-        }
+        selectRecruiter(selectedIndex);
       }
     }
 
@@ -1564,21 +1632,8 @@
           selectRecruiter(i);
           btn.innerText = `Sending to ${r.firstName}...`;
 
-          const currentSubject = document.getElementById('prev-subject').value;
-          const currentHtmlBody = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
-    p { margin: 0 0 14px 0; }
-    a { color: #0071e3; text-decoration: none; }
-  </style>
-</head>
-<body>
-  ${document.getElementById('prev-body').innerHTML}
-</body>
-</html>`;
+          // Generate dedicated subject and body for recruiter `r`
+          const payload = buildEmailPayloadForRecruiter(r);
 
           try {
             const res = await fetch('/api/send-outreach', {
@@ -1588,27 +1643,30 @@
                 firstName: r.firstName,
                 company: r.company,
                 email: r.email,
-                customSubject: currentSubject,
-                customHtml: currentHtmlBody,
+                customSubject: payload.subject,
+                customHtml: payload.bodyHtml,
                 resumeFile: r.resumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf"
               })
             });
             const data = await res.json();
             if (data.id || data.threadId || res.ok) {
               r.status = 'Sent';
-              saveRecruitersState();
-              renderQueue();
+            } else {
+              r.status = 'Failed';
             }
+            saveRecruitersState();
+            renderQueue();
           } catch (e) {
-            console.error(e);
+            r.status = 'Failed';
+            saveRecruitersState();
+            renderQueue();
           }
 
-          await new Promise(res => setTimeout(res, 4000));
+          await new Promise(res => setTimeout(res, 2000));
         }
       } finally {
         btn.disabled = false;
         saveRecruitersState();
-        renderQueue();
         selectRecruiter(selectedIndex);
         const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
         btn.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
