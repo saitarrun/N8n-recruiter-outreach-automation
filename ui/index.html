@@ -341,6 +341,26 @@
       border: 1px solid #fecaca;
     }
 
+    .lead-del-btn {
+      background: transparent;
+      border: none;
+      color: var(--label-tertiary);
+      font-size: 15px;
+      line-height: 1;
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .lead-del-btn:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
     /* Status Banner in Compose Window */
     .sent-notice-banner {
       background: #f0fdf4;
@@ -736,17 +756,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div class="form-row">
                 <label class="form-label-text">First Name</label>
-                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="" oninput="handleLeadInputChange()">
+                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="" oninput="handleLeadInputChange()" onblur="persistCurrentLead()">
               </div>
               <div class="form-row">
                 <label class="form-label-text">Company</label>
-                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="" oninput="handleLeadInputChange()">
+                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="" oninput="handleLeadInputChange()" onblur="persistCurrentLead()">
               </div>
             </div>
 
             <div class="form-row">
               <label class="form-label-text">Email Address</label>
-              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="" oninput="handleLeadInputChange()">
+              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="" oninput="handleLeadInputChange()" onblur="persistCurrentLead()">
             </div>
 
             <div class="form-row">
@@ -760,16 +780,19 @@
 
             <!-- SEPARATED ACTIVE UNSENT VS SENT LEADS -->
             <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
-              <div class="queue-subtabs">
-                <button class="queue-subtab active" onclick="setQueueFilter('all', event)">
-                  All (<span id="filter-all-count">0</span>)
-                </button>
-                <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
-                  Unsent (<span id="filter-unsent-count">0</span>)
-                </button>
-                <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
-                  Sent (<span id="filter-sent-count">0</span>)
-                </button>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="queue-subtabs" style="flex: 1; margin-bottom: 0;">
+                  <button class="queue-subtab active" onclick="setQueueFilter('all', event)">
+                    All (<span id="filter-all-count">0</span>)
+                  </button>
+                  <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
+                    Unsent (<span id="filter-unsent-count">0</span>)
+                  </button>
+                  <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
+                    Sent (<span id="filter-sent-count">0</span>)
+                  </button>
+                </div>
+                <button class="apple-btn btn-destruct" style="padding: 4px 8px; font-size: 11px; margin-left: 6px;" onclick="clearAllUnsentLeads()" title="Clear all pending leads from queue">Clear Unsent</button>
               </div>
 
               <div class="recruiter-list-group" id="recruiter-list-group"></div>
@@ -1138,7 +1161,10 @@
             <div class="rec-name">${r.firstName} @ ${r.company}</div>
             <div class="rec-sub">${subText}</div>
           </div>
-          <span class="rec-badge ${badgeClass}">${badgeText}</span>
+          <div style="display: flex; align-items: center;">
+            <span class="rec-badge ${badgeClass}">${badgeText}</span>
+            <button class="lead-del-btn" title="Delete lead" onclick="event.stopPropagation(); deleteLead(${r.originalIdx})">&times;</button>
+          </div>
         `;
         listEl.appendChild(item);
       });
@@ -1251,6 +1277,7 @@
       renderQueue();
     }
 
+    // In-memory real-time sync (does NOT spam database on keystrokes)
     function handleLeadInputChange() {
       const r = recruiters[selectedIndex];
       if (!r) return;
@@ -1262,7 +1289,6 @@
       r.firstName = fn;
       r.company = comp;
       r.email = email;
-      saveRecruitersState([r]);
 
       // Live update right compose pane
       const payload = buildEmailPayloadForRecruiter(r);
@@ -1275,6 +1301,56 @@
       if (firstP) firstP.innerText = `Hi ${payload.fn},`;
 
       renderQueue();
+    }
+
+    // Persist to SQLite only when leaving the input with valid email
+    async function persistCurrentLead() {
+      const r = recruiters[selectedIndex];
+      if (r && r.email && r.email.includes('@') && r.email.includes('.')) {
+        await saveRecruitersState([r]);
+      }
+    }
+
+    async function deleteLead(idx) {
+      const r = recruiters[idx];
+      if (!r) return;
+      if (!confirm(`Delete ${r.firstName} (${r.company}) from leads queue?`)) return;
+
+      try {
+        await fetch('/api/delete-lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: r.id, email: r.email })
+        });
+        recruiters.splice(idx, 1);
+        showAppleToast(`Deleted ${r.firstName} @ ${r.company}`);
+        if (selectedIndex >= recruiters.length) selectedIndex = Math.max(0, recruiters.length - 1);
+        renderQueue();
+        if (recruiters.length > 0) selectRecruiter(selectedIndex);
+      } catch (e) {
+        showAppleToast(`Error deleting lead: ${e.message}`);
+      }
+    }
+
+    async function clearAllUnsentLeads() {
+      const unsentCount = recruiters.filter(r => r.status !== 'Sent').length;
+      if (unsentCount === 0) {
+        showAppleToast('No unsent leads to clear.');
+        return;
+      }
+      if (!confirm(`Clear all ${unsentCount} unsent leads from the database? (Sent history will NOT be deleted)`)) return;
+
+      try {
+        await fetch('/api/delete-lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clearUnsent: true })
+        });
+        await loadLeadsFromDatabase();
+        showAppleToast('Cleared all unsent leads.');
+      } catch (e) {
+        showAppleToast(`Error: ${e.message}`);
+      }
     }
 
     function resetBodyToDefault() {
@@ -1303,12 +1379,14 @@
         return;
       }
 
-      const newLead = { firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" };
-      recruiters.unshift(newLead);
-      await saveRecruitersState([newLead]);
+      if (!email.includes('@') || !email.includes('.')) {
+        alert('Please enter a valid email address (e.g. name@company.com).');
+        return;
+      }
 
-      selectedIndex = 0;
-      renderQueue();
+      const newLead = { firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" };
+      await saveRecruitersState([newLead]);
+      await loadLeadsFromDatabase();
       selectRecruiter(0);
       showAppleToast(`Added ${fn} @ ${comp} to Persistent Queue.`);
     }

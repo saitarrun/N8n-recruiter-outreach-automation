@@ -172,7 +172,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         
-        # 1. Save or Add Leads to SQLite
+        # 1. Save or Add Leads to SQLite (ID-based, validated)
         if parsed.path == "/api/leads":
             content_length = int(self.headers.get('Content-Length', 0))
             body = json.loads(self.rfile.read(content_length).decode('utf-8'))
@@ -184,6 +184,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 now_str = time.strftime('%Y-%m-%d %H:%M:%S')
 
                 for lead in lead_list:
+                    lead_id = lead.get('id')
                     fn = lead.get('firstName', '').strip()
                     comp = lead.get('company', '').strip()
                     em = lead.get('email', '').strip()
@@ -192,18 +193,23 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     status = lead.get('status', 'Pending')
                     sent_at = lead.get('sentAt', '')
 
-                    if em:
-                        cur.execute('''
-                        INSERT INTO leads (first_name, company, email, focus, resume_file, status, sent_at, created_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        ON CONFLICT(email) DO UPDATE SET
-                            first_name=excluded.first_name,
-                            company=excluded.company,
-                            focus=excluded.focus,
-                            resume_file=excluded.resume_file,
-                            status=excluded.status,
-                            sent_at=CASE WHEN excluded.status='Sent' AND (leads.sent_at IS NULL OR leads.sent_at='') THEN excluded.sent_at ELSE leads.sent_at END
-                        ''', (fn, comp, em, focus, res_file, status, sent_at, now_str))
+                    # Only process valid email addresses
+                    if em and '@' in em and '.' in em:
+                        if lead_id:
+                            cur.execute('''
+                            UPDATE leads SET first_name=?, company=?, email=?, focus=?, resume_file=?, status=?, sent_at=?
+                            WHERE id=?
+                            ''', (fn, comp, em, focus, res_file, status, sent_at, lead_id))
+                        else:
+                            cur.execute('''
+                            INSERT INTO leads (first_name, company, email, focus, resume_file, status, sent_at, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            ON CONFLICT(email) DO UPDATE SET
+                                first_name=excluded.first_name,
+                                company=excluded.company,
+                                focus=excluded.focus,
+                                resume_file=excluded.resume_file
+                            ''', (fn, comp, em, focus, res_file, status, sent_at, now_str))
 
                 conn.commit()
                 conn.close()
@@ -220,7 +226,39 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
                 return
 
-        # 2. Mark Lead as Sent in SQLite
+        # 2. Delete Lead or Clear Unsent Leads from SQLite
+        elif parsed.path == "/api/delete-lead":
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = json.loads(self.rfile.read(content_length).decode('utf-8'))
+            lead_id = body.get('id')
+            email = body.get('email')
+            clear_unsent = body.get('clearUnsent', False)
+
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                cur = conn.cursor()
+                if clear_unsent:
+                    cur.execute("DELETE FROM leads WHERE status != 'Sent'")
+                elif lead_id:
+                    cur.execute("DELETE FROM leads WHERE id=?", (lead_id,))
+                elif email:
+                    cur.execute("DELETE FROM leads WHERE email=?", (email,))
+                conn.commit()
+                conn.close()
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(b'{"success": true}')
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+                return
+
+        # 3. Mark Lead as Sent in SQLite
         elif parsed.path == "/api/mark-sent":
             content_length = int(self.headers.get('Content-Length', 0))
             body = json.loads(self.rfile.read(content_length).decode('utf-8'))
