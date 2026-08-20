@@ -3,43 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recruiter Outreach Studio — Sai Tarrun Pitta</title>
+  <title>Recruiter Outreach — Sai Tarrun Pitta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #07090e;
-      --bg-surface: #0e131f;
-      --bg-surface-elevated: #131b2e;
-      --bg-surface-hover: #18223a;
-      --border-main: rgba(255, 255, 255, 0.08);
-      --border-subtle: rgba(255, 255, 255, 0.05);
-      --border-focus: #6366f1;
-      
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --primary-glow: rgba(99, 102, 241, 0.35);
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.3);
-      --success: #10b981;
-      --success-glow: rgba(16, 185, 129, 0.3);
-      --danger: #f43f5e;
-      --warning: #f59e0b;
-      
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --border-focus: #0f172a;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --primary: #0f172a;
+      --primary-hover: #1e293b;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --danger: #dc2626;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -47,217 +35,143 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-surface); }
-    ::-webkit-scrollbar-thumb { background: #26344f; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3b4d70; }
-
-    /* Top Glassmorphic Navbar */
-    .navbar {
-      background: rgba(14, 19, 31, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-main);
-      padding: 14px 32px;
+    /* Minimal Header */
+    .header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
     }
-    .brand {
+    .header-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 19px;
-      box-shadow: 0 4px 16px var(--primary-glow);
-    }
-    .brand-title {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.4px;
-      color: #fff;
-    }
-    .brand-sub {
+    .header-subtitle {
       font-size: 12px;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 400;
     }
-
-    .nav-metrics {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .metric-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
+    .badge-status {
+      font-size: 11px;
       font-weight: 600;
-      background: rgba(20, 27, 45, 0.7);
-      border: 1px solid var(--border-main);
-      color: var(--text-muted);
-    }
-    .status-dot-pulse {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 10px #10b981;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(0.85); }
+      color: var(--green);
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 3px 10px;
+      border-radius: 12px;
     }
 
     /* Main Container */
-    .app-container {
-      max-width: 1480px;
+    .container {
+      max-width: 1360px;
       width: 100%;
       margin: 0 auto;
-      padding: 24px 32px;
+      padding: 24px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 18px;
     }
 
-    /* Segmented Navigation Tabs */
-    .nav-tabs-wrapper {
+    /* Simple Tab Navigation */
+    .tab-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--bg-surface);
-      padding: 6px;
-      border-radius: 16px;
-      border: 1px solid var(--border-main);
-      box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), 0 4px 12px rgba(0,0,0,0.2);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
     }
-    .nav-tabs {
+    .tabs {
       display: flex;
-      gap: 6px;
-    }
-    .tab-item {
-      display: flex;
-      align-items: center;
       gap: 8px;
-      padding: 9px 20px;
-      border-radius: 12px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 6px 14px;
+      border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
-      border: 1px solid transparent;
-      background: transparent;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.15s;
     }
-    .tab-item:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.04);
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: #f1f5f9;
     }
-    .tab-item.active {
-      color: #fff;
-      background: var(--bg-surface-elevated);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-      border-color: var(--border-main);
-    }
-    .tab-item-badge {
-      font-size: 11px;
-      background: rgba(99, 102, 241, 0.2);
-      color: var(--accent);
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 700;
+    .tab-btn.active {
+      color: var(--text-main);
+      background: #ffffff;
+      border-color: var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    /* Studio 2-Column Grid Layout */
-    .studio-grid {
+    /* 2-Column Grid */
+    .grid {
       display: grid;
-      grid-template-columns: 440px 1fr;
-      gap: 26px;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
       align-items: start;
     }
-    @media (max-width: 1080px) {
-      .studio-grid { grid-template-columns: 1fr; }
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; }
     }
 
-    /* Premium Studio Panels */
-    .panel {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-main);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.04), 0 12px 32px rgba(0, 0, 0, 0.35);
+    /* Minimal Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
-    .panel-header {
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--border-main);
+    .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(20, 27, 45, 0.5);
-    }
-    .panel-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .panel-body {
-      padding: 22px;
-    }
-
-    /* Premium Inputs */
-    .form-group {
       margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
     }
-    .form-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    /* Minimal Inputs */
+    .form-group { margin-bottom: 12px; }
+    label {
+      display: block;
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
-    .form-label-hint {
-      font-size: 11px;
-      color: var(--text-dim);
-    }
-    .form-input, .form-select, .form-textarea {
+    input, select, textarea {
       width: 100%;
-      background: #090e18;
-      border: 1px solid var(--border-main);
-      border-radius: 12px;
-      padding: 10px 14px;
-      color: #fff;
-      font-size: 13.5px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
       font-family: inherit;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-      transition: all 0.15s ease;
+      color: var(--text-main);
+      transition: all 0.15s;
     }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
+    input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-glow);
-      background: #0b1220;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.08);
     }
 
     /* Buttons */
@@ -265,359 +179,219 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: 12px;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.15s;
     }
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary), #4f46e5);
-      color: #fff;
-      box-shadow: 0 4px 16px var(--primary-glow);
+      background: var(--primary);
+      color: #ffffff;
     }
     .btn-primary:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px var(--primary-glow);
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
-      box-shadow: 0 4px 16px var(--success-glow);
-    }
-    .btn-success:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
-    }
-    .btn-batch {
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
-    }
-    .btn-batch:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
+      background: var(--primary-hover);
     }
     .btn-secondary {
-      background: var(--bg-surface-elevated);
-      color: var(--text-muted);
-      border: 1px solid var(--border-main);
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border);
     }
     .btn-secondary:hover {
-      color: #fff;
-      background: var(--bg-surface-hover);
-      border-color: #3b4d70;
+      background: #f1f5f9;
+    }
+    .btn-blue {
+      background: var(--blue);
+      color: #ffffff;
+    }
+    .btn-blue:hover {
+      background: #1d4ed8;
     }
     .btn-danger {
-      background: rgba(244, 63, 94, 0.12);
-      color: #fda4af;
-      border: 1px solid rgba(244, 63, 94, 0.3);
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid #fecaca;
     }
     .btn-danger:hover {
-      background: var(--danger);
-      color: #fff;
+      background: #fee2e2;
     }
 
-    /* Recruiter List Cards */
-    .recruiter-list {
+    /* Minimal Recruiter Queue */
+    .queue-list {
       display: flex;
       flex-direction: column;
-      gap: 9px;
-      margin-top: 12px;
+      gap: 6px;
+      margin-top: 10px;
       max-height: 220px;
       overflow-y: auto;
     }
-    .recruiter-card {
-      background: #090e18;
-      border: 1px solid var(--border-main);
-      border-radius: 12px;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .recruiter-card:hover, .recruiter-card.active {
-      border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.08);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
-    .rc-avatar {
-      width: 32px;
-      height: 32px;
+    .queue-item {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
       border-radius: 8px;
-      background: linear-gradient(135deg, #1e293b, #334155);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 11px;
-      color: #38bdf8;
-      border: 1px solid var(--border-main);
-    }
-    .rc-name { font-size: 13.5px; font-weight: 700; color: #fff; }
-    .rc-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
-
-    /* macOS / Gmail Email Compose & Direct Edit Window */
-    .mail-preview-window {
-      background: #ffffff;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.45);
-      color: #1e293b;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #e2e8f0;
-    }
-    .mail-window-bar {
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    .window-dots {
-      display: flex;
-      gap: 7px;
-    }
-    .dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-    }
-    .dot-red { background: #ff5f56; }
-    .dot-yellow { background: #ffbd2e; }
-    .dot-green { background: #27c93f; }
-    
-    .editor-pill {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: #4338ca;
-      background: #e0e7ff;
-      border: 1px solid #c7d2fe;
-      padding: 4px 12px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Floating / In-window Formatting Toolbar */
-    .editor-toolbar {
-      background: #f1f5f9;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 7px 18px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .tool-btn {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      padding: 4px 9px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #334155;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .tool-btn:hover {
-      background: #e2e8f0;
-      border-color: #94a3b8;
+    .queue-item:hover, .queue-item.active {
+      border-color: var(--text-main);
+      background: #f8fafc;
+    }
+    .queue-item-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .queue-item-sub {
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
-    .mail-header {
-      padding: 16px 22px;
-      border-bottom: 1px solid #e2e8f0;
+    /* Minimalist Compose Box */
+    .compose-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .compose-top {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .compose-meta {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
       background: #fafafa;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
-    .mail-meta-row {
+    .meta-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 13.5px;
+      gap: 10px;
+      font-size: 13px;
     }
     .meta-label {
-      font-weight: 700;
-      color: #64748b;
-      width: 65px;
-      flex-shrink: 0;
+      width: 60px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
     }
-    
-    /* Direct Editable Subject Input */
-    .editable-subject {
+    .meta-input {
       flex: 1;
       border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 14.5px;
-      font-weight: 700;
-      color: #0f172a;
+      padding: 4px 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
       background: transparent;
-      transition: all 0.15s;
+      border-radius: 6px;
     }
-    .editable-subject:hover, .editable-subject:focus {
+    .meta-input:hover, .meta-input:focus {
       background: #ffffff;
-      border-color: #94a3b8;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-      outline: none;
+      border-color: var(--border);
     }
 
-    .attachment-pill {
+    .attach-tag {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      padding: 5px 12px;
-      border-radius: 8px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 6px;
       font-size: 12px;
-      font-weight: 700;
-      color: #1d4ed8;
+      font-weight: 500;
+      color: var(--text-main);
     }
 
-    /* DIRECT EDITABLE EMAIL BODY */
-    .mail-body-editable {
-      padding: 26px;
-      font-size: 15px;
-      line-height: 1.68;
+    /* Directly Editable Body */
+    .editable-body {
+      padding: 22px;
+      font-size: 14px;
+      line-height: 1.65;
       color: #1e293b;
-      min-height: 440px;
+      min-height: 420px;
       outline: none;
-      cursor: text;
       overflow-y: auto;
     }
-    .mail-body-editable:focus {
-      background: #fbfdff;
-    }
-    .mail-body-editable p { margin-bottom: 14px; }
-    .mail-signature {
-      margin-top: 26px;
-      padding-top: 16px;
-      border-top: 1px solid #e4e4e7;
-      font-size: 13.5px;
-      color: #52525b;
+    .editable-body p { margin-bottom: 14px; }
+    .signature {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
       line-height: 1.5;
     }
 
-    /* Bulk Progress Bar */
-    .progress-bar-container {
-      margin-top: 14px;
-      background: #090e18;
-      border: 1px solid var(--border-main);
-      border-radius: 12px;
-      padding: 14px 18px;
-      display: none;
-    }
-    .progress-bar-bg {
-      background: #1e293b;
-      height: 8px;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .progress-bar-fill {
-      background: linear-gradient(90deg, #10b981, #38bdf8);
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    /* Resume Library Cards */
-    .resume-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 10px;
-      max-height: 240px;
+    /* Resume List */
+    .resume-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
       overflow-y: auto;
+      margin-top: 10px;
     }
-    .resume-card {
-      background: #090e18;
-      border: 1px solid var(--border-main);
-      border-radius: 14px;
-      padding: 12px 16px;
+    .resume-item {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.15s ease;
       cursor: pointer;
     }
-    .resume-card:hover, .resume-card.active {
-      border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.06);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    .resume-item:hover, .resume-item.active {
+      border-color: var(--text-main);
+      background: #f8fafc;
     }
 
-    .upload-zone {
-      border: 2px dashed #2a374f;
-      border-radius: 14px;
-      padding: 22px;
+    .upload-box {
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 16px;
       text-align: center;
-      background: #090e18;
-      transition: all 0.2s;
-      margin-top: 14px;
-    }
-    .upload-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.08);
+      background: #fafafa;
+      margin-top: 12px;
     }
 
-    .pdf-viewer-container {
-      margin-top: 16px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid var(--border-main);
-      background: #1e293b;
-    }
-    .pdf-viewer-header {
-      padding: 10px 16px;
-      background: #090e18;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-main);
-    }
-    .pdf-frame {
+    .pdf-preview {
       width: 100%;
-      height: 380px;
-      border: none;
-      background: #525659;
+      height: 360px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 12px;
     }
 
-    /* Toast Notification */
+    /* Toast */
     .toast {
       position: fixed;
-      bottom: 28px;
-      right: 28px;
-      background: #111728;
-      color: #fff;
-      border: 1px solid var(--success);
-      padding: 14px 22px;
-      border-radius: 14px;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       display: none;
-      font-size: 13.5px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 500;
       z-index: 999;
-      animation: slideUp 0.2s ease-out;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(12px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     .tab-panel { display: none; }
@@ -626,254 +400,164 @@
 </head>
 <body>
 
-  <!-- Top App Navigation -->
-  <nav class="navbar">
-    <div class="brand">
-      <div class="brand-icon">⚡</div>
-      <div>
-        <div class="brand-title">Recruiter Outreach Studio</div>
-        <div class="brand-sub">Sai Tarrun Pitta • Software Engineer</div>
-      </div>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-title">
+      <span>✉️ Recruiter Outreach Studio</span>
+      <span class="header-subtitle">— Sai Tarrun Pitta</span>
     </div>
-    <div class="nav-metrics">
-      <div class="metric-pill">
-        <span class="status-dot-pulse"></span>
-        <span style="color: #34d399; font-weight: 700;">n8n Engine Active</span>
-      </div>
-      <div class="metric-pill">
-        <span>Deliverability: <strong style="color: #38bdf8;">100% (OAuth 2.0)</strong></span>
-      </div>
+    <div>
+      <span class="badge-status">● n8n Connected</span>
     </div>
-  </nav>
+  </header>
 
-  <div class="app-container">
+  <div class="container">
 
-    <!-- Segmented Studio Tabs -->
-    <div class="nav-tabs-wrapper">
-      <div class="nav-tabs">
-        <button class="tab-item active" onclick="switchTab('queue', event)">
-          <span>📋 Recruiter Leads</span>
-          <span class="tab-item-badge" id="queue-count-badge">4</span>
-        </button>
-        <button class="tab-item" onclick="switchTab('bulk', event)">
-          <span>🚀 Bulk Paste &amp; Import</span>
-        </button>
-        <button class="tab-item" onclick="switchTab('resume', event)">
-          <span>📄 Resume Library</span>
-          <span class="tab-item-badge" id="resume-count-badge">4</span>
-        </button>
+    <!-- Top Tab Bar -->
+    <div class="tab-bar">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('queue', event)">📋 Leads (<span id="queue-badge">4</span>)</button>
+        <button class="tab-btn" onclick="switchTab('bulk', event)">🚀 Bulk Import</button>
+        <button class="tab-btn" onclick="switchTab('resume', event)">📄 Resumes (<span id="resume-badge">4</span>)</button>
       </div>
       <div>
-        <button class="btn btn-batch" onclick="sendBulkAllQueue()" id="bulk-send-top-btn">
-          🚀 Dispatch All <span id="bulk-count-label">4</span> in Bulk
+        <button class="btn btn-primary" onclick="sendBulkAllQueue()" id="bulk-btn">
+          🚀 Send All (<span id="bulk-btn-count">4</span>) in Bulk
         </button>
       </div>
     </div>
 
-    <!-- Main Two-Column Layout -->
-    <div class="studio-grid">
+    <!-- 2-Column Minimal Layout -->
+    <div class="grid">
 
-      <!-- LEFT COLUMN: CONTROLS & LEAD MANAGEMENT -->
+      <!-- LEFT COLUMN -->
       <div>
 
-        <!-- TAB 1: RECRUITER QUEUE -->
+        <!-- TAB 1: QUEUE -->
         <div id="tab-queue" class="tab-panel active">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">👥 Target Recruiter</span>
-              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="clearRecruiterForm()">+ New Lead</button>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recruiter Details</span>
+              <button class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;" onclick="clearForm()">+ Clear</button>
             </div>
-            <div class="panel-body">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div class="form-group">
-                  <label class="form-label">First Name</label>
-                  <input type="text" id="fn" class="form-input" placeholder="e.g. Stephanie" value="Stephanie" oninput="updateRecipientFromInputs()">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Company</label>
-                  <input type="text" id="comp" class="form-input" placeholder="e.g. TikTok" value="TikTok" oninput="updateRecipientFromInputs()">
-                </div>
-              </div>
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
               <div class="form-group">
-                <label class="form-label">Recruiter Email</label>
-                <input type="email" id="email" class="form-input" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateRecipientFromInputs()">
+                <label>First Name</label>
+                <input type="text" id="fn" placeholder="Stephanie" value="Stephanie" oninput="updateRecipientFromInputs()">
               </div>
-
               <div class="form-group">
-                <label class="form-label">
-                  <span>Attached Resume Version</span>
-                  <span class="form-label-hint">Dynamic mount</span>
-                </label>
-                <select id="recruiter-resume-select" class="form-select" onchange="updateResumeFromSelect()"></select>
+                <label>Company</label>
+                <input type="text" id="comp" placeholder="TikTok" value="TikTok" oninput="updateRecipientFromInputs()">
               </div>
+            </div>
 
-              <button class="btn btn-primary" style="width: 100%;" onclick="addRecruiter()">+ Save Lead in Queue</button>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="email" placeholder="stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateRecipientFromInputs()">
+            </div>
 
-              <div style="margin-top: 20px; border-top: 1px solid var(--border-main); padding-top: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Active Lead Queue</span>
-                  <button class="btn btn-batch" style="padding: 4px 10px; font-size: 11px;" onclick="sendBulkAllQueue()">🚀 Send All in Queue</button>
-                </div>
-                <div class="recruiter-list" id="recruiter-list"></div>
-              </div>
+            <div class="form-group">
+              <label>Attach Resume Version</label>
+              <select id="resume-select" onchange="updateResumeFromSelect()"></select>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 4px;" onclick="addRecruiter()">+ Save Lead</button>
+
+            <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
+              <label style="margin-bottom: 6px;">Queue Leads</label>
+              <div class="queue-list" id="queue-list"></div>
             </div>
           </div>
         </div>
 
         <!-- TAB 2: BULK IMPORT -->
         <div id="tab-bulk" class="tab-panel">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">🚀 Bulk Paste Recruiter Leads</span>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Bulk Import Leads</span>
             </div>
-            <div class="panel-body">
-              <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
-                Paste multiple recruiters in <code>FirstName, Company, Email</code> format (one per line) or comma-separated:
-              </p>
-
-              <div class="form-group">
-                <textarea id="bulk-paste-area" class="form-textarea" style="min-height: 140px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px;" placeholder="John, Uber, john@uber.com&#10;Sarah, Stripe, sarah@stripe.com&#10;Alex, Meta, alex@meta.com"></textarea>
-              </div>
-
-              <button class="btn btn-primary" style="width: 100%;" onclick="parseBulkLeads()">+ Add All to Queue</button>
-            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+              Paste <code>FirstName, Company, Email</code> (one per line):
+            </p>
+            <textarea id="bulk-text" rows="6" placeholder="John, Uber, john@uber.com&#10;Sarah, Stripe, sarah@stripe.com" style="font-family: monospace; font-size: 12px;"></textarea>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="parseBulkLeads()">+ Add to Queue</button>
           </div>
         </div>
 
         <!-- TAB 3: RESUME LIBRARY -->
         <div id="tab-resume" class="tab-panel">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">📄 Resume Library (<span id="resume-count-title">4</span>)</span>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Resume Library</span>
             </div>
-            <div class="panel-body">
-              <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
-                Assign specialized resumes per company or role.
-              </p>
+            <div class="resume-list" id="resume-list"></div>
 
-              <!-- Resume List -->
-              <div class="resume-grid" id="resume-grid"></div>
-
-              <!-- Upload Zone -->
-              <div class="upload-zone" id="drop-area">
-                <div style="font-size: 26px; margin-bottom: 6px;">📤</div>
-                <div style="font-weight: 700; font-size: 13.5px; color: #fff; margin-bottom: 4px;">Upload New Resume Variant (PDF)</div>
-                <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px;">Drag &amp; drop or browse from disk</div>
-                
-                <input type="file" id="file-input" accept=".pdf" style="display: none;">
-                <button class="btn btn-primary" style="padding: 7px 18px; font-size: 12px;" onclick="document.getElementById('file-input').click()">
-                  📁 Browse PDF Resume
-                </button>
-              </div>
-
-              <!-- PDF Viewer -->
-              <div class="pdf-viewer-container">
-                <div class="pdf-viewer-header">
-                  <span id="pdf-viewer-title">📄 PDF Preview</span>
-                  <a id="pdf-open-tab" href="#" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11.5px; font-weight: 600;">Open Full Screen ↗</a>
-                </div>
-                <iframe id="pdf-frame" class="pdf-frame" src=""></iframe>
-              </div>
+            <div class="upload-box">
+              <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">Upload New Resume (PDF)</div>
+              <input type="file" id="file-input" accept=".pdf" style="display: none;">
+              <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
+                📁 Choose File
+              </button>
             </div>
+
+            <iframe id="pdf-frame" class="pdf-preview" src=""></iframe>
           </div>
         </div>
 
       </div>
 
-      <!-- RIGHT COLUMN: DIRECT WYSIWYG EDITABLE EMAIL COMPOSE WINDOW -->
+      <!-- RIGHT COLUMN: COMPOSE & DIRECT EDIT -->
       <div>
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title">✍️ Live Email Compose &amp; Send</span>
+        <div class="compose-box">
+          <div class="compose-top">
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
+              ✍️ Click below to edit email directly
+            </span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="resetBodyToDefault()">
-                ↺ Reset Template
-              </button>
-              <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
-                ⚡ Send Selected Lead
-              </button>
+              <button class="btn btn-secondary" style="font-size: 12px;" onclick="resetBodyToDefault()">↺ Reset</button>
+              <button class="btn btn-blue" onclick="sendOutreach()" id="send-btn">✉️ Send Message</button>
             </div>
           </div>
-          <div class="panel-body" style="padding: 18px;">
-            
-            <!-- Bulk Progress Bar -->
-            <div class="progress-bar-container" id="bulk-progress-box">
-              <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700;">
-                <span id="bulk-progress-text" style="color: var(--accent);">🚀 Dispatching bulk batch...</span>
-                <span id="bulk-progress-percent" style="color: #fff;">0%</span>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="bulk-progress-fill"></div>
-              </div>
+
+          <div class="compose-meta">
+            <div class="meta-row">
+              <span class="meta-label">To:</span>
+              <span id="prev-to" style="font-weight: 600; color: var(--blue);">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
             </div>
-
-            <div class="mail-preview-window" style="margin-top: 10px;">
-              <!-- Window Chrome -->
-              <div class="mail-window-bar">
-                <div class="window-dots">
-                  <span class="dot dot-red"></span>
-                  <span class="dot dot-yellow"></span>
-                  <span class="dot dot-green"></span>
-                </div>
-                <div class="editor-pill">
-                  <span>✏️ Click anywhere in this box to edit text directly</span>
-                </div>
-              </div>
-
-              <!-- Formatting Toolbar -->
-              <div class="editor-toolbar">
-                <button class="tool-btn" onclick="execCmd('bold')"><b>B</b></button>
-                <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
-                <button class="tool-btn" onclick="execCmd('underline')"><u>U</u></button>
-                <span style="border-right: 1px solid #cbd5e1; height: 16px; margin: 0 4px;"></span>
-                <span style="font-size: 11.5px; color: #64748b; font-weight: 600;">Direct In-place Typing Enabled</span>
-              </div>
-
-              <!-- Email Headers -->
-              <div class="mail-header">
-                <div class="mail-meta-row">
-                  <span class="meta-label">To:</span>
-                  <span class="meta-val" id="prev-to" style="font-weight: 700; color: #0284c7;">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
-                </div>
-                <div class="mail-meta-row">
-                  <span class="meta-label">Subject:</span>
-                  <input type="text" id="prev-subject" class="editable-subject" value="Software Engineering Opportunities at TikTok — Sai Tarrun Pitta" title="Click to edit subject">
-                </div>
-                <div class="mail-meta-row">
-                  <span class="meta-label">Attach:</span>
-                  <span class="attachment-pill" id="prev-attach">
-                    <span>📄</span>
-                    <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
-                    <span style="font-size: 11px; opacity: 0.8;" id="prev-attach-size">(73.4 KB)</span>
-                  </span>
-                </div>
-              </div>
-
-              <!-- DIRECT EDITABLE EMAIL BODY -->
-              <div class="mail-body-editable" id="prev-body" contenteditable="true" spellcheck="false">
-                <p>Hi Stephanie,</p>
-                <p>I hope you're doing well.</p>
-                <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-                <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-                <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
-                <p>I'm currently exploring Software Engineering opportunities at <strong>TikTok</strong>.</p>
-                <p>I'm particularly interested in <strong>TikTok</strong> because of the work your engineering teams are doing in large-scale distributed systems and high-throughput infrastructure, which aligns closely with my experience and technical interests.</p>
-                <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-                <p>I've attached my resume for reference.</p>
-                <p>Thank you for your time and consideration.</p>
-                <p>Best regards,</p>
-                <div class="mail-signature" contenteditable="false">
-                  <strong>Sai Tarrun Pitta</strong><br>
-                  Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0284c7; text-decoration: none;">saitarrunpitta@gmail.com</a><br>
-                  LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0284c7; text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
-                  GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: #0284c7; text-decoration: none;">github.com/saitarrun</a><br>
-                  Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0284c7; text-decoration: none;">saitarrunpitta.vercel.app</a>
-                </div>
-              </div>
-
+            <div class="meta-row">
+              <span class="meta-label">Subject:</span>
+              <input type="text" id="prev-subject" class="meta-input" value="Software Engineering Opportunities at TikTok — Sai Tarrun Pitta">
             </div>
+            <div class="meta-row">
+              <span class="meta-label">Attach:</span>
+              <span class="attach-tag" id="prev-attach">
+                📄 <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
+                <span style="color: var(--text-muted); font-size: 11px;" id="prev-attach-size">(73.4 KB)</span>
+              </span>
+            </div>
+          </div>
 
+          <!-- DIRECT EDITABLE EMAIL CONTENT -->
+          <div class="editable-body" id="prev-body" contenteditable="true" spellcheck="false">
+            <p>Hi Stephanie,</p>
+            <p>I hope you're doing well.</p>
+            <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+            <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+            <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+            <p>I'm currently exploring Software Engineering opportunities at <strong>TikTok</strong>.</p>
+            <p>I'm particularly interested in <strong>TikTok</strong> because of the work your engineering teams are doing in large-scale distributed systems and high-throughput infrastructure, which aligns closely with my experience and technical interests.</p>
+            <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+            <p>I've attached my resume for reference.</p>
+            <p>Thank you for your time and consideration.</p>
+            <p>Best regards,</p>
+            <div class="signature" contenteditable="false">
+              <strong>Sai Tarrun Pitta</strong><br>
+              Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: var(--blue); text-decoration: none;">saitarrunpitta@gmail.com</a><br>
+              LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: var(--blue); text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
+              GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: var(--blue); text-decoration: none;">github.com/saitarrun</a><br>
+              Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: var(--blue); text-decoration: none;">saitarrunpitta.vercel.app</a>
+            </div>
           </div>
         </div>
       </div>
@@ -896,18 +580,13 @@
 
     let selectedIndex = 0;
 
-    function execCmd(cmd) {
-      document.execCommand(cmd, false, null);
-    }
-
     async function loadResumes() {
       try {
         const res = await fetch('/api/resumes');
         const data = await res.json();
         resumeLibrary = data.resumes || [];
         
-        document.getElementById('resume-count-badge').innerText = resumeLibrary.length;
-        document.getElementById('resume-count-title').innerText = resumeLibrary.length;
+        document.getElementById('resume-badge').innerText = resumeLibrary.length;
 
         if (resumeLibrary.length > 0) {
           if (!selectedResumeFile || !resumeLibrary.some(r => r.filename === selectedResumeFile)) {
@@ -917,13 +596,12 @@
           selectedResumeFile = "";
         }
 
-        // Populate dropdown
-        const selectEl = document.getElementById('recruiter-resume-select');
+        const selectEl = document.getElementById('resume-select');
         selectEl.innerHTML = '';
         resumeLibrary.forEach(r => {
           const opt = document.createElement('option');
           opt.value = r.filename;
-          opt.innerText = `📄 ${r.filename} (${r.size})`;
+          opt.innerText = `${r.filename} (${r.size})`;
           selectEl.appendChild(opt);
         });
 
@@ -932,7 +610,7 @@
           selectEl.value = currentRecruiter.resumeFile;
         }
 
-        renderResumeGrid();
+        renderResumeList();
         if (selectedResumeFile) {
           previewResumeFile(selectedResumeFile);
         }
@@ -942,37 +620,30 @@
       }
     }
 
-    function renderResumeGrid() {
-      const grid = document.getElementById('resume-grid');
-      grid.innerHTML = '';
+    function renderResumeList() {
+      const list = document.getElementById('resume-list');
+      list.innerHTML = '';
 
       if (resumeLibrary.length === 0) {
-        grid.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">No resumes uploaded yet. Upload a PDF below!</div>';
+        list.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">No resumes uploaded.</div>';
         return;
       }
 
       resumeLibrary.forEach(r => {
-        const card = document.createElement('div');
-        card.className = `resume-card ${r.filename === selectedResumeFile ? 'active' : ''}`;
-        card.onclick = () => previewResumeFile(r.filename);
-        card.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
-            <span style="font-size: 22px; flex-shrink: 0;">📄</span>
-            <div style="overflow: hidden;">
-              <div style="font-weight: 700; font-size: 13.5px; color: #fff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${r.filename}</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">${r.size} • ${r.lastModified}</div>
-            </div>
+        const item = document.createElement('div');
+        item.className = `resume-item ${r.filename === selectedResumeFile ? 'active' : ''}`;
+        item.onclick = () => previewResumeFile(r.filename);
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 600; font-size: 12.5px;">📄 ${r.filename}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${r.size}</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
-            <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 11.5px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
-              Select
-            </button>
-            <button class="btn btn-danger" style="padding: 5px 9px; font-size: 11.5px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')" title="Delete resume">
-              🗑
-            </button>
+          <div style="display: flex; gap: 4px;">
+            <button class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">Attach</button>
+            <button class="btn btn-danger" style="padding: 3px 6px; font-size: 11px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')">🗑</button>
           </div>
         `;
-        grid.appendChild(card);
+        list.appendChild(item);
       });
     }
 
@@ -986,22 +657,18 @@
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`🗑 Deleted ${filename}!`);
+          showToast(`Deleted ${filename}`);
           await loadResumes();
-        } else {
-          showToast(`❌ Delete failed: ${data.error}`);
         }
       } catch (err) {
-        showToast(`❌ Delete error: ${err.message}`);
+        showToast(`Error: ${err.message}`);
       }
     }
 
     function previewResumeFile(filename) {
       selectedResumeFile = filename;
-      document.getElementById('pdf-viewer-title').innerText = `📄 Viewing: ${filename}`;
-      document.getElementById('pdf-open-tab').href = `/api/resume-pdf?file=${encodeURIComponent(filename)}`;
       document.getElementById('pdf-frame').src = `/api/resume-pdf?file=${encodeURIComponent(filename)}&t=${Date.now()}`;
-      renderResumeGrid();
+      renderResumeList();
       updateAttachmentUI();
     }
 
@@ -1010,20 +677,20 @@
       const r = recruiters[selectedIndex];
       if (r) {
         r.resumeFile = filename;
-        document.getElementById('recruiter-resume-select').value = filename;
+        document.getElementById('resume-select').value = filename;
         showToast(`Attached ${filename}`);
-        renderList();
+        renderQueue();
       }
       previewResumeFile(filename);
     }
 
     function updateResumeFromSelect() {
-      const val = document.getElementById('recruiter-resume-select').value;
+      const val = document.getElementById('resume-select').value;
       selectedResumeFile = val;
       const r = recruiters[selectedIndex];
       if (r) {
         r.resumeFile = val;
-        renderList();
+        renderQueue();
       }
       updateAttachmentUI();
     }
@@ -1038,32 +705,28 @@
     }
 
     function switchTab(tabId, evt) {
-      document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-panel').forEach(c => c.classList.remove('active'));
       if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
-    function renderList() {
-      const listEl = document.getElementById('recruiter-list');
+    function renderQueue() {
+      const listEl = document.getElementById('queue-list');
       listEl.innerHTML = '';
-      document.getElementById('queue-count-badge').innerText = recruiters.length;
-      document.getElementById('bulk-count-label').innerText = recruiters.length;
+      document.getElementById('queue-badge').innerText = recruiters.length;
+      document.getElementById('bulk-btn-count').innerText = recruiters.length;
 
       recruiters.forEach((r, idx) => {
-        const initials = r.company.substring(0, 2).toUpperCase();
         const item = document.createElement('div');
-        item.className = `recruiter-card ${idx === selectedIndex ? 'active' : ''}`;
+        item.className = `queue-item ${idx === selectedIndex ? 'active' : ''}`;
         item.onclick = () => selectRecruiter(idx);
         item.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="rc-avatar">${initials}</div>
-            <div>
-              <div class="rc-name">${r.firstName} @ ${r.company}</div>
-              <div class="rc-sub">${r.email} • <span style="color: var(--accent);">📄 ${r.resumeFile || 'Default'}</span></div>
-            </div>
+          <div>
+            <div class="queue-item-name">${r.firstName} @ ${r.company}</div>
+            <div class="queue-item-sub">${r.email}</div>
           </div>
-          <span class="metric-pill" style="font-size: 11px; padding: 2px 8px; color: ${r.status === 'Sent' ? '#34d399' : '#fbbf24'};">${r.status || 'Pending'}</span>
+          <span style="font-size: 11px; font-weight: 600; color: ${r.status === 'Sent' ? 'var(--green)' : 'var(--text-muted)'};">${r.status || 'Pending'}</span>
         `;
         listEl.appendChild(item);
       });
@@ -1076,9 +739,9 @@
       document.getElementById('comp').value = r.company;
       document.getElementById('email').value = r.email;
       if (r.resumeFile) {
-        document.getElementById('recruiter-resume-select').value = r.resumeFile;
+        document.getElementById('resume-select').value = r.resumeFile;
       }
-      renderList();
+      renderQueue();
       populateBodyForRecruiter(r);
     }
 
@@ -1090,7 +753,7 @@
       r.email = document.getElementById('email').value.trim() || 'email@example.com';
       document.getElementById('prev-to').innerHTML = `${r.firstName} &lt;${r.email}&gt;`;
       document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta`;
-      renderList();
+      renderQueue();
     }
 
     function populateBodyForRecruiter(r) {
@@ -1112,12 +775,12 @@
         <p>I've attached my resume for reference.</p>
         <p>Thank you for your time and consideration.</p>
         <p>Best regards,</p>
-        <div class="mail-signature" contenteditable="false">
+        <div class="signature" contenteditable="false">
           <strong>Sai Tarrun Pitta</strong><br>
-          Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0284c7; text-decoration: none;">saitarrunpitta@gmail.com</a><br>
-          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0284c7; text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
-          GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: #0284c7; text-decoration: none;">github.com/saitarrun</a><br>
-          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0284c7; text-decoration: none;">saitarrunpitta.vercel.app</a>
+          Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: var(--blue); text-decoration: none;">saitarrunpitta@gmail.com</a><br>
+          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: var(--blue); text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
+          GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: var(--blue); text-decoration: none;">github.com/saitarrun</a><br>
+          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: var(--blue); text-decoration: none;">saitarrunpitta.vercel.app</a>
         </div>
       `;
     }
@@ -1125,21 +788,20 @@
     function resetBodyToDefault() {
       const r = recruiters[selectedIndex] || { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure" };
       populateBodyForRecruiter(r);
-      showToast('Template reset to default.');
+      showToast('Template reset.');
     }
 
-    function clearRecruiterForm() {
+    function clearForm() {
       document.getElementById('fn').value = '';
       document.getElementById('comp').value = '';
       document.getElementById('email').value = '';
-      showToast('Ready for new lead entry!');
     }
 
     function addRecruiter() {
       const fn = document.getElementById('fn').value.trim();
       const comp = document.getElementById('comp').value.trim();
       const email = document.getElementById('email').value.trim();
-      const resFile = document.getElementById('recruiter-resume-select').value;
+      const resFile = document.getElementById('resume-select').value;
 
       if (!fn || !comp || !email) {
         alert('Please fill in First Name, Company, and Email.');
@@ -1148,17 +810,14 @@
 
       recruiters.unshift({ firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" });
       selectedIndex = 0;
-      renderList();
+      renderQueue();
       selectRecruiter(0);
-      showToast(`Added ${fn} @ ${comp} to queue!`);
+      showToast(`Added ${fn} @ ${comp}!`);
     }
 
     function parseBulkLeads() {
-      const text = document.getElementById('bulk-paste-area').value.trim();
-      if (!text) {
-        alert('Please paste at least one recruiter lead.');
-        return;
-      }
+      const text = document.getElementById('bulk-text').value.trim();
+      if (!text) return;
 
       const lines = text.split('\n');
       let count = 0;
@@ -1176,40 +835,24 @@
             });
             count++;
           }
-        } else if (parts.length === 1 && parts[0].includes('@')) {
-          const email = parts[0];
-          const domain = email.split('@')[1].split('.')[0];
-          const namePart = email.split('@')[0].split(/[._]/)[0];
-          const fn = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-          const comp = domain.charAt(0).toUpperCase() + domain.slice(1);
-          recruiters.push({
-            firstName: fn,
-            company: comp,
-            email: email,
-            resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
-            status: "Pending"
-          });
-          count++;
         }
       });
 
-      renderList();
-      document.getElementById('bulk-paste-area').value = '';
+      renderQueue();
+      document.getElementById('bulk-text').value = '';
       switchTab('queue', null);
-      document.querySelectorAll('.tab-item')[0].classList.add('active');
-      showToast(`✅ Added ${count} leads to the queue!`);
+      document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      showToast(`Added ${count} leads!`);
     }
 
-    async function handleFileUpload(files) {
-      if (!files || files.length === 0) return;
-      const file = files[0];
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        alert('Please select a valid .pdf file.');
-        return;
-      }
+    // Direct Binary File Upload
+    const fileInput = document.getElementById('file-input');
+    fileInput.addEventListener('change', async function() {
+      if (!this.files || this.files.length === 0) return;
+      const file = this.files[0];
+      if (!file.name.toLowerCase().endsWith('.pdf')) return;
 
       showToast(`Uploading ${file.name}...`);
-
       try {
         const res = await fetch('/api/upload-resume', {
           method: 'POST',
@@ -1221,37 +864,14 @@
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`✅ Added ${file.name} to library!`);
+          showToast(`Added ${file.name}!`);
           await loadResumes();
           previewResumeFile(file.name);
-        } else {
-          showToast(`❌ Upload failed: ${data.error || 'Unknown error'}`);
         }
       } catch (err) {
-        showToast(`❌ Upload error: ${err.message}`);
+        showToast(`Error: ${err.message}`);
       }
-    }
-
-    const fileInput = document.getElementById('file-input');
-    fileInput.addEventListener('change', function() {
-      handleFileUpload(this.files);
       this.value = '';
-    });
-
-    const dropArea = document.getElementById('drop-area');
-    ['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); dropArea.classList.add('dragover'); }, false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('dragover'); }, false);
-    });
-    dropArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const dt = e.dataTransfer;
-      if (dt && dt.files) {
-        handleFileUpload(dt.files);
-      }
     });
 
     async function sendOutreach() {
@@ -1259,7 +879,7 @@
       if (!r) return;
 
       const btn = document.getElementById('send-btn');
-      btn.innerText = '⏳ Sending via n8n...';
+      btn.innerText = 'Sending...';
       btn.disabled = true;
 
       const currentSubject = document.getElementById('prev-subject').value;
@@ -1271,7 +891,6 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
     p { margin: 0 0 14px 0; }
     a { color: #0066cc; text-decoration: none; }
-    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }
   </style>
 </head>
 <body>
@@ -1294,38 +913,27 @@
         });
         const data = await res.json();
         r.status = 'Sent';
-        renderList();
-        showToast(`✅ Successfully sent to ${r.firstName} (${r.email})! Message ID: ${data.id || 'OK'}`);
+        renderQueue();
+        showToast(`Sent to ${r.firstName}!`);
       } catch (err) {
-        showToast(`❌ Error: ${err.message}`);
+        showToast(`Error: ${err.message}`);
       } finally {
-        btn.innerText = '⚡ Send Selected Lead';
+        btn.innerText = '✉️ Send Message';
         btn.disabled = false;
       }
     }
 
-    // BULK SEND ALL QUEUE
     async function sendBulkAllQueue() {
-      if (recruiters.length === 0) {
-        alert('Your queue is empty. Add leads to queue first!');
-        return;
-      }
+      if (recruiters.length === 0) return;
+      if (!confirm(`Send outreach to all ${recruiters.length} recruiters in queue?`)) return;
 
-      if (!confirm(`Are you ready to dispatch personalized outreach emails to all ${recruiters.length} recruiters in your queue?`)) {
-        return;
-      }
-
-      const pBox = document.getElementById('bulk-progress-box');
-      const pText = document.getElementById('bulk-progress-text');
-      const pPercent = document.getElementById('bulk-progress-percent');
-      const pFill = document.getElementById('bulk-progress-fill');
-
-      pBox.style.display = 'block';
-      let sentCount = 0;
+      const btn = document.getElementById('bulk-btn');
+      btn.disabled = true;
 
       for (let i = 0; i < recruiters.length; i++) {
         const r = recruiters[i];
         selectRecruiter(i);
+        btn.innerText = `Sending [${i+1}/${recruiters.length}]...`;
 
         const currentSubject = document.getElementById('prev-subject').value;
         const currentHtmlBody = `<!DOCTYPE html>
@@ -1343,13 +951,8 @@
 </body>
 </html>`;
 
-        const pct = Math.round(((i + 1) / recruiters.length) * 100);
-        pText.innerText = `[${i+1}/${recruiters.length}] Sending to ${r.firstName} @ ${r.company}...`;
-        pPercent.innerText = `${pct}%`;
-        pFill.style.width = `${pct}%`;
-
         try {
-          const res = await fetch('http://localhost:5678/webhook/send-recruiter-outreach', {
+          await fetch('http://localhost:5678/webhook/send-recruiter-outreach', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1361,35 +964,32 @@
               resumeFile: r.resumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf"
             })
           });
-          const data = await res.json();
           r.status = 'Sent';
-          sentCount++;
-          renderList();
-        } catch (err) {
+          renderQueue();
+        } catch (e) {
           r.status = 'Failed';
-          renderList();
+          renderQueue();
         }
 
         if (i < recruiters.length - 1) {
-          pText.innerText = `[${i+1}/${recruiters.length}] Sent! Waiting 5s before next lead...`;
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          await new Promise(res => setTimeout(res, 5000));
         }
       }
 
-      pText.innerText = `🎉 Bulk Batch Complete! Sent ${sentCount}/${recruiters.length} emails.`;
-      showToast(`🎉 Bulk Batch Complete! Sent ${sentCount}/${recruiters.length} emails.`);
-      setTimeout(() => { pBox.style.display = 'none'; }, 8000);
+      btn.innerText = `🚀 Send All (${recruiters.length}) in Bulk`;
+      btn.disabled = false;
+      showToast('🎉 Bulk Send Complete!');
     }
 
     function showToast(msg) {
       const t = document.getElementById('toast');
-      t.innerHTML = msg;
+      t.innerText = msg;
       t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, 4000);
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
     loadResumes();
-    renderList();
+    renderQueue();
   </script>
 </body>
 </html>
