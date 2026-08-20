@@ -275,6 +275,15 @@
       opacity: 0.95;
       transform: translateY(-1px);
     }
+    .btn-batch {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+    }
+    .btn-batch:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
     .btn-secondary {
       background: var(--bg-elevated);
       color: var(--text-muted);
@@ -300,7 +309,7 @@
       flex-direction: column;
       gap: 8px;
       margin-top: 12px;
-      max-height: 220px;
+      max-height: 200px;
       overflow-y: auto;
     }
     .recruiter-card {
@@ -466,6 +475,29 @@
       line-height: 1.5;
     }
 
+    /* Bulk Progress Bar */
+    .progress-bar-container {
+      margin-top: 14px;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: none;
+    }
+    .progress-bar-bg {
+      background: #1e293b;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #10b981, #38bdf8);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
     /* Resume Library Cards */
     .resume-grid {
       display: grid;
@@ -584,13 +616,18 @@
           <span>📋 Recruiter Leads</span>
           <span class="tab-item-badge" id="queue-count-badge">4</span>
         </button>
+        <button class="tab-item" onclick="switchTab('bulk', event)">
+          <span>🚀 Bulk Paste &amp; Import</span>
+        </button>
         <button class="tab-item" onclick="switchTab('resume', event)">
           <span>📄 Resume Library</span>
           <span class="tab-item-badge" id="resume-count-badge">4</span>
         </button>
       </div>
       <div>
-        <span style="font-size: 12px; color: #a5b4fc; font-weight: 600;">✨ Direct WYSIWYG Email Compose Active</span>
+        <button class="btn btn-batch" onclick="sendBulkAllQueue()" id="bulk-send-top-btn">
+          🚀 Dispatch All <span id="bulk-count-label">4</span> in Bulk
+        </button>
       </div>
     </div>
 
@@ -635,14 +672,37 @@
               <button class="btn btn-primary" style="width: 100%;" onclick="addRecruiter()">+ Save Lead in Queue</button>
 
               <div style="margin-top: 18px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
-                <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Active Lead Queue</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Active Lead Queue</span>
+                  <button class="btn btn-batch" style="padding: 3px 8px; font-size: 11px;" onclick="sendBulkAllQueue()">🚀 Send All in Queue</button>
+                </div>
                 <div class="recruiter-list" id="recruiter-list"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- TAB 2: RESUME LIBRARY -->
+        <!-- TAB 2: BULK IMPORT -->
+        <div id="tab-bulk" class="tab-panel">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">🚀 Bulk Paste Recruiter Leads</span>
+            </div>
+            <div class="panel-body">
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+                Paste multiple recruiters in <code>FirstName, Company, Email</code> format (one per line) or comma-separated:
+              </p>
+
+              <div class="form-group">
+                <textarea id="bulk-paste-area" class="form-input" style="min-height: 140px; font-family: 'JetBrains Mono', monospace; font-size: 12px;" placeholder="John, Uber, john@uber.com&#10;Sarah, Stripe, sarah@stripe.com&#10;Alex, Meta, alex@meta.com"></textarea>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%;" onclick="parseBulkLeads()">+ Add All to Queue</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: RESUME LIBRARY -->
         <div id="tab-resume" class="tab-panel">
           <div class="panel">
             <div class="panel-header">
@@ -692,13 +752,24 @@
                 ↺ Reset Template
               </button>
               <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
-                ⚡ Send Outreach via n8n
+                ⚡ Send Selected Lead
               </button>
             </div>
           </div>
           <div class="panel-body" style="padding: 16px;">
             
-            <div class="mail-preview-window">
+            <!-- Bulk Progress Bar -->
+            <div class="progress-bar-container" id="bulk-progress-box">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;">
+                <span id="bulk-progress-text" style="color: var(--accent);">🚀 Dispatching bulk batch...</span>
+                <span id="bulk-progress-percent" style="color: #fff;">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="bulk-progress-fill"></div>
+              </div>
+            </div>
+
+            <div class="mail-preview-window" style="margin-top: 10px;">
               <!-- Window Chrome -->
               <div class="mail-window-bar">
                 <div class="window-dots">
@@ -938,6 +1009,7 @@
       const listEl = document.getElementById('recruiter-list');
       listEl.innerHTML = '';
       document.getElementById('queue-count-badge').innerText = recruiters.length;
+      document.getElementById('bulk-count-label').innerText = recruiters.length;
 
       recruiters.forEach((r, idx) => {
         const item = document.createElement('div');
@@ -1038,6 +1110,53 @@
       showToast(`Added ${fn} @ ${comp} to queue!`);
     }
 
+    function parseBulkLeads() {
+      const text = document.getElementById('bulk-paste-area').value.trim();
+      if (!text) {
+        alert('Please paste at least one recruiter lead.');
+        return;
+      }
+
+      const lines = text.split('\n');
+      let count = 0;
+      lines.forEach(line => {
+        const parts = line.split(/[,;\t]/).map(p => p.trim());
+        if (parts.length >= 3) {
+          const [fn, comp, email] = parts;
+          if (email.includes('@')) {
+            recruiters.push({
+              firstName: fn,
+              company: comp,
+              email: email,
+              resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
+              status: "Pending"
+            });
+            count++;
+          }
+        } else if (parts.length === 1 && parts[0].includes('@')) {
+          const email = parts[0];
+          const domain = email.split('@')[1].split('.')[0];
+          const namePart = email.split('@')[0].split(/[._]/)[0];
+          const fn = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+          const comp = domain.charAt(0).toUpperCase() + domain.slice(1);
+          recruiters.push({
+            firstName: fn,
+            company: comp,
+            email: email,
+            resumeFile: selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf",
+            status: "Pending"
+          });
+          count++;
+        }
+      });
+
+      renderList();
+      document.getElementById('bulk-paste-area').value = '';
+      switchTab('queue', null);
+      document.querySelectorAll('.tab-item')[0].classList.add('active');
+      showToast(`✅ Added ${count} leads to the queue!`);
+    }
+
     async function handleFileUpload(files) {
       if (!files || files.length === 0) return;
       const file = files[0];
@@ -1100,7 +1219,6 @@
       btn.innerText = '⏳ Sending via n8n...';
       btn.disabled = true;
 
-      // Extract the EXACT subject and HTML body directly typed in the white box!
       const currentSubject = document.getElementById('prev-subject').value;
       const currentHtmlBody = `<!DOCTYPE html>
 <html>
@@ -1138,9 +1256,86 @@
       } catch (err) {
         showToast(`❌ Error: ${err.message}`);
       } finally {
-        btn.innerText = '⚡ Send Outreach via n8n';
+        btn.innerText = '⚡ Send Selected Lead';
         btn.disabled = false;
       }
+    }
+
+    // BULK SEND ALL QUEUE
+    async function sendBulkAllQueue() {
+      if (recruiters.length === 0) {
+        alert('Your queue is empty. Add leads to queue first!');
+        return;
+      }
+
+      if (!confirm(`Are you ready to dispatch personalized outreach emails to all ${recruiters.length} recruiters in your queue?`)) {
+        return;
+      }
+
+      const pBox = document.getElementById('bulk-progress-box');
+      const pText = document.getElementById('bulk-progress-text');
+      const pPercent = document.getElementById('bulk-progress-percent');
+      const pFill = document.getElementById('bulk-progress-fill');
+
+      pBox.style.display = 'block';
+      let sentCount = 0;
+
+      for (let i = 0; i < recruiters.length; i++) {
+        const r = recruiters[i];
+        selectRecruiter(i);
+
+        const currentSubject = document.getElementById('prev-subject').value;
+        const currentHtmlBody = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
+    p { margin: 0 0 14px 0; }
+    a { color: #0066cc; text-decoration: none; }
+  </style>
+</head>
+<body>
+  ${document.getElementById('prev-body').innerHTML}
+</body>
+</html>`;
+
+        const pct = Math.round(((i + 1) / recruiters.length) * 100);
+        pText.innerText = `[${i+1}/${recruiters.length}] Sending to ${r.firstName} @ ${r.company}...`;
+        pPercent.innerText = `${pct}%`;
+        pFill.style.width = `${pct}%`;
+
+        try {
+          const res = await fetch('http://localhost:5678/webhook/send-recruiter-outreach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firstName: r.firstName,
+              company: r.company,
+              email: r.email,
+              customSubject: currentSubject,
+              customHtml: currentHtmlBody,
+              resumeFile: r.resumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf"
+            })
+          });
+          const data = await res.json();
+          r.status = 'Sent';
+          sentCount++;
+          renderList();
+        } catch (err) {
+          r.status = 'Failed';
+          renderList();
+        }
+
+        if (i < recruiters.length - 1) {
+          pText.innerText = `[${i+1}/${recruiters.length}] Sent! Waiting 5s before next lead...`;
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+      }
+
+      pText.innerText = `🎉 Bulk Batch Complete! Sent ${sentCount}/${recruiters.length} emails.`;
+      showToast(`🎉 Bulk Batch Complete! Sent ${sentCount}/${recruiters.length} emails.`);
+      setTimeout(() => { pBox.style.display = 'none'; }, 8000);
     }
 
     function showToast(msg) {
