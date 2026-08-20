@@ -928,9 +928,23 @@
 
             <div class="form-row" style="margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label class="form-label-text" style="margin: 0;">Master Email Template Body</label>
-                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 500;">Uses {RecruiterName} & {Company}</span>
+                <label class="form-label-text" style="margin: 0;">Master Email Template</label>
+                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 500;">Supports {RecruiterName}, {Company}, {SenderName}</span>
               </div>
+              
+              <div style="display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap;">
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadTemplatePreset('comprehensive')">Full Stack / AI</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadTemplatePreset('concise')">Concise & Direct</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadTemplatePreset('backend')">Backend / Systems</button>
+              </div>
+
+              <div style="display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap;">
+                <button class="placeholder-chip" onclick="insertProfToken('{RecruiterName}')">+ {RecruiterName}</button>
+                <button class="placeholder-chip" onclick="insertProfToken('{Company}')">+ {Company}</button>
+                <button class="placeholder-chip" onclick="insertProfToken('{SenderName}')">+ {SenderName}</button>
+                <button class="placeholder-chip" onclick="insertProfToken('{SenderTitle}')">+ {SenderTitle}</button>
+              </div>
+
               <textarea id="prof-template" class="apple-textarea" rows="8" style="font-family: monospace; font-size: 11.5px; line-height: 1.5;"></textarea>
             </div>
 
@@ -1300,9 +1314,10 @@
       portfolio: "https://saitarrunpitta.vercel.app"
     };
 
-    const DEFAULT_MASTER_TEMPLATE = `<p>Hi {RecruiterName},</p>
+    const TEMPLATE_PRESETS = {
+      comprehensive: `<p>Hi {RecruiterName},</p>
 <p>I hope you're doing well.</p>
-<p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
+<p>My name is <strong>{SenderName}</strong>, and I'm a {SenderTitle} with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>
 <p>I've previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
 <p>My technical background includes <strong>Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems</strong>.</p>
 <p>I'm currently exploring <strong>Software Engineering opportunities at {Company}</strong>.</p>
@@ -1311,17 +1326,44 @@
 <p>I've attached my resume for reference.</p>
 <p>Thank you for your time and consideration.</p>
 <p>Best regards,</p>
-<div class="mail-signature-block" contenteditable="false">
-  <strong>Sai Tarrun Pitta</strong><br>
-  Email: saitarrunpitta@gmail.com<br>
-  LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
-  GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
-  Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+{SignatureBlock}`,
+
+      concise: `<p>Hi {RecruiterName},</p>
+<p>I hope you're having a great week.</p>
+<p>I'm <strong>{SenderName}</strong>, a {SenderTitle} specializing in scalable backend services, distributed systems, and AI/LLM applications.</p>
+<p>I've previously built high-performance microservices and cloud infrastructure at companies like <strong>Uber, Pacific Life, and Cognizant</strong> with a core stack in <strong>Python, Java, TypeScript, AWS, Docker, Kubernetes, and PostgreSQL</strong>.</p>
+<p>I'm currently exploring <strong>Software Engineering roles at {Company}</strong> and would love to connect to discuss how my engineering background aligns with your team's upcoming hiring priorities.</p>
+<p>I've attached my resume for reference. If there is a better person to speak with regarding engineering roles at {Company}, please let me know!</p>
+<p>Best regards,</p>
+{SignatureBlock}`,
+
+      backend: `<p>Hi {RecruiterName},</p>
+<p>I hope this finds you well.</p>
+<p>My name is <strong>{SenderName}</strong>, and I'm a {SenderTitle} focused on <strong>high-throughput distributed systems, scalable backend infrastructure, and cloud data platforms</strong>.</p>
+<p>Across my work with <strong>Uber, Pacific Life, and Cognizant</strong>, I've designed resilient microservices, optimized SQL/NoSQL data pipelines, and architected cloud-native systems using <strong>Python, Java, Spring Boot, FastAPI, AWS, Redis, Docker, and Kubernetes</strong>.</p>
+<p>I've been following the engineering innovations at <strong>{Company}</strong> and am very interested in contributing to your distributed systems and infrastructure teams.</p>
+<p>I've attached my resume and would welcome the opportunity to connect for an interview or introduction to the relevant engineering manager.</p>
+<p>Thank you for your time and consideration.</p>
+<p>Best regards,</p>
+{SignatureBlock}`
+    };
+
+    const DEFAULT_MASTER_TEMPLATE = TEMPLATE_PRESETS.comprehensive;
+
+    function generateSignatureBlock(p) {
+      p = p || getSenderProfile();
+      return `<div class="mail-signature-block" contenteditable="false">
+  <strong>${p.name}</strong><br>
+  Email: ${p.email}<br>
+  LinkedIn: <a href="${p.linkedin}" target="_blank">${p.linkedin.replace(/^https?:\/\//, '')}</a><br>
+  GitHub: <a href="${p.github}" target="_blank">${p.github.replace(/^https?:\/\//, '')}</a><br>
+  Portfolio: <a href="${p.portfolio}" target="_blank">${p.portfolio.replace(/^https?:\/\//, '')}</a>
 </div>`;
+    }
 
     function getMasterTemplate() {
       const stored = localStorage.getItem('custom_master_template');
-      if (stored && stored.trim().length > 100) {
+      if (stored && stored.trim().length > 60) {
         return stored;
       }
       return DEFAULT_MASTER_TEMPLATE;
@@ -1332,6 +1374,27 @@
       bodyEl.focus();
       document.execCommand('insertText', false, token);
       showAppleToast(`Inserted placeholder: ${token}`);
+    }
+
+    function insertProfToken(token) {
+      const area = document.getElementById('prof-template');
+      if (!area) return;
+      const start = area.selectionStart || 0;
+      const end = area.selectionEnd || 0;
+      const val = area.value;
+      area.value = val.substring(0, start) + token + val.substring(end);
+      area.focus();
+      area.selectionStart = area.selectionEnd = start + token.length;
+      showAppleToast(`Inserted ${token}`);
+    }
+
+    function loadTemplatePreset(presetKey) {
+      const tpl = TEMPLATE_PRESETS[presetKey] || TEMPLATE_PRESETS.comprehensive;
+      const area = document.getElementById('prof-template');
+      if (area) {
+        area.value = tpl;
+        showAppleToast(`Loaded "${presetKey}" template preset.`);
+      }
     }
 
     function getSenderProfile() {
@@ -1411,6 +1474,7 @@
         .replace(/opportunities at\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\.|\s*<)/gi, 'opportunities at {Company}')
         .replace(/interested in\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\s+(?:and|because|the|which))/gi, 'interested in {Company}');
 
+      const sig = generateSignatureBlock(profile);
       const bodyHtml = `<!DOCTYPE html>
 <html>
 <head>
@@ -1423,12 +1487,13 @@
 </head>
 <body>
 ${tpl
+  .replace(/\{SignatureBlock\}|\[SignatureBlock\]/gi, sig)
   .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${comp}</strong>`)
-  .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?\s*name|name)\s*(?:\}\}|\}|\])/gi, fn)
+  .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?name|name)\s*(?:\}\}|\}|\])/gi, fn)
+  .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*name)\s*(?:\}\}|\}|\])/gi, profile.name)
+  .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*title|title)\s*(?:\}\}|\}|\])/gi, profile.title)
   .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, email)
-  .replace(/(?:\{\{|\{|\[)\s*past_?companies\s*(?:\}\}|\}|\])/gi, `<strong>${profile.pastCompanies}</strong>`)
-  .replace(/(?:\{\{|\{|\[)\s*skills\s*(?:\}\}|\}|\])/gi, profile.techStack)
-  .replace(/(?:\{\{|\{|\[)\s*sender_?name\s*(?:\}\}|\}|\])/gi, profile.name)}
+  .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*email)\s*(?:\}\}|\}|\])/gi, profile.email)}
 </body>
 </html>`;
 
@@ -1441,7 +1506,7 @@ ${tpl
       
       // Auto-tokenize current recruiter's company & name into placeholders
       let tpl = currentBody
-        .replace(/\[\s*(recruiter_?\s*name|first_?\s*name|name)\s*\]/gi, '{RecruiterName}')
+        .replace(/\[\s*(recruiter_?\s*name|first_?name|name)\s*\]/gi, '{RecruiterName}')
         .replace(/\[\s*(company|target_?company)\s*\]/gi, '{Company}')
         .replace(/\[\s*(email|recruiter_?\s*email)\s*\]/gi, '{Email}');
 
@@ -1521,13 +1586,15 @@ ${tpl
         .replace(/opportunities at\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\.|\s*<)/gi, 'opportunities at {Company}')
         .replace(/interested in\s+(?:<strong>)?[A-Za-z0-9\s&.-]+?(?:<\/strong>)?(?=\s+(?:and|because|the|which))/gi, 'interested in {Company}');
 
+      const sig = generateSignatureBlock(profile);
       const renderedBody = tpl
+        .replace(/\{SignatureBlock\}|\[SignatureBlock\]/gi, sig)
         .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${payload.comp}</strong>`)
         .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?name|name)\s*(?:\}\}|\}|\])/gi, payload.fn)
+        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*name)\s*(?:\}\}|\}|\])/gi, profile.name)
+        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*title|title)\s*(?:\}\}|\}|\])/gi, profile.title)
         .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, payload.email)
-        .replace(/(?:\{\{|\{|\[)\s*past_?companies\s*(?:\}\}|\}|\])/gi, `<strong>${profile.pastCompanies}</strong>`)
-        .replace(/(?:\{\{|\{|\[)\s*skills\s*(?:\}\}|\}|\])/gi, profile.techStack)
-        .replace(/(?:\{\{|\{|\[)\s*sender_?name\s*(?:\}\}|\}|\])/gi, profile.name);
+        .replace(/(?:\{\{|\{|\[)\s*(sender_?\s*email)\s*(?:\}\}|\}|\])/gi, profile.email);
 
       const bodyEl = document.getElementById('prev-body');
       if (bodyEl) bodyEl.innerHTML = renderedBody;
