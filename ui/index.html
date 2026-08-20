@@ -712,9 +712,34 @@
       box-shadow: 0 0 6px #dc2626;
       animation: none;
     }
-    @keyframes healthPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+    /* Full-Page Studio Layout */
+    .fullpage-studio {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px 32px 48px 32px;
+      width: 100%;
+    }
+    .studio-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .studio-editor-pane {
+      display: flex;
+      flex-direction: column;
+    }
+    .studio-preview-pane {
+      position: sticky;
+      top: 90px;
     }
 
     .tab-content { display: none; }
@@ -744,7 +769,7 @@
         Bulk Import
       </button>
       <button class="segmented-item" onclick="setStudioTab('profile', event)">
-        Profile
+        Templates & Profile
       </button>
     </div>
 
@@ -760,6 +785,168 @@
       </button>
     </div>
   </header>
+
+  <!-- FULL-PAGE TEMPLATE & PROFILE STUDIO (Clean, Spacious & Intuitive) -->
+  <div id="view-profile-studio" class="fullpage-studio" style="display: none;">
+    <!-- Studio Topbar -->
+    <div class="studio-topbar">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 700; color: var(--label-primary); margin: 0; letter-spacing: -0.02em;">Templates & Sender Profile Studio</h2>
+        <p style="font-size: 13px; color: var(--label-secondary); margin: 4px 0 0 0;">Spacious, distraction-free environment to customize your profile, master subject line, and outreach email copy.</p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="apple-btn btn-plain" onclick="resetProfileDefaults()">Reset to Defaults</button>
+        <button class="apple-btn btn-blue-primary" onclick="saveSenderProfile()">Save Profile & Templates</button>
+      </div>
+    </div>
+
+    <!-- 2-Column Studio Grid -->
+    <div class="studio-grid">
+      <!-- LEFT: Profile & Template Editors -->
+      <div class="studio-editor-pane">
+        
+        <!-- Sender Identity Card -->
+        <div class="apple-card" style="margin-bottom: 16px;">
+          <div class="card-head">
+            <span class="card-head-title">1. Sender Identity & Contact Info</span>
+          </div>
+          <div class="card-content" style="padding: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label class="form-label-text">Full Name</label>
+                <input type="text" id="prof-name" class="apple-input" value="Sai Tarrun Pitta" oninput="onProfileStudioLiveInput()">
+              </div>
+              <div>
+                <label class="form-label-text">Professional Title</label>
+                <input type="text" id="prof-title" class="apple-input" value="Software Engineer" oninput="onProfileStudioLiveInput()">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label class="form-label-text">Contact Email</label>
+                <input type="email" id="prof-email" class="apple-input" value="saitarrunpitta@gmail.com" oninput="onProfileStudioLiveInput()">
+              </div>
+              <div>
+                <label class="form-label-text">LinkedIn Profile URL</label>
+                <input type="text" id="prof-linkedin" class="apple-input" value="https://linkedin.com/in/saitarrunpitta" oninput="onProfileStudioLiveInput()">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label-text">GitHub URL</label>
+                <input type="text" id="prof-github" class="apple-input" value="https://github.com/saitarrun" oninput="onProfileStudioLiveInput()">
+              </div>
+              <div>
+                <label class="form-label-text">Portfolio Website URL</label>
+                <input type="text" id="prof-portfolio" class="apple-input" value="https://saitarrunpitta.vercel.app" oninput="onProfileStudioLiveInput()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Subject Line Card -->
+        <div class="apple-card" style="margin-bottom: 16px;">
+          <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-head-title">2. Master Subject Line Template</span>
+            <span style="font-size: 11.5px; color: var(--accent-blue); font-weight: 500;">Supports {Company}, {SenderName}</span>
+          </div>
+          <div class="card-content" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('standard')">Standard</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('technical')">Technical Focus</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('inquiry')">Role Inquiry</button>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <button class="token-chip" onclick="insertSubjectToken('{Company}')">+ {Company}</button>
+                <button class="token-chip" onclick="insertSubjectToken('{SenderName}')">+ {SenderName}</button>
+                <button class="token-chip" onclick="insertSubjectToken('{SenderTitle}')">+ {SenderTitle}</button>
+              </div>
+            </div>
+            <input type="text" id="prof-subject" class="apple-input" style="font-size: 13.5px; padding: 9px 12px; font-weight: 500;" value="Software Engineering Opportunities at {Company} — {SenderName}" oninput="onProfileStudioLiveInput()">
+          </div>
+        </div>
+
+        <!-- Master Email Body Card -->
+        <div class="apple-card">
+          <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-head-title">3. Master Email Body (Pure Plain Text)</span>
+            <span style="font-size: 11.5px; color: var(--label-secondary);">Type naturally with blank lines between paragraphs</span>
+          </div>
+          <div class="card-content" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('comprehensive')">Full Stack / AI</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('concise')">Concise & Direct</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('backend')">Backend / Systems</button>
+              </div>
+              <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                <button class="token-chip" onclick="insertProfToken('{RecruiterName}')">+ {RecruiterName}</button>
+                <button class="token-chip" onclick="insertProfToken('{Company}')">+ {Company}</button>
+                <button class="token-chip" onclick="insertProfToken('{SenderName}')">+ {SenderName}</button>
+                <button class="token-chip" onclick="insertProfToken('{SenderTitle}')">+ {SenderTitle}</button>
+                <button class="token-chip" onclick="insertProfToken('{SignatureBlock}')">+ {SignatureBlock}</button>
+              </div>
+            </div>
+            <textarea id="prof-template" class="apple-textarea" rows="18" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; font-size: 13.5px; line-height: 1.6; padding: 14px; border-radius: 8px;" oninput="onProfileStudioLiveInput()"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Real-Time Live Apple Mail Preview -->
+      <div class="studio-preview-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--label-secondary); text-transform: uppercase; letter-spacing: 0.04em;">Live Email Preview</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 12px; color: var(--label-secondary);">Testing with:</span>
+            <select id="studio-preview-sample-select" class="apple-select" style="padding: 3px 8px; font-size: 12px; width: auto;" onchange="onProfileStudioLiveInput()">
+              <option value="Google">Google (Sundar)</option>
+              <option value="TikTok">TikTok (Emma)</option>
+              <option value="Databricks">Databricks (Alex)</option>
+              <option value="Apple">Apple (Sarah)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mail-window" style="box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+          <div class="mail-toolbar">
+            <div class="mail-window-controls">
+              <span class="mac-dot dot-close"></span>
+              <span class="mac-dot dot-min"></span>
+              <span class="mac-dot dot-max"></span>
+            </div>
+            <div style="font-size: 12.5px; color: var(--label-secondary); font-weight: 500;">Preview: Outbound Recruiter Email</div>
+          </div>
+
+          <div class="mail-header-fields">
+            <div class="field-row">
+              <span class="field-tag">To:</span>
+              <span id="studio-prev-to" style="font-weight: 600; color: var(--accent-blue);">Sundar &lt;sundar@google.com&gt;</span>
+            </div>
+            <div class="field-row">
+              <span class="field-tag">Subject:</span>
+              <span id="studio-prev-subject" style="font-weight: 600; color: var(--label-primary); font-size: 13px;"></span>
+            </div>
+            <div class="field-row">
+              <span class="field-tag">Attach:</span>
+              <span class="attachment-pill">
+                <span class="file-tag-badge">PDF</span>
+                <span>Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
+                <span style="color: var(--label-tertiary); font-size: 11px;">(60.3 KB)</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="mail-body-canvas" id="studio-prev-body" style="min-height: 420px; padding: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Main 2-Pane Apple Workspace -->
   <main class="main-workspace">
@@ -880,98 +1067,6 @@
             <textarea id="bulk-text" class="apple-textarea" rows="4" placeholder="Sarah, Stripe, sarah@stripe.com&#10;Alex, Databricks, alex@databricks.com"></textarea>
             <button class="apple-btn btn-plain" style="width: 100%; margin-top: 10px;" onclick="parseBulkLeads()">
               Import Text Leads
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: SENDER PROFILE & TEMPLATE SETTINGS -->
-      <div id="tab-profile" class="tab-content">
-        <div class="apple-card">
-          <div class="card-head">
-            <span class="card-head-title">Sender Profile & Template</span>
-            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="resetProfileDefaults()">Defaults</button>
-          </div>
-          <div class="card-content" style="padding: 16px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-              <div>
-                <label class="form-label-text">Your Full Name</label>
-                <input type="text" id="prof-name" class="apple-input" value="Sai Tarrun Pitta">
-              </div>
-              <div>
-                <label class="form-label-text">Your Title</label>
-                <input type="text" id="prof-title" class="apple-input" value="Software Engineer">
-              </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-              <div>
-                <label class="form-label-text">Contact Email</label>
-                <input type="email" id="prof-email" class="apple-input" value="saitarrunpitta@gmail.com">
-              </div>
-              <div>
-                <label class="form-label-text">LinkedIn URL</label>
-                <input type="text" id="prof-linkedin" class="apple-input" value="https://linkedin.com/in/saitarrunpitta">
-              </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-              <div>
-                <label class="form-label-text">GitHub URL</label>
-                <input type="text" id="prof-github" class="apple-input" value="https://github.com/saitarrun">
-              </div>
-              <div>
-                <label class="form-label-text">Portfolio URL</label>
-                <input type="text" id="prof-portfolio" class="apple-input" value="https://saitarrunpitta.vercel.app">
-              </div>
-            </div>
-
-            <div class="form-row" style="margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label class="form-label-text" style="margin: 0;">Master Subject Line Template</label>
-                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 500;">Supports {Company}, {SenderName}</span>
-              </div>
-              
-              <div style="display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap;">
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadSubjectPreset('standard')">Standard</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadSubjectPreset('technical')">Technical Focus</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadSubjectPreset('inquiry')">Role Inquiry</button>
-              </div>
-
-              <div style="display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap;">
-                <button class="placeholder-chip" onclick="insertSubjectToken('{Company}')">+ {Company}</button>
-                <button class="placeholder-chip" onclick="insertSubjectToken('{SenderName}')">+ {SenderName}</button>
-                <button class="placeholder-chip" onclick="insertSubjectToken('{SenderTitle}')">+ {SenderTitle}</button>
-                <button class="placeholder-chip" onclick="insertSubjectToken('{RecruiterName}')">+ {RecruiterName}</button>
-              </div>
-
-              <input type="text" id="prof-subject" class="apple-input" value="Software Engineering Opportunities at {Company} — {SenderName}">
-            </div>
-
-            <div class="form-row" style="margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label class="form-label-text" style="margin: 0;">Master Email Template Body</label>
-                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 500;">Supports {RecruiterName}, {Company}, {SenderName}</span>
-              </div>
-              
-              <div style="display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap;">
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadTemplatePreset('comprehensive')">Full Stack / AI</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadTemplatePreset('concise')">Concise & Direct</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 7px;" onclick="loadTemplatePreset('backend')">Backend / Systems</button>
-              </div>
-
-              <div style="display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap;">
-                <button class="placeholder-chip" onclick="insertProfToken('{RecruiterName}')">+ {RecruiterName}</button>
-                <button class="placeholder-chip" onclick="insertProfToken('{Company}')">+ {Company}</button>
-                <button class="placeholder-chip" onclick="insertProfToken('{SenderName}')">+ {SenderName}</button>
-                <button class="placeholder-chip" onclick="insertProfToken('{SenderTitle}')">+ {SenderTitle}</button>
-              </div>
-
-              <textarea id="prof-template" class="apple-textarea" rows="8" style="font-family: monospace; font-size: 11.5px; line-height: 1.5;"></textarea>
-            </div>
-
-            <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 13px; margin-top: 10px;" onclick="saveSenderProfile()">
-              Save Profile & Update Templates
             </button>
           </div>
         </div>
@@ -1251,9 +1346,66 @@
 
     function setStudioTab(tabId, evt) {
       document.querySelectorAll('.segmented-item').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
-      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      const mainWs = document.querySelector('.main-workspace');
+      const fullStudio = document.getElementById('view-profile-studio');
+
+      if (tabId === 'profile') {
+        if (mainWs) mainWs.style.display = 'none';
+        if (fullStudio) {
+          fullStudio.style.display = 'block';
+          loadSenderProfileToInputs();
+          onProfileStudioLiveInput();
+        }
+      } else {
+        if (fullStudio) fullStudio.style.display = 'none';
+        if (mainWs) mainWs.style.display = 'grid';
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const targetTab = document.getElementById(`tab-${tabId}`);
+        if (targetTab) targetTab.classList.add('active');
+        if (recruiters.length > 0 && recruiters[selectedIndex]) {
+          updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+        }
+      }
+    }
+
+    function onProfileStudioLiveInput() {
+      const getVal = (id, def) => { const el = document.getElementById(id); return (el && el.value.trim()) || def; };
+      const currentProfile = {
+        name: getVal('prof-name', DEFAULT_SENDER_PROFILE.name),
+        title: getVal('prof-title', DEFAULT_SENDER_PROFILE.title),
+        email: getVal('prof-email', DEFAULT_SENDER_PROFILE.email),
+        linkedin: getVal('prof-linkedin', DEFAULT_SENDER_PROFILE.linkedin),
+        github: getVal('prof-github', DEFAULT_SENDER_PROFILE.github),
+        portfolio: getVal('prof-portfolio', DEFAULT_SENDER_PROFILE.portfolio),
+        pastCompanies: DEFAULT_SENDER_PROFILE.pastCompanies,
+        techStack: DEFAULT_SENDER_PROFILE.techStack
+      };
+
+      const sampleComp = (document.getElementById('studio-preview-sample-select') && document.getElementById('studio-preview-sample-select').value) || 'Google';
+      const sampleMap = {
+        'Google': { fn: 'Sundar', email: 'sundar@google.com', comp: 'Google' },
+        'TikTok': { fn: 'Emma', email: 'emma@tiktok.com', comp: 'TikTok' },
+        'Databricks': { fn: 'Alex', email: 'alex@databricks.com', comp: 'Databricks' },
+        'Apple': { fn: 'Sarah', email: 'sarah@apple.com', comp: 'Apple' }
+      };
+      const activeSample = sampleMap[sampleComp] || sampleMap['Google'];
+
+      const subTpl = (document.getElementById('prof-subject') && document.getElementById('prof-subject').value.trim()) || DEFAULT_MASTER_SUBJECT;
+      const renderedSub = renderSubject(subTpl, activeSample, currentProfile);
+
+      const prevSub = document.getElementById('studio-prev-subject');
+      if (prevSub) prevSub.innerText = renderedSub;
+
+      const prevTo = document.getElementById('studio-prev-to');
+      if (prevTo) prevTo.innerHTML = `${activeSample.fn} &lt;${activeSample.email}&gt;`;
+
+      const bodyTpl = (document.getElementById('prof-template') && document.getElementById('prof-template').value) || DEFAULT_MASTER_TEMPLATE;
+      const renderedHtml = renderTextToHtml(bodyTpl, activeSample, currentProfile);
+
+      const prevBody = document.getElementById('studio-prev-body');
+      if (prevBody) prevBody.innerHTML = renderedHtml;
     }
 
     function renderQueue() {
@@ -1520,6 +1672,7 @@ Best regards,
       area.value = val.substring(0, start) + token + val.substring(end);
       area.focus();
       area.selectionStart = area.selectionEnd = start + token.length;
+      onProfileStudioLiveInput();
       showAppleToast(`Inserted ${token}`);
     }
 
@@ -1528,6 +1681,7 @@ Best regards,
       const area = document.getElementById('prof-subject');
       if (area) {
         area.value = tpl;
+        onProfileStudioLiveInput();
         showAppleToast(`Loaded "${key}" subject preset.`);
       }
     }
@@ -1556,6 +1710,7 @@ Best regards,
       area.value = val.substring(0, start) + token + val.substring(end);
       area.focus();
       area.selectionStart = area.selectionEnd = start + token.length;
+      onProfileStudioLiveInput();
       showAppleToast(`Inserted ${token}`);
     }
 
@@ -1564,6 +1719,7 @@ Best regards,
       const area = document.getElementById('prof-template');
       if (area) {
         area.value = tpl;
+        onProfileStudioLiveInput();
         showAppleToast(`Loaded "${presetKey}" template preset.`);
       }
     }
