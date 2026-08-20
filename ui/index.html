@@ -3,552 +3,675 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recruiter Outreach — Sai Tarrun Pitta</title>
+  <title>Outreach Studio — Sai Tarrun Pitta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f8fafc;
+      --system-bg: #f5f5f7;
       --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --border-focus: #0f172a;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --text-dim: #94a3b8;
-      --primary: #0f172a;
-      --primary-hover: #1e293b;
-      --blue: #2563eb;
-      --green: #16a34a;
-      --danger: #dc2626;
+      --border-color: #e5e5ea;
+      --border-subtle: #ebebf0;
+      
+      --label-primary: #1d1d1f;
+      --label-secondary: #6e6e73;
+      --label-tertiary: #86868b;
+      
+      --accent-blue: #0071e3;
+      --accent-blue-hover: #0077ed;
+      --accent-blue-tint: #eff6ff;
+      --accent-green: #34c759;
+      --accent-red: #ff3b30;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 980px;
+      
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg);
-      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
+      background-color: var(--system-bg);
+      color: var(--label-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Minimal Header */
-    .header {
-      background: #ffffff;
-      border-bottom: 1px solid var(--border);
-      padding: 14px 28px;
+    /* Apple macOS Titlebar */
+    .app-header {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header-title {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
-    .header-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 400;
+    .app-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(180deg, #3897f0 0%, var(--accent-blue) 100%);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(0, 113, 227, 0.3);
     }
-    .badge-status {
-      font-size: 11px;
+    .app-title {
+      font-size: 15px;
       font-weight: 600;
-      color: var(--green);
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      padding: 3px 10px;
-      border-radius: 12px;
+      letter-spacing: -0.015em;
+    }
+    .app-sub {
+      font-size: 12px;
+      color: var(--label-secondary);
+      margin-top: 1px;
     }
 
-    /* Main Container */
-    .container {
-      max-width: 1360px;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Apple Segmented Control */
+    .segmented-control {
+      background: rgba(118, 118, 128, 0.12);
+      padding: 3px;
+      border-radius: 9px;
+      display: inline-flex;
+      gap: 2px;
+    }
+    .segmented-item {
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--label-secondary);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .segmented-item.active {
+      background: #ffffff;
+      color: var(--label-primary);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 1px rgba(0,0,0,0.06);
+    }
+
+    /* Main App Layout */
+    .main-workspace {
+      max-width: 1400px;
       width: 100%;
       margin: 0 auto;
-      padding: 24px;
+      padding: 24px 32px;
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    /* Simple Tab Navigation */
-    .tab-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-    }
-    .tabs {
-      display: flex;
-      gap: 8px;
-    }
-    .tab-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .tab-btn:hover {
-      color: var(--text-main);
-      background: #f1f5f9;
-    }
-    .tab-btn.active {
-      color: var(--text-main);
-      background: #ffffff;
-      border-color: var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    /* 2-Column Grid */
-    .grid {
       display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 20px;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
       align-items: start;
     }
-    @media (max-width: 960px) {
-      .grid { grid-template-columns: 1fr; }
+    @media (max-width: 1024px) {
+      .main-workspace { grid-template-columns: 1fr; }
     }
 
-    /* Minimal Card */
-    .card {
+    /* macOS Window / Card Containers */
+    .apple-card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
     }
-    .card-header {
+    .card-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
+      background: #fafafa;
     }
-    .card-title {
+    .card-head-title {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
+      color: var(--label-secondary);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+    .card-content {
+      padding: 20px;
     }
 
-    /* Minimal Inputs */
-    .form-group { margin-bottom: 12px; }
-    label {
-      display: block;
+    /* Apple Form Controls */
+    .form-row {
+      margin-bottom: 14px;
+    }
+    .form-label-text {
+      display: flex;
+      justify-content: space-between;
       font-size: 12px;
       font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 4px;
+      color: var(--label-secondary);
+      margin-bottom: 6px;
     }
-    input, select, textarea {
+    .apple-input, .apple-select, .apple-textarea {
       width: 100%;
       background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 13px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 13.5px;
       font-family: inherit;
-      color: var(--text-main);
-      transition: all 0.15s;
+      color: var(--label-primary);
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input:focus, select:focus, textarea:focus {
+    .apple-input:focus, .apple-select:focus, .apple-textarea:focus {
       outline: none;
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.08);
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3.5px rgba(0, 113, 227, 0.15);
     }
 
-    /* Buttons */
-    .btn {
+    /* Apple Buttons */
+    .apple-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      border: none;
-      transition: all 0.15s;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
     }
-    .btn-primary {
-      background: var(--primary);
+    .btn-blue-primary {
+      background: var(--accent-blue);
       color: #ffffff;
     }
-    .btn-primary:hover {
-      background: var(--primary-hover);
+    .btn-blue-primary:hover {
+      background: var(--accent-blue-hover);
     }
-    .btn-secondary {
+    .btn-plain {
       background: #ffffff;
-      color: var(--text-main);
-      border: 1px solid var(--border);
+      color: var(--label-primary);
+      border-color: var(--border-color);
     }
-    .btn-secondary:hover {
-      background: #f1f5f9;
+    .btn-plain:hover {
+      background: #f5f5f7;
     }
-    .btn-blue {
-      background: var(--blue);
-      color: #ffffff;
+    .btn-tint {
+      background: var(--accent-blue-tint);
+      color: var(--accent-blue);
+      border-color: rgba(0, 113, 227, 0.2);
     }
-    .btn-blue:hover {
-      background: #1d4ed8;
+    .btn-tint:hover {
+      background: #dbeafe;
     }
-    .btn-danger {
+    .btn-destruct {
       background: transparent;
-      color: var(--danger);
-      border: 1px solid #fecaca;
+      color: var(--accent-red);
+      border-color: rgba(255, 59, 48, 0.2);
     }
-    .btn-danger:hover {
-      background: #fee2e2;
-    }
-
-    /* Minimal Recruiter Queue */
-    .queue-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-    .queue-item {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .queue-item:hover, .queue-item.active {
-      border-color: var(--text-main);
-      background: #f8fafc;
-    }
-    .queue-item-name {
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text-main);
-    }
-    .queue-item-sub {
-      font-size: 11px;
-      color: var(--text-muted);
+    .btn-destruct:hover {
+      background: #fff1f0;
     }
 
-    /* Minimalist Compose Box */
-    .compose-box {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    }
-    .compose-top {
-      background: #ffffff;
-      border-bottom: 1px solid var(--border);
-      padding: 12px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .compose-meta {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: #fafafa;
+    /* Recruiter List Item */
+    .recruiter-list-group {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      margin-top: 10px;
+      max-height: 240px;
+      overflow-y: auto;
     }
-    .meta-row {
+    .recruiter-row {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .recruiter-row:hover {
+      background: #f9f9fb;
+      border-color: #d1d1d6;
+    }
+    .recruiter-row.selected {
+      background: var(--accent-blue-tint);
+      border-color: var(--accent-blue);
+    }
+    .rec-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--label-primary);
+    }
+    .rec-sub {
+      font-size: 11.5px;
+      color: var(--label-secondary);
+      margin-top: 1px;
+    }
+
+    /* Resume Card in List - Proper Non-overflowing Alignment */
+    .resume-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .resume-row-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .resume-row-card:hover {
+      background: #f9f9fb;
+    }
+    .resume-row-card.selected {
+      background: var(--accent-blue-tint);
+      border-color: var(--accent-blue);
+    }
+    .resume-info {
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+    }
+    .resume-filename {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .resume-meta {
+      font-size: 11px;
+      color: var(--label-secondary);
+    }
+
+    /* Apple Mail Compose Window (Right Column) */
+    .mail-window {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .mail-toolbar {
+      background: #fafafa;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mail-window-controls {
       display: flex;
       align-items: center;
+      gap: 8px;
+    }
+    .mac-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-close { background: #ff5f56; }
+    .dot-min { background: #ffbd2e; }
+    .dot-max { background: #27c93f; }
+
+    .mail-header-fields {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
       gap: 10px;
-      font-size: 13px;
+      background: #ffffff;
     }
-    .meta-label {
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+    }
+    .field-tag {
       width: 60px;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 12px;
+      font-weight: 500;
+      color: var(--label-secondary);
+      flex-shrink: 0;
     }
-    .meta-input {
+    .field-subject-input {
       flex: 1;
       border: 1px solid transparent;
       padding: 4px 8px;
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--text-main);
-      background: transparent;
+      color: var(--label-primary);
       border-radius: 6px;
+      background: transparent;
+      transition: all 0.15s;
     }
-    .meta-input:hover, .meta-input:focus {
-      background: #ffffff;
-      border-color: var(--border);
+    .field-subject-input:hover, .field-subject-input:focus {
+      background: #f5f5f7;
+      border-color: var(--border-color);
+      outline: none;
     }
 
-    .attach-tag {
+    .attachment-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      padding: 3px 8px;
+      background: #f2f2f7;
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 500;
-      color: var(--text-main);
+      color: var(--label-primary);
     }
 
-    /* Directly Editable Body */
-    .editable-body {
-      padding: 22px;
-      font-size: 14px;
-      line-height: 1.65;
-      color: #1e293b;
-      min-height: 420px;
+    /* Mail Editor Body */
+    .mail-body-canvas {
+      padding: 26px 30px;
+      font-size: 14.5px;
+      line-height: 1.68;
+      color: #1d1d1f;
+      min-height: 480px;
       outline: none;
       overflow-y: auto;
     }
-    .editable-body p { margin-bottom: 14px; }
-    .signature {
+    .mail-body-canvas p { margin-bottom: 14px; }
+    .mail-signature-block {
       margin-top: 24px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--text-muted);
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 13.5px;
+      color: var(--label-secondary);
       line-height: 1.5;
     }
+    .mail-signature-block a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
 
-    /* Resume List */
-    .resume-list {
+    /* Modal Quick Look for PDF */
+    .pdf-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+    .pdf-modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 900px;
+      height: 85vh;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-float);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-      margin-top: 10px;
+      overflow: hidden;
     }
-    .resume-item {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 8px;
+    .pdf-modal-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
     }
-    .resume-item:hover, .resume-item.active {
-      border-color: var(--text-main);
-      background: #f8fafc;
-    }
-
-    .upload-box {
-      border: 1px dashed var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      background: #fafafa;
-      margin-top: 12px;
-    }
-
-    .pdf-preview {
+    .pdf-frame-embed {
       width: 100%;
-      height: 360px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-top: 12px;
+      flex: 1;
+      border: none;
     }
 
-    /* Toast */
-    .toast {
+    /* Toast Notification */
+    .apple-toast {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: #0f172a;
+      background: rgba(29, 29, 31, 0.95);
+      backdrop-filter: blur(12px);
       color: #ffffff;
-      padding: 12px 18px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-float);
       font-size: 13px;
       font-weight: 500;
-      z-index: 999;
+      display: none;
+      z-index: 1000;
+      animation: toastIn 0.2s ease-out;
+    }
+    @keyframes toastIn {
+      from { transform: translateY(8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-title">
-      <span>✉️ Recruiter Outreach Studio</span>
-      <span class="header-subtitle">— Sai Tarrun Pitta</span>
+  <!-- macOS Window Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="app-icon">⚡</div>
+      <div>
+        <div class="app-title">Recruiter Outreach Studio</div>
+        <div class="app-sub">Sai Tarrun Pitta • Software Engineer</div>
+      </div>
     </div>
-    <div>
-      <span class="badge-status">● n8n Connected</span>
+
+    <!-- Apple Segmented Navigation -->
+    <div class="segmented-control">
+      <button class="segmented-item active" onclick="setStudioTab('queue', event)">
+        Leads (<span id="queue-badge">4</span>)
+      </button>
+      <button class="segmented-item" onclick="setStudioTab('resumes', event)">
+        Resumes (<span id="resume-badge">4</span>)
+      </button>
+      <button class="segmented-item" onclick="setStudioTab('bulk', event)">
+        Bulk Import
+      </button>
+    </div>
+
+    <div class="header-actions">
+      <button class="apple-btn btn-blue-primary" onclick="sendBulkAllQueue()" id="btn-bulk-send">
+        🚀 Send All (<span id="bulk-badge-num">4</span>) in Bulk
+      </button>
     </div>
   </header>
 
-  <div class="container">
+  <!-- Main 2-Pane Apple Workspace -->
+  <main class="main-workspace">
 
-    <!-- Top Tab Bar -->
-    <div class="tab-bar">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('queue', event)">📋 Leads (<span id="queue-badge">4</span>)</button>
-        <button class="tab-btn" onclick="switchTab('bulk', event)">🚀 Bulk Import</button>
-        <button class="tab-btn" onclick="switchTab('resume', event)">📄 Resumes (<span id="resume-badge">4</span>)</button>
-      </div>
-      <div>
-        <button class="btn btn-primary" onclick="sendBulkAllQueue()" id="bulk-btn">
-          🚀 Send All (<span id="bulk-btn-count">4</span>) in Bulk
-        </button>
-      </div>
-    </div>
+    <!-- LEFT PANE: CONTROLS & INSPECTOR -->
+    <aside>
 
-    <!-- 2-Column Minimal Layout -->
-    <div class="grid">
-
-      <!-- LEFT COLUMN -->
-      <div>
-
-        <!-- TAB 1: QUEUE -->
-        <div id="tab-queue" class="tab-panel active">
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Recruiter Details</span>
-              <button class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;" onclick="clearForm()">+ Clear</button>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <div class="form-group">
-                <label>First Name</label>
-                <input type="text" id="fn" placeholder="Stephanie" value="Stephanie" oninput="handleLeadInputChange()">
+      <!-- TAB 1: RECRUITER LEADS -->
+      <div id="tab-queue" class="tab-content active">
+        <div class="apple-card">
+          <div class="card-head">
+            <span class="card-head-title">Recruiter Details</span>
+            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">+ New Lead</button>
+          </div>
+          <div class="card-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-row">
+                <label class="form-label-text">First Name</label>
+                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="Stephanie" oninput="handleLeadInputChange()">
               </div>
-              <div class="form-group">
-                <label>Company</label>
-                <input type="text" id="comp" placeholder="Google" value="TikTok" oninput="handleLeadInputChange()">
+              <div class="form-row">
+                <label class="form-label-text">Company</label>
+                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="TikTok" oninput="handleLeadInputChange()">
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" id="email" placeholder="stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="handleLeadInputChange()">
+            <div class="form-row">
+              <label class="form-label-text">Email Address</label>
+              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="handleLeadInputChange()">
             </div>
 
-            <div class="form-group">
-              <label>Attach Resume Version</label>
-              <select id="resume-select" onchange="updateResumeFromSelect()"></select>
+            <div class="form-row">
+              <label class="form-label-text">Resume Attached</label>
+              <select id="resume-select" class="apple-select" onchange="updateResumeFromSelect()"></select>
             </div>
 
-            <button class="btn btn-primary" style="width: 100%; margin-top: 4px;" onclick="addRecruiter()">+ Save Lead</button>
+            <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 4px;" onclick="addRecruiter()">
+              + Add Lead to Queue
+            </button>
 
-            <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-              <label style="margin-bottom: 6px;">Queue Leads</label>
-              <div class="queue-list" id="queue-list"></div>
+            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+              <div class="form-label-text" style="margin-bottom: 8px;">Active Lead Queue</div>
+              <div class="recruiter-list-group" id="recruiter-list-group"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- TAB 2: BULK IMPORT -->
-        <div id="tab-bulk" class="tab-panel">
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Bulk Import Leads</span>
-            </div>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-              Paste <code>FirstName, Company, Email</code> (one per line):
-            </p>
-            <textarea id="bulk-text" rows="6" placeholder="John, Uber, john@uber.com&#10;Sarah, Stripe, sarah@stripe.com" style="font-family: monospace; font-size: 12px;"></textarea>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="parseBulkLeads()">+ Add to Queue</button>
+      <!-- TAB 2: RESUME LIBRARY -->
+      <div id="tab-resumes" class="tab-content">
+        <div class="apple-card">
+          <div class="card-head">
+            <span class="card-head-title">Resume Library</span>
+            <button class="apple-btn btn-tint" style="padding: 3px 8px; font-size: 11.5px;" onclick="openQuickLookModal()">👁 Quick Look</button>
           </div>
-        </div>
+          <div class="card-content">
+            <div class="resume-list-container" id="resume-list-container"></div>
 
-        <!-- TAB 3: RESUME LIBRARY -->
-        <div id="tab-resume" class="tab-panel">
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Resume Library</span>
-            </div>
-            <div class="resume-list" id="resume-list"></div>
-
-            <div class="upload-box">
-              <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">Upload New Resume (PDF)</div>
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+              <div class="form-label-text">Upload Resume Variant</div>
               <input type="file" id="file-input" accept=".pdf" style="display: none;">
-              <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
-                📁 Choose File
+              <button class="apple-btn btn-plain" style="width: 100%;" onclick="document.getElementById('file-input').click()">
+                📁 Upload PDF Document
               </button>
             </div>
-
-            <iframe id="pdf-frame" class="pdf-preview" src=""></iframe>
           </div>
         </div>
-
       </div>
 
-      <!-- RIGHT COLUMN: COMPOSE & DIRECT EDIT -->
-      <div>
-        <div class="compose-box">
-          <div class="compose-top">
-            <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
-              ✍️ Click below to edit email directly
+      <!-- TAB 3: BULK IMPORT -->
+      <div id="tab-bulk" class="tab-content">
+        <div class="apple-card">
+          <div class="card-head">
+            <span class="card-head-title">Bulk Import Leads</span>
+          </div>
+          <div class="card-content">
+            <p style="font-size: 12.5px; color: var(--label-secondary); margin-bottom: 10px; line-height: 1.4;">
+              Paste <code>FirstName, Company, Email</code> (one lead per line):
+            </p>
+            <textarea id="bulk-text" class="apple-textarea" rows="6" placeholder="Stephanie, TikTok, stephanie.chao@tiktok.com&#10;Vivian, ByteDance, vivianjiang@bytedance.com"></textarea>
+            <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 12px;" onclick="parseBulkLeads()">
+              + Import All Leads
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT PANE: APPLE MAIL COMPOSE & DIRECT INLINE EDITING -->
+    <section>
+      <div class="mail-window">
+        <!-- Window Chrome Toolbar -->
+        <div class="mail-toolbar">
+          <div class="mail-window-controls">
+            <span class="mac-dot dot-close"></span>
+            <span class="mac-dot dot-min"></span>
+            <span class="mac-dot dot-max"></span>
+            <span style="font-size: 12px; color: var(--label-secondary); margin-left: 6px; font-weight: 500;">
+              ✨ Direct WYSIWYG Compose — Click anywhere below to edit
             </span>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-secondary" style="font-size: 12px;" onclick="resetBodyToDefault()">↺ Reset</button>
-              <button class="btn btn-blue" onclick="sendOutreach()" id="send-btn">✉️ Send Message</button>
-            </div>
           </div>
-
-          <div class="compose-meta">
-            <div class="meta-row">
-              <span class="meta-label">To:</span>
-              <span id="prev-to" style="font-weight: 600; color: var(--blue);">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-label">Subject:</span>
-              <input type="text" id="prev-subject" class="meta-input" value="Software Engineering Opportunities at TikTok — Sai Tarrun Pitta">
-            </div>
-            <div class="meta-row">
-              <span class="meta-label">Attach:</span>
-              <span class="attach-tag" id="prev-attach">
-                📄 <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
-                <span style="color: var(--text-muted); font-size: 11px;" id="prev-attach-size">(73.4 KB)</span>
-              </span>
-            </div>
-          </div>
-
-          <!-- DIRECT EDITABLE EMAIL CONTENT -->
-          <div class="editable-body" id="prev-body" contenteditable="true" spellcheck="false">
-            <!-- Dynamically generated with exact First Name & Company replacement -->
+          <div style="display: flex; gap: 8px;">
+            <button class="apple-btn btn-plain" style="font-size: 12.5px;" onclick="resetBodyToDefault()">↺ Reset</button>
+            <button class="apple-btn btn-blue-primary" style="font-size: 12.5px;" onclick="sendOutreach()" id="btn-send-single">
+              ✉️ Send Email
+            </button>
           </div>
         </div>
-      </div>
 
+        <!-- Mail Header Metadata Rows -->
+        <div class="mail-header-fields">
+          <div class="field-row">
+            <span class="field-tag">To:</span>
+            <span id="prev-to" style="font-weight: 600; color: var(--accent-blue);">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
+          </div>
+          <div class="field-row">
+            <span class="field-tag">Subject:</span>
+            <input type="text" id="prev-subject" class="field-subject-input" value="Software Engineering Opportunities at TikTok — Sai Tarrun Pitta">
+          </div>
+          <div class="field-row">
+            <span class="field-tag">Attach:</span>
+            <span class="attachment-pill" id="prev-attach">
+              📄 <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
+              <span style="color: var(--label-tertiary); font-size: 11px;" id="prev-attach-size">(73.4 KB)</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Mail Body (Directly In-place Editable) -->
+        <div class="mail-body-canvas" id="prev-body" contenteditable="true" spellcheck="false">
+          <!-- Dynamic Content Injected in Real Time -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PDF Quick Look Modal -->
+  <div class="pdf-modal" id="pdf-modal" onclick="closeQuickLookModal(event)">
+    <div class="pdf-modal-card" onclick="event.stopPropagation()">
+      <div class="pdf-modal-head">
+        <span style="font-weight: 600; font-size: 14px;" id="modal-pdf-title">📄 Quick Look Preview</span>
+        <button class="apple-btn btn-plain" onclick="closeQuickLookModal()">Done</button>
+      </div>
+      <iframe id="pdf-modal-frame" class="pdf-frame-embed" src=""></iframe>
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <!-- Apple Toast -->
+  <div id="apple-toast" class="apple-toast"></div>
 
   <script>
     let resumeLibrary = [];
@@ -594,9 +717,6 @@
         }
 
         renderResumeList();
-        if (selectedResumeFile) {
-          previewResumeFile(selectedResumeFile);
-        }
         updateAttachmentUI();
       } catch (e) {
         console.error("Failed to load resumes", e);
@@ -604,26 +724,31 @@
     }
 
     function renderResumeList() {
-      const list = document.getElementById('resume-list');
+      const list = document.getElementById('resume-list-container');
       list.innerHTML = '';
 
       if (resumeLibrary.length === 0) {
-        list.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">No resumes uploaded.</div>';
+        list.innerHTML = '<div style="font-size: 12px; color: var(--label-secondary); text-align: center; padding: 14px;">No resumes uploaded.</div>';
         return;
       }
 
       resumeLibrary.forEach(r => {
         const item = document.createElement('div');
-        item.className = `resume-item ${r.filename === selectedResumeFile ? 'active' : ''}`;
-        item.onclick = () => previewResumeFile(r.filename);
+        item.className = `resume-row-card ${r.filename === selectedResumeFile ? 'selected' : ''}`;
+        item.onclick = () => {
+          selectedResumeFile = r.filename;
+          renderResumeList();
+          updateAttachmentUI();
+        };
         item.innerHTML = `
-          <div>
-            <div style="font-weight: 600; font-size: 12.5px;">📄 ${r.filename}</div>
-            <div style="font-size: 11px; color: var(--text-muted);">${r.size}</div>
+          <div style="font-size: 18px;">📄</div>
+          <div class="resume-info">
+            <div class="resume-filename">${r.filename}</div>
+            <div class="resume-meta">${r.size} • ${r.lastModified}</div>
           </div>
-          <div style="display: flex; gap: 4px;">
-            <button class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">Attach</button>
-            <button class="btn btn-danger" style="padding: 3px 6px; font-size: 11px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')">🗑</button>
+          <div style="display: flex; gap: 4px; flex-shrink: 0;">
+            <button class="apple-btn btn-tint" style="padding: 4px 8px; font-size: 11.5px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">Attach</button>
+            <button class="apple-btn btn-destruct" style="padding: 4px 6px; font-size: 11.5px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')">🗑</button>
           </div>
         `;
         list.appendChild(item);
@@ -631,7 +756,7 @@
     }
 
     async function deleteResume(filename) {
-      if (!confirm(`Delete "${filename}"?`)) return;
+      if (!confirm(`Delete "${filename}" from library?`)) return;
       try {
         const res = await fetch('/api/delete-resume', {
           method: 'POST',
@@ -640,19 +765,12 @@
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`Deleted ${filename}`);
+          showAppleToast(`Deleted ${filename}`);
           await loadResumes();
         }
       } catch (err) {
-        showToast(`Error: ${err.message}`);
+        showAppleToast(`Error: ${err.message}`);
       }
-    }
-
-    function previewResumeFile(filename) {
-      selectedResumeFile = filename;
-      document.getElementById('pdf-frame').src = `/api/resume-pdf?file=${encodeURIComponent(filename)}&t=${Date.now()}`;
-      renderResumeList();
-      updateAttachmentUI();
     }
 
     function assignResumeToCurrent(filename) {
@@ -661,10 +779,11 @@
       if (r) {
         r.resumeFile = filename;
         document.getElementById('resume-select').value = filename;
-        showToast(`Attached ${filename}`);
+        showAppleToast(`Attached ${filename}`);
         renderQueue();
       }
-      previewResumeFile(filename);
+      renderResumeList();
+      updateAttachmentUI();
     }
 
     function updateResumeFromSelect() {
@@ -675,6 +794,7 @@
         r.resumeFile = val;
         renderQueue();
       }
+      renderResumeList();
       updateAttachmentUI();
     }
 
@@ -687,29 +807,31 @@
       document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
     }
 
-    function switchTab(tabId, evt) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(c => c.classList.remove('active'));
+    function setStudioTab(tabId, evt) {
+      document.querySelectorAll('.segmented-item').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
     function renderQueue() {
-      const listEl = document.getElementById('queue-list');
+      const listEl = document.getElementById('recruiter-list-group');
       listEl.innerHTML = '';
       document.getElementById('queue-badge').innerText = recruiters.length;
-      document.getElementById('bulk-btn-count').innerText = recruiters.length;
+      document.getElementById('bulk-badge-num').innerText = recruiters.length;
 
       recruiters.forEach((r, idx) => {
         const item = document.createElement('div');
-        item.className = `queue-item ${idx === selectedIndex ? 'active' : ''}`;
+        item.className = `recruiter-row ${idx === selectedIndex ? 'selected' : ''}`;
         item.onclick = () => selectRecruiter(idx);
         item.innerHTML = `
           <div>
-            <div class="queue-item-name">${r.firstName} @ ${r.company}</div>
-            <div class="queue-item-sub">${r.email}</div>
+            <div class="rec-name">${r.firstName} @ ${r.company}</div>
+            <div class="rec-sub">${r.email} • 📄 ${r.resumeFile || 'Default'}</div>
           </div>
-          <span style="font-size: 11px; font-weight: 600; color: ${r.status === 'Sent' ? 'var(--green)' : 'var(--text-muted)'};">${r.status || 'Pending'}</span>
+          <span style="font-size: 11px; font-weight: 600; color: ${r.status === 'Sent' ? 'var(--accent-green)' : 'var(--label-secondary)'};">
+            ${r.status || 'Pending'}
+          </span>
         `;
         listEl.appendChild(item);
       });
@@ -728,7 +850,6 @@
       generateBodyHTML(r.firstName, r.company, r.email, r.focus);
     }
 
-    // LIVE DYNAMIC UPDATES AS YOU TYPE FIRST NAME OR COMPANY
     function handleLeadInputChange() {
       const r = recruiters[selectedIndex];
       const fn = document.getElementById('fn').value.trim() || 'Recruiter';
@@ -766,12 +887,12 @@
         <p>I've attached my resume for reference.</p>
         <p>Thank you for your time and consideration.</p>
         <p>Best regards,</p>
-        <div class="signature" contenteditable="false">
+        <div class="mail-signature-block" contenteditable="false">
           <strong>Sai Tarrun Pitta</strong><br>
-          Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: var(--blue); text-decoration: none;">saitarrunpitta@gmail.com</a><br>
-          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: var(--blue); text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
-          GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: var(--blue); text-decoration: none;">github.com/saitarrun</a><br>
-          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: var(--blue); text-decoration: none;">saitarrunpitta.vercel.app</a>
+          Email: <a href="mailto:saitarrunpitta@gmail.com">saitarrunpitta@gmail.com</a><br>
+          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
+          GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
+          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
         </div>
       `;
     }
@@ -782,13 +903,14 @@
       const email = document.getElementById('email').value.trim() || 'stephanie.chao@tiktok.com';
       const r = recruiters[selectedIndex];
       generateBodyHTML(fn, comp, email, r ? r.focus : '');
-      showToast('Template reset with current lead details.');
+      showAppleToast('Template reset with current lead details.');
     }
 
     function clearForm() {
       document.getElementById('fn').value = '';
       document.getElementById('comp').value = '';
       document.getElementById('email').value = '';
+      showAppleToast('Ready for new lead entry');
     }
 
     function addRecruiter() {
@@ -806,7 +928,7 @@
       selectedIndex = 0;
       renderQueue();
       selectRecruiter(0);
-      showToast(`Added ${fn} @ ${comp}!`);
+      showAppleToast(`Added ${fn} @ ${comp}!`);
     }
 
     function parseBulkLeads() {
@@ -834,9 +956,9 @@
 
       renderQueue();
       document.getElementById('bulk-text').value = '';
-      switchTab('queue', null);
-      document.querySelectorAll('.tab-btn')[0].classList.add('active');
-      showToast(`Added ${count} leads!`);
+      setStudioTab('queue', null);
+      document.querySelectorAll('.segmented-item')[0].classList.add('active');
+      showAppleToast(`Imported ${count} leads!`);
     }
 
     // Direct Binary File Upload
@@ -846,7 +968,7 @@
       const file = this.files[0];
       if (!file.name.toLowerCase().endsWith('.pdf')) return;
 
-      showToast(`Uploading ${file.name}...`);
+      showAppleToast(`Uploading ${file.name}...`);
       try {
         const res = await fetch('/api/upload-resume', {
           method: 'POST',
@@ -858,21 +980,32 @@
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`Added ${file.name}!`);
+          showAppleToast(`Added ${file.name}!`);
           await loadResumes();
-          previewResumeFile(file.name);
         }
       } catch (err) {
-        showToast(`Error: ${err.message}`);
+        showAppleToast(`Error: ${err.message}`);
       }
       this.value = '';
     });
+
+    function openQuickLookModal() {
+      const file = selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
+      document.getElementById('modal-pdf-title').innerText = `📄 Quick Look: ${file}`;
+      document.getElementById('pdf-modal-frame').src = `/api/resume-pdf?file=${encodeURIComponent(file)}&t=${Date.now()}`;
+      document.getElementById('pdf-modal').style.display = 'flex';
+    }
+
+    function closeQuickLookModal() {
+      document.getElementById('pdf-modal').style.display = 'none';
+      document.getElementById('pdf-modal-frame').src = '';
+    }
 
     async function sendOutreach() {
       const r = recruiters[selectedIndex];
       if (!r) return;
 
-      const btn = document.getElementById('send-btn');
+      const btn = document.getElementById('btn-send-single');
       btn.innerText = 'Sending...';
       btn.disabled = true;
 
@@ -884,7 +1017,7 @@
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
     p { margin: 0 0 14px 0; }
-    a { color: #0066cc; text-decoration: none; }
+    a { color: #0071e3; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -908,20 +1041,20 @@
         const data = await res.json();
         r.status = 'Sent';
         renderQueue();
-        showToast(`Sent to ${r.firstName}!`);
+        showAppleToast(`Sent to ${r.firstName} (${r.company})!`);
       } catch (err) {
-        showToast(`Error: ${err.message}`);
+        showAppleToast(`Error: ${err.message}`);
       } finally {
-        btn.innerText = '✉️ Send Message';
+        btn.innerText = '✉️ Send Email';
         btn.disabled = false;
       }
     }
 
     async function sendBulkAllQueue() {
       if (recruiters.length === 0) return;
-      if (!confirm(`Send outreach to all ${recruiters.length} recruiters in queue?`)) return;
+      if (!confirm(`Dispatch personalized emails to all ${recruiters.length} recruiters in your queue?`)) return;
 
-      const btn = document.getElementById('bulk-btn');
+      const btn = document.getElementById('btn-bulk-send');
       btn.disabled = true;
 
       for (let i = 0; i < recruiters.length; i++) {
@@ -937,7 +1070,7 @@
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
     p { margin: 0 0 14px 0; }
-    a { color: #0066cc; text-decoration: none; }
+    a { color: #0071e3; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -972,11 +1105,11 @@
 
       btn.innerText = `🚀 Send All (${recruiters.length}) in Bulk`;
       btn.disabled = false;
-      showToast('🎉 Bulk Send Complete!');
+      showAppleToast('🎉 Bulk Outreach Complete!');
     }
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
+    function showAppleToast(msg) {
+      const t = document.getElementById('apple-toast');
       t.innerText = msg;
       t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 3500);
