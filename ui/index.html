@@ -749,51 +749,49 @@
       <div id="tab-queue" class="tab-content active">
         <div class="apple-card">
           <div class="card-head">
-            <span class="card-head-title">Recruiter Details</span>
-            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">New Lead</button>
+            <span class="card-head-title">Recruiter Queue</span>
+            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">Clear Form</button>
           </div>
-          <div class="card-content">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <div class="form-row">
-                <label class="form-label-text">First Name</label>
-                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="">
-              </div>
-              <div class="form-row">
-                <label class="form-label-text">Company</label>
-                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="">
-              </div>
+          <div class="card-content" style="padding: 16px;">
+
+            <!-- QUEUE FILTER SUB-TABS -->
+            <div class="queue-subtabs">
+              <button class="queue-subtab active" data-filter="all" onclick="setQueueFilter('all')">
+                All (<span id="filter-all-count">0</span>)
+              </button>
+              <button class="queue-subtab" data-filter="unsent" onclick="setQueueFilter('unsent')">
+                Unsent (<span id="filter-unsent-count">0</span>)
+              </button>
+              <button class="queue-subtab" data-filter="sent" onclick="setQueueFilter('sent')">
+                Sent (<span id="filter-sent-count">0</span>)
+              </button>
             </div>
 
-            <div class="form-row">
-              <label class="form-label-text">Email Address</label>
-              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="">
-            </div>
+            <!-- RECRUITER LIST GROUP (Always Front and Center) -->
+            <div class="recruiter-list-group" id="recruiter-list-group" style="max-height: 270px; margin-bottom: 14px;"></div>
 
-            <div class="form-row">
-              <label class="form-label-text">Resume Attached</label>
-              <select id="resume-select" class="apple-select" onchange="updateResumeFromSelect()"></select>
-            </div>
-
-            <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 4px;" onclick="addRecruiter()">
-              Add Lead to Queue
-            </button>
-
-            <!-- SEPARATED ACTIVE UNSENT VS SENT LEADS -->
-            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
-              <div class="queue-subtabs">
-                <button class="queue-subtab active" onclick="setQueueFilter('all', event)">
-                  All (<span id="filter-all-count">0</span>)
-                </button>
-                <button class="queue-subtab" onclick="setQueueFilter('unsent', event)">
-                  Unsent (<span id="filter-unsent-count">0</span>)
-                </button>
-                <button class="queue-subtab" onclick="setQueueFilter('sent', event)">
-                  Sent (<span id="filter-sent-count">0</span>)
-                </button>
+            <!-- COMPACT ADD LEAD FORM -->
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+              <div style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em;">Add Lead to Queue</div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <input type="text" id="fn" class="apple-input" placeholder="First Name" style="padding: 7px 10px; font-size: 13px;">
+                <input type="text" id="comp" class="apple-input" placeholder="Company" style="padding: 7px 10px; font-size: 13px;">
               </div>
 
-              <div class="recruiter-list-group" id="recruiter-list-group"></div>
+              <div style="margin-bottom: 8px;">
+                <input type="email" id="email" class="apple-input" placeholder="recruiter@company.com" style="padding: 7px 10px; font-size: 13px;">
+              </div>
+
+              <div style="margin-bottom: 10px;">
+                <select id="resume-select" class="apple-select" style="padding: 6px 10px; font-size: 12px;" onchange="updateResumeFromSelect()"></select>
+              </div>
+
+              <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 12.5px; padding: 7px 12px;" onclick="addRecruiter()">
+                Add Lead to Queue
+              </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -1366,11 +1364,10 @@
       showAppleToast('Ready for new lead entry');
     }
 
-    function setQueueFilter(filter, evt) {
+    function setQueueFilter(filter) {
       currentQueueFilter = filter;
       document.querySelectorAll('.queue-subtab').forEach(b => {
-        b.classList.remove('active');
-        if (b.innerText.toLowerCase().startsWith(filter)) b.classList.add('active');
+        b.classList.toggle('active', b.getAttribute('data-filter') === filter);
       });
       renderQueue();
     }
