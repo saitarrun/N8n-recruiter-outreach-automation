@@ -1387,6 +1387,46 @@ Best regards,
 </div>`;
     }
 
+    function htmlToPlainText(html) {
+      if (!html) return "";
+      if (!html.includes('<p>') && !html.includes('<div>') && !html.includes('<br>') && !html.includes('<strong>')) {
+        return html.trim();
+      }
+      let text = html;
+      
+      // Replace signature block with {SignatureBlock} token
+      text = text.replace(/<div class="mail-signature-block"[\s\S]*?<\/div>/gi, "{SignatureBlock}");
+
+      // Convert bold
+      text = text.replace(/<(?:strong|b)>(.*?)<\/(?:strong|b)>/gi, "**$1**");
+      
+      // Convert breaks
+      text = text.replace(/<br\s*[\/]?>/gi, "\n");
+
+      // Convert paragraphs and divs to double line breaks
+      text = text.replace(/<\/(?:p|div)>/gi, "\n\n");
+      text = text.replace(/<(?:p|div)[^>]*>/gi, "");
+
+      // Strip any remaining html tags
+      text = text.replace(/<[^>]+>/g, "");
+
+      // Decode common html entities
+      text = text
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, "\"")
+        .replace(/&#39;/g, "'")
+        .replace(/&rsquo;/g, "'")
+        .replace(/&lsquo;/g, "'")
+        .replace(/&rdquo;/g, "\"")
+        .replace(/&ldquo;/g, "\"");
+
+      // Normalize excessive newlines
+      text = text.replace(/\n{3,}/g, "\n\n").trim();
+      return text;
+    }
+
     function renderTextToHtml(rawText, payload, profile) {
       let text = rawText || "";
       const sig = generateSignatureBlock(profile);
@@ -1427,7 +1467,7 @@ Best regards,
     function getMasterTemplate() {
       const stored = localStorage.getItem('custom_master_template');
       if (stored && stored.trim().length > 60) {
-        return stored;
+        return htmlToPlainText(stored);
       }
       return DEFAULT_MASTER_TEMPLATE;
     }
@@ -1481,7 +1521,7 @@ Best regards,
       setVal('prof-linkedin', p.linkedin);
       setVal('prof-github', p.github);
       setVal('prof-portfolio', p.portfolio);
-      setVal('prof-template', getMasterTemplate());
+      setVal('prof-template', htmlToPlainText(getMasterTemplate()));
     }
 
     function saveSenderProfile() {
@@ -1498,7 +1538,7 @@ Best regards,
 
       const tplVal = document.getElementById('prof-template').value.trim();
       if (tplVal && tplVal.length > 30) {
-        localStorage.setItem('custom_master_template', tplVal);
+        localStorage.setItem('custom_master_template', htmlToPlainText(tplVal));
       }
 
       showAppleToast('Profile & Master Template saved!');
@@ -1555,26 +1595,30 @@ ${contentHtml}
     function saveCurrentCanvasAsTemplate() {
       const currentBody = document.getElementById('prev-body').innerHTML;
       const currentRecruiter = recruiters[selectedIndex] || { firstName: 'Recruiter', company: 'Company' };
-      
+      const currentComp = (document.getElementById('comp') && document.getElementById('comp').value.trim()) || currentRecruiter.company;
+      const currentName = (document.getElementById('fn') && document.getElementById('fn').value.trim()) || currentRecruiter.firstName;
+
+      let plain = htmlToPlainText(currentBody);
+
       // Auto-tokenize current recruiter's company & name into placeholders
-      let tpl = currentBody
+      plain = plain
         .replace(/\[\s*(recruiter_?\s*name|first_?name|name)\s*\]/gi, '{RecruiterName}')
         .replace(/\[\s*(company|target_?company)\s*\]/gi, '{Company}')
         .replace(/\[\s*(email|recruiter_?\s*email)\s*\]/gi, '{Email}');
 
-      if (currentRecruiter.company && currentRecruiter.company !== 'Company') {
-        const compRegex = new RegExp(currentRecruiter.company, 'g');
-        tpl = tpl.replace(compRegex, '{Company}');
+      if (currentComp && currentComp !== 'Company') {
+        const compRegex = new RegExp(`\\b${currentComp}\\b`, 'gi');
+        plain = plain.replace(compRegex, '{Company}');
       }
-      if (currentRecruiter.firstName && currentRecruiter.firstName !== 'Recruiter') {
-        const nameRegex = new RegExp(`\\b${currentRecruiter.firstName}\\b`, 'g');
-        tpl = tpl.replace(nameRegex, '{RecruiterName}');
+      if (currentName && currentName !== 'Recruiter') {
+        const nameRegex = new RegExp(`\\b${currentName}\\b`, 'g');
+        plain = plain.replace(nameRegex, '{RecruiterName}');
       }
 
-      if (tpl && tpl.trim().length > 30) {
-        localStorage.setItem('custom_master_template', tpl);
+      if (plain && plain.trim().length > 30) {
+        localStorage.setItem('custom_master_template', plain);
         const profTpl = document.getElementById('prof-template');
-        if (profTpl) profTpl.value = tpl;
+        if (profTpl) profTpl.value = plain;
         showAppleToast('Saved! Custom format set with dynamic {Company} placeholders.');
       }
       
