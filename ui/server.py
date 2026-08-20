@@ -14,6 +14,13 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+    def end_headers(self):
+        # Prevent any aggressive browser caching so edits and uploads reflect instantly
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_GET(self):
         if self.path == "/api/resume-info":
             if os.path.exists(RESUME_DEST):
@@ -41,7 +48,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
-            self.send_header('Cache-Control', 'no-cache')
             self.end_headers()
             self.wfile.write(json.dumps(res).encode('utf-8'))
             return
@@ -54,7 +60,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/pdf')
                 self.send_header('Content-Disposition', 'inline; filename="Sai_Tarrun_Pitta_Resume.pdf"')
                 self.send_header('Content-Length', str(len(pdf_data)))
-                self.send_header('Cache-Control', 'no-cache')
                 self.end_headers()
                 self.wfile.write(pdf_data)
                 return
@@ -101,7 +106,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 parts = body.split(b'--' + boundary)
                 for part in parts:
                     if b'filename=' in part:
-                        # Extract original filename
                         fn_match = re.search(r'filename="([^"]+)"', part.decode('utf-8', errors='ignore'))
                         if fn_match:
                             original_filename = fn_match.group(1)
