@@ -795,8 +795,9 @@
         <p style="font-size: 13px; color: var(--label-secondary); margin: 4px 0 0 0;">Spacious, distraction-free environment to customize your profile, master subject line, and outreach email copy.</p>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button class="apple-btn btn-plain" onclick="resetProfileDefaults()">Reset to Defaults</button>
-        <button class="apple-btn btn-blue-primary" onclick="saveSenderProfile()">Save Profile & Templates</button>
+        <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back to Leads</button>
+        <button class="apple-btn btn-plain" onclick="resetProfileDefaults()">Reset Defaults</button>
+        <button class="apple-btn btn-blue-primary" onclick="saveAndGoToMainPage()">Save & Apply to Main Page →</button>
       </div>
     </div>
 
@@ -1803,6 +1804,12 @@ Best regards,
       showAppleToast('Profile, Subject & Master Template saved!');
     }
 
+    function saveAndGoToMainPage() {
+      saveSenderProfileSilently();
+      setStudioTab('queue', null);
+      showAppleToast('✓ Template & Profile applied to all recruiter emails!');
+    }
+
     function resetProfileDefaults() {
       localStorage.removeItem('sender_profile');
       localStorage.removeItem('custom_master_template');
@@ -1871,7 +1878,7 @@ ${contentHtml}
         plain = plain.replace(nameRegex, '{RecruiterName}');
       }
 
-      if (plain && plain.trim().length > 30) {
+      if (plain && plain.trim().length > 5) {
         localStorage.setItem('custom_master_template', plain);
         const profTpl = document.getElementById('prof-template');
         if (profTpl) profTpl.value = plain;
@@ -1882,13 +1889,13 @@ ${contentHtml}
         const compRegex = new RegExp(`\\b${currentComp}\\b`, 'gi');
         currentSub = currentSub.replace(compRegex, '{Company}');
       }
-      if (currentSub && currentSub.length > 5) {
+      if (currentSub && currentSub.length > 2) {
         localStorage.setItem('custom_master_subject', currentSub);
         const profSub = document.getElementById('prof-subject');
         if (profSub) profSub.value = currentSub;
       }
 
-      showAppleToast('Saved! Custom format set with dynamic {Company} placeholders.');
+      showAppleToast('✓ Saved! Custom format set with dynamic {Company} placeholders.');
       
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
