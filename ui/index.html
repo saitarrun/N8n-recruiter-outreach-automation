@@ -756,17 +756,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div class="form-row">
                 <label class="form-label-text">First Name</label>
-                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="" oninput="handleLeadInputChange()" onblur="persistCurrentLead()">
+                <input type="text" id="fn" class="apple-input" placeholder="Stephanie" value="">
               </div>
               <div class="form-row">
                 <label class="form-label-text">Company</label>
-                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="" oninput="handleLeadInputChange()" onblur="persistCurrentLead()">
+                <input type="text" id="comp" class="apple-input" placeholder="TikTok" value="">
               </div>
             </div>
 
             <div class="form-row">
               <label class="form-label-text">Email Address</label>
-              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="" oninput="handleLeadInputChange()" onblur="persistCurrentLead()">
+              <input type="email" id="email" class="apple-input" placeholder="stephanie.chao@tiktok.com" value="">
             </div>
 
             <div class="form-row">
@@ -1387,6 +1387,12 @@
 
       const newLead = { firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" };
       await saveRecruitersState([newLead]);
+      
+      // Clear the input form fields
+      document.getElementById('fn').value = '';
+      document.getElementById('comp').value = '';
+      document.getElementById('email').value = '';
+
       await loadLeadsFromDatabase();
       setQueueFilter('unsent');
 
