@@ -170,7 +170,7 @@
     .upload-zone {
       border: 2px dashed #334155;
       border-radius: 12px;
-      padding: 30px 20px;
+      padding: 24px 20px;
       text-align: center;
       background: #0b1120;
       transition: all 0.2s;
@@ -180,7 +180,7 @@
       border-color: var(--accent);
       background: rgba(56, 189, 248, 0.08);
     }
-    .upload-icon { font-size: 36px; margin-bottom: 10px; }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
 
     .resume-badge {
       display: flex;
@@ -190,7 +190,33 @@
       background: #0b1120;
       border: 1px solid var(--card-border);
       border-radius: 10px;
+      margin-top: 14px;
+    }
+
+    /* Embedded PDF Container */
+    .pdf-viewer-container {
       margin-top: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      background: #1e293b;
+    }
+    .pdf-viewer-header {
+      padding: 8px 14px;
+      background: #0b1120;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .pdf-frame {
+      width: 100%;
+      height: 380px;
+      border: none;
+      background: #525659;
     }
 
     .toast {
@@ -228,7 +254,7 @@
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('queue', event)">📋 Recruiter Queue</button>
     <button class="tab-btn" onclick="switchTab('template', event)">✏️ Edit Email Template</button>
-    <button class="tab-btn" onclick="switchTab('resume', event)">📄 Upload / Manage Resume</button>
+    <button class="tab-btn" onclick="switchTab('resume', event)">📄 Upload &amp; Preview Resume</button>
   </div>
 
   <div class="grid">
@@ -307,14 +333,14 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           </div>
 
           <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-            Upload your latest PDF resume. It will replace the active resume and attach to all outgoing recruiter emails.
+            Upload your updated PDF resume. It will immediately mount as the active resume for all outgoing recruiter emails.
           </p>
 
           <!-- Upload Drop Zone -->
           <div class="upload-zone" id="drop-area">
             <div class="upload-icon">📤</div>
-            <div style="font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 6px;">Drag & Drop your PDF here</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">or choose from your files</div>
+            <div style="font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 4px;">Drag &amp; Drop your PDF here</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">or browse from your files</div>
             
             <input type="file" id="file-input" accept=".pdf" style="display: none;">
             <button class="btn btn-primary" style="width: auto; padding: 8px 20px;" onclick="document.getElementById('file-input').click()">
@@ -322,13 +348,24 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
             </button>
           </div>
 
+          <!-- Active File Status Card -->
           <div class="resume-badge" id="resume-status">
             <span style="font-size: 28px;">📄</span>
             <div style="flex: 1;">
-              <div style="font-weight: 700; font-size: 13px;" id="resume-file-title">Sai_Tarrun_Pitta_Resume.pdf</div>
-              <div style="font-size: 11px; color: var(--text-muted);" id="resume-size-text">Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (73.4 KB)</div>
+              <div style="font-weight: 700; font-size: 13px; color: #fff;" id="resume-file-title">PittaSaiTarrun_Resume.pdf</div>
+              <div style="font-size: 11px; color: var(--text-muted);" id="resume-size-text">Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> • 73.4 KB</div>
+              <div style="font-size: 10px; color: var(--accent); margin-top: 2px;" id="resume-updated-text">Updated: Today</div>
             </div>
             <span class="badge badge-sent" id="resume-badge-status">Active</span>
+          </div>
+
+          <!-- Live Embedded PDF Preview -->
+          <div class="pdf-viewer-container">
+            <div class="pdf-viewer-header">
+              <span>📄 Live PDF View</span>
+              <a href="/api/resume-pdf" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 11px;">Open in New Tab ↗</a>
+            </div>
+            <iframe id="pdf-frame" class="pdf-frame" src="/api/resume-pdf"></iframe>
           </div>
         </div>
       </div>
@@ -360,6 +397,27 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
     ];
 
     let selectedIndex = 0;
+    let currentResumeName = "PittaSaiTarrun_Resume.pdf";
+    let currentResumeSize = "73.4 KB";
+
+    async function fetchResumeInfo() {
+      try {
+        const res = await fetch('/api/resume-info');
+        const data = await res.json();
+        if (data.exists) {
+          currentResumeName = data.filename || "PittaSaiTarrun_Resume.pdf";
+          currentResumeSize = data.size || "73.4 KB";
+          document.getElementById('resume-file-title').innerText = currentResumeName;
+          document.getElementById('resume-size-text').innerHTML = `Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> • ${currentResumeSize}`;
+          if (data.lastModified) {
+            document.getElementById('resume-updated-text').innerText = `Updated: ${data.lastModified}`;
+          }
+          renderPreview();
+        }
+      } catch (e) {
+        console.error("Failed to load resume info", e);
+      }
+    }
 
     function switchTab(tabId, evt) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -440,7 +498,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         <div class="preview-header">
           <div><b>To:</b> ${r.email}</div>
           <div><b>Subject:</b> ${subjectTpl}</div>
-          <div><b>Attachment:</b> 📄 Sai_Tarrun_Pitta_Resume.pdf (Mounted)</div>
+          <div><b>Attachment:</b> 📄 <span style="color: #0066cc; font-weight: 600;">${currentResumeName}</span> (${currentResumeSize} • Mounted)</div>
         </div>
         <p style="margin-bottom: 14px;">Hi ${r.firstName},</p>
         <p style="margin-bottom: 14px;">I hope you're doing well.</p>
@@ -474,19 +532,27 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       document.getElementById('resume-file-title').innerText = file.name;
 
       try {
-        // Direct binary upload for maximum reliability
         const res = await fetch('/api/upload-resume', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/pdf'
+            'Content-Type': 'application/pdf',
+            'X-File-Name': file.name
           },
           body: file
         });
         const data = await res.json();
         if (data.success) {
-          document.getElementById('resume-size-text').innerHTML = `Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (${data.size})`;
+          currentResumeName = file.name;
+          currentResumeSize = data.size;
+          document.getElementById('resume-size-text').innerHTML = `Active File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> • ${data.size}`;
+          document.getElementById('resume-updated-text').innerText = 'Updated: Just now';
           document.getElementById('resume-badge-status').innerText = 'Active';
           document.getElementById('resume-badge-status').className = 'badge badge-sent';
+
+          // Refresh embedded PDF iframe
+          document.getElementById('pdf-frame').src = `/api/resume-pdf?t=${Date.now()}`;
+          
+          renderPreview();
           showToast(`✅ Successfully uploaded ${file.name} (${data.size})!`);
         } else {
           showToast(`❌ Upload failed: ${data.error || 'Unknown error'}`);
@@ -560,6 +626,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       setTimeout(() => { t.style.display = 'none'; }, 4000);
     }
 
+    fetchResumeInfo();
     renderList();
   </script>
 </body>
