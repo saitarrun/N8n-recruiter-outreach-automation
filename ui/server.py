@@ -8,9 +8,19 @@ import sqlite3
 import urllib.parse
 import urllib.request
 
-PORT = 3000
+PORT = int(os.environ.get("PORT", 3000))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-FILES_DIR = "/Users/xploit404/n8n-files"
+PROJECT_ROOT = os.path.dirname(DIRECTORY)
+LOCAL_FILES = os.path.join(PROJECT_ROOT, "files")
+os.makedirs(LOCAL_FILES, exist_ok=True)
+
+if os.environ.get("FILES_DIR") and os.path.exists(os.environ.get("FILES_DIR")):
+    FILES_DIR = os.environ.get("FILES_DIR")
+elif os.path.exists("/Users/xploit404/n8n-files"):
+    FILES_DIR = "/Users/xploit404/n8n-files"
+else:
+    FILES_DIR = LOCAL_FILES
+
 DB_PATH = os.path.join(DIRECTORY, "leads.db")
 
 def init_sqlite_db():
