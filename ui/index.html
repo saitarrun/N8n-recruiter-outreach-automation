@@ -781,12 +781,12 @@
               <div style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em;">Add Lead to Queue</div>
               
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                <input type="text" id="fn" class="apple-input" placeholder="First Name" style="padding: 7px 10px; font-size: 13px;">
-                <input type="text" id="comp" class="apple-input" placeholder="Company" style="padding: 7px 10px; font-size: 13px;">
+                <input type="text" id="fn" class="apple-input" placeholder="First Name" style="padding: 7px 10px; font-size: 13px;" oninput="onFormLiveInput()">
+                <input type="text" id="comp" class="apple-input" placeholder="Company" style="padding: 7px 10px; font-size: 13px;" oninput="onFormLiveInput()">
               </div>
 
               <div style="margin-bottom: 8px;">
-                <input type="email" id="email" class="apple-input" placeholder="recruiter@company.com" style="padding: 7px 10px; font-size: 13px;">
+                <input type="email" id="email" class="apple-input" placeholder="recruiter@company.com" style="padding: 7px 10px; font-size: 13px;" oninput="onFormLiveInput()">
               </div>
 
               <div style="margin-bottom: 10px;">
@@ -1488,14 +1488,51 @@ ${tpl
       if (bodyEl) bodyEl.innerHTML = renderedBody;
     }
 
+    function onFormLiveInput() {
+      const fn = document.getElementById('fn').value.trim();
+      const comp = document.getElementById('comp').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const resFile = document.getElementById('resume-select').value;
+
+      const currentPreview = {
+        firstName: fn || 'Recruiter',
+        company: comp || 'Company',
+        email: email || 'recruiter@example.com',
+        resumeFile: resFile,
+        status: 'Pending'
+      };
+
+      updateComposeCanvasForRecruiter(currentPreview);
+    }
+
     function selectRecruiter(idx) {
       if (idx < 0 || idx >= recruiters.length) idx = 0;
       selectedIndex = idx;
       const r = recruiters[idx];
       if (!r) return;
 
+      // Populate input form fields simultaneously with selected recruiter
+      const fnInput = document.getElementById('fn');
+      if (fnInput) fnInput.value = r.firstName || '';
+      const compInput = document.getElementById('comp');
+      if (compInput) compInput.value = r.company || '';
+      const emailInput = document.getElementById('email');
+      if (emailInput) emailInput.value = r.email || '';
+      if (r.resumeFile) {
+        const resSel = document.getElementById('resume-select');
+        if (resSel) resSel.value = r.resumeFile;
+      }
+
       updateComposeCanvasForRecruiter(r);
       renderQueue();
+    }
+
+    function clearForm() {
+      document.getElementById('fn').value = '';
+      document.getElementById('comp').value = '';
+      document.getElementById('email').value = '';
+      updateComposeCanvasForRecruiter(null);
+      showAppleToast('Ready for new lead entry');
     }
 
     async function deleteLead(idx) {
@@ -1514,6 +1551,7 @@ ${tpl
         if (selectedIndex >= recruiters.length) selectedIndex = Math.max(0, recruiters.length - 1);
         renderQueue();
         if (recruiters.length > 0) selectRecruiter(selectedIndex);
+        else clearForm();
       } catch (e) {
         showAppleToast(`Error deleting lead: ${e.message}`);
       }
@@ -1538,21 +1576,6 @@ ${tpl
       } catch (e) {
         showAppleToast(`Error: ${e.message}`);
       }
-    }
-
-    function resetBodyToDefault() {
-      const r = recruiters[selectedIndex];
-      if (r) {
-        selectRecruiter(selectedIndex);
-        showAppleToast('Template reset to lead defaults.');
-      }
-    }
-
-    function clearForm() {
-      document.getElementById('fn').value = '';
-      document.getElementById('comp').value = '';
-      document.getElementById('email').value = '';
-      showAppleToast('Ready for new lead entry');
     }
 
     function setQueueFilter(filter) {
