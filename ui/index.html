@@ -940,8 +940,9 @@
             </span>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="apple-btn btn-plain" style="font-size: 12.5px;" onclick="resetBodyToDefault()">Reset</button>
-            <button class="apple-btn btn-blue-primary" style="font-size: 12.5px;" onclick="sendOutreach()" id="btn-send-single">
+            <button class="apple-btn btn-plain" style="font-size: 12px;" onclick="saveCurrentCanvasAsTemplate()" title="Save current inline format as master template for all leads">Save as Template</button>
+            <button class="apple-btn btn-plain" style="font-size: 12px;" onclick="resetBodyToDefault()">Reset</button>
+            <button class="apple-btn btn-blue-primary" style="font-size: 12px;" onclick="sendOutreach()" id="btn-send-single">
               Send Email
             </button>
           </div>
@@ -1349,6 +1350,36 @@
       return { subject, bodyHtml, fn, comp, email, focus, focusText, profile };
     }
 
+    function saveCurrentCanvasAsTemplate() {
+      const currentBody = document.getElementById('prev-body').innerHTML;
+      const currentRecruiter = recruiters[selectedIndex] || { firstName: 'Recruiter', company: 'Company' };
+      
+      // Auto-tokenize current recruiter's company & name into placeholders
+      let tpl = currentBody;
+      if (currentRecruiter.company && currentRecruiter.company !== 'Company') {
+        const compRegex = new RegExp(currentRecruiter.company, 'g');
+        tpl = tpl.replace(compRegex, '{company}');
+      }
+      if (currentRecruiter.firstName && currentRecruiter.firstName !== 'Recruiter') {
+        const nameRegex = new RegExp(`\\b${currentRecruiter.firstName}\\b`, 'g');
+        tpl = tpl.replace(nameRegex, '{firstName}');
+      }
+
+      localStorage.setItem('custom_master_template', tpl);
+      showAppleToast('Saved! Custom format set with dynamic {company} placeholders.');
+      if (recruiters.length > 0) {
+        updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      }
+    }
+
+    function resetBodyToDefault() {
+      localStorage.removeItem('custom_master_template');
+      if (recruiters.length > 0) {
+        updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      }
+      showAppleToast('Reset to platform default template.');
+    }
+
     // Updates right Apple Mail Compose Pane without touching Add Lead Form
     function updateComposeCanvasForRecruiter(r) {
       if (!r) return;
@@ -1377,26 +1408,41 @@
       document.getElementById('prev-attach-name').innerText = resumeName;
       document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
 
-      document.getElementById('prev-body').innerHTML = `
-        <p>Hi ${payload.fn},</p>
-        <p>I hope you're doing well.</p>
-        <p>My name is <strong>${profile.name}</strong>, and I'm a ${profile.title} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-        <p>I've previously worked with <strong>${profile.pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-        <p>My technical background includes ${profile.techStack}.</p>
-        <p>I'm currently exploring Software Engineering opportunities at <strong>${payload.comp}</strong>.</p>
-        ${payload.focusText}
-        <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-        <p>I've attached my resume for reference.</p>
-        <p>Thank you for your time and consideration.</p>
-        <p>Best regards,</p>
-        <div class="mail-signature-block" contenteditable="false">
-          <strong>${profile.name}</strong><br>
-          Email: <a href="mailto:${profile.email}">${profile.email}</a><br>
-          LinkedIn: <a href="${profile.linkedin}" target="_blank">${profile.linkedin}</a><br>
-          GitHub: <a href="${profile.github}" target="_blank">${profile.github}</a><br>
-          Portfolio: <a href="${profile.portfolio}" target="_blank">${profile.portfolio}</a>
-        </div>
-      `;
+      const customTpl = localStorage.getItem('custom_master_template');
+      let renderedBody = "";
+
+      if (customTpl) {
+        renderedBody = customTpl
+          .replace(/\{\{\s*company\s*\}\}|\{\s*company\s*\}/gi, `<strong>${payload.comp}</strong>`)
+          .replace(/\{\{\s*(first_?name|name)\s*\}\}|\{\s*(first_?name|name)\s*\}/gi, payload.fn)
+          .replace(/\{\{\s*past_?companies\s*\}\}|\{\s*past_?companies\s*\}/gi, `<strong>${profile.pastCompanies}</strong>`)
+          .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
+          .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name)
+          .replace(/\{\{\s*focus\s*\}\}|\{\s*focus\s*\}/gi, payload.focusText);
+      } else {
+        renderedBody = `
+          <p>Hi ${payload.fn},</p>
+          <p>I hope you're doing well.</p>
+          <p>My name is <strong>${profile.name}</strong>, and I'm a ${profile.title} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+          <p>I've previously worked with <strong>${profile.pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+          <p>My technical background includes ${profile.techStack}.</p>
+          <p>I'm currently exploring Software Engineering opportunities at <strong>${payload.comp}</strong>.</p>
+          ${payload.focusText}
+          <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+          <p>I've attached my resume for reference.</p>
+          <p>Thank you for your time and consideration.</p>
+          <p>Best regards,</p>
+          <div class="mail-signature-block" contenteditable="false">
+            <strong>${profile.name}</strong><br>
+            Email: <a href="mailto:${profile.email}">${profile.email}</a><br>
+            LinkedIn: <a href="${profile.linkedin}" target="_blank">${profile.linkedin}</a><br>
+            GitHub: <a href="${profile.github}" target="_blank">${profile.github}</a><br>
+            Portfolio: <a href="${profile.portfolio}" target="_blank">${profile.portfolio}</a>
+          </div>
+        `;
+      }
+
+      document.getElementById('prev-body').innerHTML = renderedBody;
     }
 
     function selectRecruiter(idx) {
