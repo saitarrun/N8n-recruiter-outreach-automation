@@ -1,4 +1,5 @@
 {
+  "id": "T5xzFPEkCQ3vjclr",
   "name": "Direct Recruiter Outreach Sender",
   "nodes": [
     {
@@ -20,7 +21,7 @@
     },
     {
       "parameters": {
-        "fileSelector": "=/files/{{ $('Webhook Trigger').first().json.body.resumeFile || 'Sai_Tarrun_Pitta_Resume.pdf' }}",
+        "fileSelector": "={{ '/files/' + ($('Webhook Trigger').first().json.body.resumeFile || 'Sai_Tarrun_Pitta_Resume.pdf') }}",
         "options": {}
       },
       "id": "node-read-resume",
@@ -30,7 +31,8 @@
       "position": [
         320,
         300
-      ]
+      ],
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -76,7 +78,10 @@
           "name": "Gmail OAuth2 account"
         }
       },
-      "webhookId": "e1fc3475-d9bf-4b31-91b2-8cb9663f4c51"
+      "webhookId": "e1fc3475-d9bf-4b31-91b2-8cb9663f4c51",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2
     }
   ],
   "connections": {
@@ -113,8 +118,5 @@
         ]
       ]
     }
-  },
-  "settings": {
-    "executionOrder": "v1"
   }
 }
