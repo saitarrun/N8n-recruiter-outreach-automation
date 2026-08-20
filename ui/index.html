@@ -1334,6 +1334,18 @@
       showAppleToast(`Inserted placeholder: ${token}`);
     }
 
+    function getSenderProfile() {
+      try {
+        const stored = localStorage.getItem('sender_profile');
+        if (stored) {
+          return { ...DEFAULT_SENDER_PROFILE, ...JSON.parse(stored) };
+        }
+      } catch (e) {
+        console.error("Error reading sender profile", e);
+      }
+      return DEFAULT_SENDER_PROFILE;
+    }
+
     function loadSenderProfileToInputs() {
       const p = getSenderProfile();
       const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
