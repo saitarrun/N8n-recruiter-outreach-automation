@@ -173,7 +173,7 @@
     /* Studio 2-Column Grid Layout */
     .studio-grid {
       display: grid;
-      grid-template-columns: 1.05fr 1.25fr;
+      grid-template-columns: 420px 1fr;
       gap: 24px;
       align-items: start;
     }
@@ -190,7 +190,7 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     }
     .panel-header {
-      padding: 16px 20px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       justify-content: space-between;
@@ -211,7 +211,7 @@
 
     /* Form Design */
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .form-label {
       display: flex;
@@ -220,57 +220,27 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     .form-label-hint {
       font-size: 11px;
       color: var(--text-dim);
     }
-    .form-input, .form-textarea, .form-select {
+    .form-input, .form-select {
       width: 100%;
       background: #090e18;
       border: 1px solid var(--border-subtle);
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       color: #fff;
       font-size: 13px;
       font-family: inherit;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
+    .form-input:focus, .form-select:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px var(--primary-glow);
-    }
-    .form-textarea {
-      resize: vertical;
-      min-height: 90px;
-      line-height: 1.5;
-    }
-
-    /* Variable Insertion Chips */
-    .chip-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-      margin-bottom: 16px;
-    }
-    .var-chip {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      background: rgba(99, 102, 241, 0.12);
-      color: #a5b4fc;
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      padding: 3px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .var-chip:hover {
-      background: var(--primary);
-      color: #fff;
     }
 
     /* Buttons */
@@ -329,7 +299,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 12px;
       max-height: 220px;
       overflow-y: auto;
     }
@@ -351,23 +321,24 @@
     .rc-name { font-size: 13px; font-weight: 700; color: #fff; }
     .rc-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-    /* macOS / Gmail Email Preview Window */
+    /* macOS / Gmail Email Compose & Direct Edit Window */
     .mail-preview-window {
       background: #ffffff;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.35);
       color: #1e293b;
       display: flex;
       flex-direction: column;
+      border: 1px solid #e2e8f0;
     }
     .mail-window-bar {
-      background: #f1f5f9;
+      background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
-      padding: 10px 16px;
+      padding: 12px 18px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 12px;
     }
     .window-dots {
       display: flex;
@@ -381,38 +352,83 @@
     .dot-red { background: #ff5f56; }
     .dot-yellow { background: #ffbd2e; }
     .dot-green { background: #27c93f; }
-    .mail-window-title {
+    
+    .editor-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: #4338ca;
+      background: #e0e7ff;
+      border: 1px solid #c7d2fe;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Floating / In-window Formatting Toolbar */
+    .editor-toolbar {
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 6px 16px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .tool-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
-      color: #64748b;
-      margin-left: 4px;
+      color: #334155;
+      cursor: pointer;
+    }
+    .tool-btn:hover {
+      background: #e2e8f0;
     }
 
     .mail-header {
       padding: 16px 20px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
       background: #fafafa;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .mail-meta-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       font-size: 13px;
     }
     .meta-label {
-      font-weight: 600;
+      font-weight: 700;
       color: #64748b;
       width: 60px;
       flex-shrink: 0;
     }
-    .meta-val {
-      color: #0f172a;
-      font-weight: 500;
-    }
     
+    /* Direct Editable Subject Input */
+    .editable-subject {
+      flex: 1;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .editable-subject:hover, .editable-subject:focus {
+      background: #ffffff;
+      border-color: #94a3b8;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+      outline: none;
+    }
+
     .attachment-pill {
       display: inline-flex;
       align-items: center;
@@ -426,16 +442,21 @@
       color: #1d4ed8;
     }
 
-    .mail-body {
+    /* DIRECT EDITABLE EMAIL BODY */
+    .mail-body-editable {
       padding: 24px;
-      font-size: 14px;
+      font-size: 14.5px;
       line-height: 1.65;
-      color: #27272a;
-      min-height: 380px;
-      max-height: 480px;
+      color: #1e293b;
+      min-height: 440px;
+      outline: none;
+      cursor: text;
       overflow-y: auto;
     }
-    .mail-body p { margin-bottom: 14px; }
+    .mail-body-editable:focus {
+      background: #fcfeff;
+    }
+    .mail-body-editable p { margin-bottom: 14px; }
     .mail-signature {
       margin-top: 24px;
       padding-top: 14px;
@@ -560,11 +581,8 @@
     <div class="nav-tabs-wrapper">
       <div class="nav-tabs">
         <button class="tab-item active" onclick="switchTab('queue', event)">
-          <span>📋 Recruiter Queue</span>
+          <span>📋 Recruiter Leads</span>
           <span class="tab-item-badge" id="queue-count-badge">4</span>
-        </button>
-        <button class="tab-item" onclick="switchTab('template', event)">
-          <span>✏️ Email Template Studio</span>
         </button>
         <button class="tab-item" onclick="switchTab('resume', event)">
           <span>📄 Resume Library</span>
@@ -572,56 +590,49 @@
         </button>
       </div>
       <div>
-        <span style="font-size: 12px; color: var(--text-dim);">OAuth 2.0 • Live Delivery</span>
+        <span style="font-size: 12px; color: #a5b4fc; font-weight: 600;">✨ Direct WYSIWYG Email Compose Active</span>
       </div>
     </div>
 
     <!-- Main Two-Column Layout -->
     <div class="studio-grid">
 
-      <!-- LEFT COLUMN: CONTROLS & EDITORS -->
+      <!-- LEFT COLUMN: CONTROLS & LEAD MANAGEMENT -->
       <div>
 
         <!-- TAB 1: RECRUITER QUEUE -->
         <div id="tab-queue" class="tab-panel active">
           <div class="panel">
             <div class="panel-header">
-              <span class="panel-title">👥 Recruiter Lead Details</span>
-              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="clearRecruiterForm()">+ New Blank</button>
+              <span class="panel-title">👥 Target Recruiter</span>
+              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="clearRecruiterForm()">+ New Lead</button>
             </div>
             <div class="panel-body">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div class="form-group">
                   <label class="form-label">First Name</label>
-                  <input type="text" id="fn" class="form-input" placeholder="e.g. Stephanie" value="Stephanie" oninput="updateCurrentRecruiter()">
+                  <input type="text" id="fn" class="form-input" placeholder="e.g. Stephanie" value="Stephanie" oninput="updateRecipientFromInputs()">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Company Name</label>
-                  <input type="text" id="comp" class="form-input" placeholder="e.g. TikTok" value="TikTok" oninput="updateCurrentRecruiter()">
+                  <label class="form-label">Company</label>
+                  <input type="text" id="comp" class="form-input" placeholder="e.g. TikTok" value="TikTok" oninput="updateRecipientFromInputs()">
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Recruiter Email Address</label>
-                <input type="email" id="email" class="form-input" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateCurrentRecruiter()">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <span>Company Engineering Focus (Personalization)</span>
-                </label>
-                <input type="text" id="focus" class="form-input" placeholder="e.g. large-scale distributed systems" value="large-scale distributed systems and high-throughput infrastructure" oninput="updateCurrentRecruiter()">
+                <label class="form-label">Recruiter Email</label>
+                <input type="email" id="email" class="form-input" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateRecipientFromInputs()">
               </div>
 
               <div class="form-group">
                 <label class="form-label">
                   <span>Attached Resume Version</span>
-                  <span class="form-label-hint">Matched to role</span>
+                  <span class="form-label-hint">Dynamic mount</span>
                 </label>
-                <select id="recruiter-resume-select" class="form-select" onchange="updateCurrentRecruiter()"></select>
+                <select id="recruiter-resume-select" class="form-select" onchange="updateResumeFromSelect()"></select>
               </div>
 
-              <button class="btn btn-primary" style="width: 100%;" onclick="addRecruiter()">+ Add / Update Lead in Queue</button>
+              <button class="btn btn-primary" style="width: 100%;" onclick="addRecruiter()">+ Save Lead in Queue</button>
 
               <div style="margin-top: 18px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
                 <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Active Lead Queue</div>
@@ -631,63 +642,15 @@
           </div>
         </div>
 
-        <!-- TAB 2: EMAIL TEMPLATE STUDIO -->
-        <div id="tab-template" class="tab-panel">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">✉️ Email Template Studio</span>
-              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="resetTemplate()">Reset Default</button>
-            </div>
-            <div class="panel-body">
-              
-              <div class="form-group">
-                <label class="form-label">
-                  <span>Subject Line</span>
-                  <span class="form-label-hint">Click variable chip to insert</span>
-                </label>
-                <input type="text" id="tpl-subject" class="form-input" value="Software Engineering Opportunities at {{Company}} — Sai Tarrun Pitta" oninput="renderPreview()">
-              </div>
-
-              <div class="chip-bar">
-                <span class="var-chip" onclick="insertVar('tpl-subject', '{{Company}}')">+ {{Company}}</span>
-                <span class="var-chip" onclick="insertVar('tpl-subject', '{{FirstName}}')">+ {{FirstName}}</span>
-                <span class="var-chip" onclick="insertVar('tpl-subject', 'Software Engineer')">+ Software Engineer</span>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <span>Intro &amp; Experience Paragraphs</span>
-                  <span class="form-label-hint">Highlight key work</span>
-                </label>
-                <textarea id="tpl-intro" class="form-textarea" rows="4" oninput="renderPreview()">My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
-
-I've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</textarea>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Technical Stack Line</label>
-                <input type="text" id="tpl-stack" class="form-input" value="Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems." oninput="renderPreview()">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Call to Action &amp; Closing</label>
-                <textarea id="tpl-cta" class="form-textarea" rows="3" oninput="renderPreview()">If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</textarea>
-              </div>
-
-              <button class="btn btn-primary" style="width: 100%;" onclick="showToast('✅ Template saved &amp; applied!')">💾 Save &amp; Apply Template</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 3: RESUME LIBRARY -->
+        <!-- TAB 2: RESUME LIBRARY -->
         <div id="tab-resume" class="tab-panel">
           <div class="panel">
             <div class="panel-header">
-              <span class="panel-title">📄 Resume Library (<span id="resume-count-title">4</span> Variants)</span>
+              <span class="panel-title">📄 Resume Library (<span id="resume-count-title">4</span>)</span>
             </div>
             <div class="panel-body">
               <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
-                Manage your specialized resume variants. Assign different resumes to backend, AI/ML, or full-stack opportunities.
+                Assign specialized resumes per company or role.
               </p>
 
               <!-- Resume List -->
@@ -719,14 +682,19 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
 
       </div>
 
-      <!-- RIGHT COLUMN: LIVE REAL-TIME EMAIL PREVIEW -->
+      <!-- RIGHT COLUMN: DIRECT WYSIWYG EDITABLE EMAIL COMPOSE WINDOW -->
       <div>
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">✉️ Live Outgoing Message Preview</span>
-            <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
-              ⚡ Trigger Outreach via n8n
-            </button>
+            <span class="panel-title">✍️ Live Email Compose &amp; Send</span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="resetBodyToDefault()">
+                ↺ Reset Template
+              </button>
+              <button class="btn btn-success" onclick="sendOutreach()" id="send-btn">
+                ⚡ Send Outreach via n8n
+              </button>
+            </div>
           </div>
           <div class="panel-body" style="padding: 16px;">
             
@@ -738,18 +706,29 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
                   <span class="dot dot-yellow"></span>
                   <span class="dot dot-green"></span>
                 </div>
-                <span class="mail-window-title">New Message — Gmail API</span>
+                <div class="editor-pill">
+                  <span>✏️ Click anywhere in this box to edit text directly</span>
+                </div>
+              </div>
+
+              <!-- Formatting Toolbar -->
+              <div class="editor-toolbar">
+                <button class="tool-btn" onclick="execCmd('bold')"><b>B</b></button>
+                <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
+                <button class="tool-btn" onclick="execCmd('underline')"><u>U</u></button>
+                <span style="border-right: 1px solid #cbd5e1; height: 16px; margin: 0 4px;"></span>
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">Direct In-place Typing Enabled</span>
               </div>
 
               <!-- Email Headers -->
               <div class="mail-header">
                 <div class="mail-meta-row">
                   <span class="meta-label">To:</span>
-                  <span class="meta-val" id="prev-to">stephanie.chao@tiktok.com</span>
+                  <span class="meta-val" id="prev-to" style="font-weight: 600; color: #0284c7;">Stephanie &lt;stephanie.chao@tiktok.com&gt;</span>
                 </div>
                 <div class="mail-meta-row">
                   <span class="meta-label">Subject:</span>
-                  <span class="meta-val" id="prev-subject" style="font-weight: 700;">Software Engineering Opportunities at TikTok — Sai Tarrun Pitta</span>
+                  <input type="text" id="prev-subject" class="editable-subject" value="Software Engineering Opportunities at TikTok — Sai Tarrun Pitta" title="Click to edit subject">
                 </div>
                 <div class="mail-meta-row">
                   <span class="meta-label">Attach:</span>
@@ -761,8 +740,28 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
                 </div>
               </div>
 
-              <!-- Email Body -->
-              <div class="mail-body" id="prev-body"></div>
+              <!-- DIRECT EDITABLE EMAIL BODY -->
+              <div class="mail-body-editable" id="prev-body" contenteditable="true" spellcheck="false">
+                <p>Hi Stephanie,</p>
+                <p>I hope you're doing well.</p>
+                <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+                <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+                <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+                <p>I'm currently exploring Software Engineering opportunities at <strong>TikTok</strong>.</p>
+                <p>I'm particularly interested in <strong>TikTok</strong> because of the work your engineering teams are doing in large-scale distributed systems and high-throughput infrastructure, which aligns closely with my experience and technical interests.</p>
+                <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
+                <p>I've attached my resume for reference.</p>
+                <p>Thank you for your time and consideration.</p>
+                <p>Best regards,</p>
+                <div class="mail-signature" contenteditable="false">
+                  <strong>Sai Tarrun Pitta</strong><br>
+                  Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0284c7; text-decoration: none;">saitarrunpitta@gmail.com</a><br>
+                  LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0284c7; text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
+                  GitHub: <a href="https://github.com/saitarrun" target="_blank" style="color: #0284c7; text-decoration: none;">github.com/saitarrun</a><br>
+                  Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0284c7; text-decoration: none;">saitarrunpitta.vercel.app</a>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -786,6 +785,10 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
     ];
 
     let selectedIndex = 0;
+
+    function execCmd(cmd) {
+      document.execCommand(cmd, false, null);
+    }
 
     async function loadResumes() {
       try {
@@ -823,7 +826,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         if (selectedResumeFile) {
           previewResumeFile(selectedResumeFile);
         }
-        renderPreview();
+        updateAttachmentUI();
       } catch (e) {
         console.error("Failed to load resumes", e);
       }
@@ -889,6 +892,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       document.getElementById('pdf-open-tab').href = `/api/resume-pdf?file=${encodeURIComponent(filename)}`;
       document.getElementById('pdf-frame').src = `/api/resume-pdf?file=${encodeURIComponent(filename)}&t=${Date.now()}`;
       renderResumeGrid();
+      updateAttachmentUI();
     }
 
     function assignResumeToCurrent(filename) {
@@ -897,10 +901,30 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       if (r) {
         r.resumeFile = filename;
         document.getElementById('recruiter-resume-select').value = filename;
-        showToast(`Assigned ${filename} to ${r.firstName}`);
+        showToast(`Attached ${filename}`);
         renderList();
       }
       previewResumeFile(filename);
+    }
+
+    function updateResumeFromSelect() {
+      const val = document.getElementById('recruiter-resume-select').value;
+      selectedResumeFile = val;
+      const r = recruiters[selectedIndex];
+      if (r) {
+        r.resumeFile = val;
+        renderList();
+      }
+      updateAttachmentUI();
+    }
+
+    function updateAttachmentUI() {
+      const r = recruiters[selectedIndex];
+      const resumeName = (r && r.resumeFile) || selectedResumeFile || "Sai_Tarrun_Pitta_Resume.pdf";
+      const matched = resumeLibrary.find(x => x.filename === resumeName);
+      const resumeSize = matched ? matched.size : "73.4 KB";
+      document.getElementById('prev-attach-name').innerText = resumeName;
+      document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
     }
 
     function switchTab(tabId, evt) {
@@ -908,12 +932,6 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       document.querySelectorAll('.tab-panel').forEach(c => c.classList.remove('active'));
       if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
-    }
-
-    function insertVar(inputId, varText) {
-      const el = document.getElementById(inputId);
-      el.value += ' ' + varText;
-      renderPreview();
     }
 
     function renderList() {
@@ -934,7 +952,6 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
         `;
         listEl.appendChild(item);
       });
-      renderPreview();
     }
 
     function selectRecruiter(idx) {
@@ -943,89 +960,44 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       document.getElementById('fn').value = r.firstName;
       document.getElementById('comp').value = r.company;
       document.getElementById('email').value = r.email;
-      document.getElementById('focus').value = r.focus || '';
       if (r.resumeFile) {
         document.getElementById('recruiter-resume-select').value = r.resumeFile;
       }
       renderList();
+      populateBodyForRecruiter(r);
     }
 
-    function updateCurrentRecruiter() {
+    function updateRecipientFromInputs() {
       const r = recruiters[selectedIndex];
       if (!r) return;
       r.firstName = document.getElementById('fn').value.trim() || 'Recruiter';
       r.company = document.getElementById('comp').value.trim() || 'Company';
       r.email = document.getElementById('email').value.trim() || 'email@example.com';
-      r.focus = document.getElementById('focus').value.trim();
-      r.resumeFile = document.getElementById('recruiter-resume-select').value;
-      renderPreview();
-    }
-
-    function clearRecruiterForm() {
-      document.getElementById('fn').value = '';
-      document.getElementById('comp').value = '';
-      document.getElementById('email').value = '';
-      document.getElementById('focus').value = '';
-      showToast('Ready for new lead entry!');
-    }
-
-    function addRecruiter() {
-      const fn = document.getElementById('fn').value.trim();
-      const comp = document.getElementById('comp').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const focus = document.getElementById('focus').value.trim();
-      const resFile = document.getElementById('recruiter-resume-select').value;
-
-      if (!fn || !comp || !email) {
-        alert('Please fill in First Name, Company, and Email.');
-        return;
-      }
-
-      recruiters.unshift({ firstName: fn, company: comp, email, focus, resumeFile: resFile, status: "Pending" });
-      selectedIndex = 0;
+      document.getElementById('prev-to').innerHTML = `${r.firstName} &lt;${r.email}&gt;`;
+      document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta`;
       renderList();
-      showToast(`Added ${fn} @ ${comp} to queue!`);
     }
 
-    function resetTemplate() {
-      document.getElementById('tpl-subject').value = "Software Engineering Opportunities at {{Company}} — Sai Tarrun Pitta";
-      document.getElementById('tpl-intro').value = `My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.\n\nI've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.`;
-      document.getElementById('tpl-stack').value = "Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.";
-      document.getElementById('tpl-cta').value = "If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.";
-      renderPreview();
-      showToast('Template reset to default.');
-    }
-
-    function renderPreview() {
-      const r = recruiters[selectedIndex] || { firstName: "Recruiter", company: "Company", email: "recruiter@example.com", focus: "", resumeFile: "Sai_Tarrun_Pitta_Backend_Resume.pdf" };
-      const resumeName = r.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Resume.pdf";
-      const matchedResume = resumeLibrary.find(x => x.filename === resumeName);
-      const resumeSize = matchedResume ? matchedResume.size : "73.4 KB";
+    function populateBodyForRecruiter(r) {
+      document.getElementById('prev-to').innerHTML = `${r.firstName} &lt;${r.email}&gt;`;
+      document.getElementById('prev-subject').value = `Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta`;
+      updateAttachmentUI();
       
-      const subjectTpl = document.getElementById('tpl-subject').value.replace(/{{Company}}/g, r.company).replace(/{{FirstName}}/g, r.firstName);
-      const introText = document.getElementById('tpl-intro').value.split('\n\n').map(p => `<p>${p.replace(/Uber/g, '<strong>Uber</strong>').replace(/Pacific Life/g, '<strong>Pacific Life</strong>').replace(/Cognizant/g, '<strong>Cognizant</strong>').replace(/California State University, Fullerton/g, '<strong>California State University, Fullerton</strong>')}</p>`).join('');
-      const stackText = document.getElementById('tpl-stack').value;
-      const ctaText = document.getElementById('tpl-cta').value;
-      
-      const focusHtml = r.focus ? `<p>I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
-
-      document.getElementById('prev-to').innerText = `${r.firstName} (${r.email})`;
-      document.getElementById('prev-subject').innerText = subjectTpl;
-      document.getElementById('prev-attach-name').innerText = resumeName;
-      document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
+      const focusText = r.focus ? `<p>I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
 
       document.getElementById('prev-body').innerHTML = `
         <p>Hi ${r.firstName},</p>
         <p>I hope you're doing well.</p>
-        ${introText}
-        <p>My technical background includes ${stackText}</p>
+        <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+        <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+        <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
         <p>I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
-        ${focusHtml}
-        <p>${ctaText}</p>
+        ${focusText}
+        <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
         <p>I've attached my resume for reference.</p>
         <p>Thank you for your time and consideration.</p>
         <p>Best regards,</p>
-        <div class="mail-signature">
+        <div class="mail-signature" contenteditable="false">
           <strong>Sai Tarrun Pitta</strong><br>
           Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0284c7; text-decoration: none;">saitarrunpitta@gmail.com</a><br>
           LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank" style="color: #0284c7; text-decoration: none;">linkedin.com/in/saitarrunpitta</a><br>
@@ -1033,6 +1005,37 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
           Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank" style="color: #0284c7; text-decoration: none;">saitarrunpitta.vercel.app</a>
         </div>
       `;
+    }
+
+    function resetBodyToDefault() {
+      const r = recruiters[selectedIndex] || { firstName: "Stephanie", company: "TikTok", email: "stephanie.chao@tiktok.com", focus: "large-scale distributed systems and high-throughput infrastructure" };
+      populateBodyForRecruiter(r);
+      showToast('Template reset to default.');
+    }
+
+    function clearRecruiterForm() {
+      document.getElementById('fn').value = '';
+      document.getElementById('comp').value = '';
+      document.getElementById('email').value = '';
+      showToast('Ready for new lead entry!');
+    }
+
+    function addRecruiter() {
+      const fn = document.getElementById('fn').value.trim();
+      const comp = document.getElementById('comp').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const resFile = document.getElementById('recruiter-resume-select').value;
+
+      if (!fn || !comp || !email) {
+        alert('Please fill in First Name, Company, and Email.');
+        return;
+      }
+
+      recruiters.unshift({ firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" });
+      selectedIndex = 0;
+      renderList();
+      selectRecruiter(0);
+      showToast(`Added ${fn} @ ${comp} to queue!`);
     }
 
     async function handleFileUpload(files) {
@@ -1097,6 +1100,24 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       btn.innerText = '⏳ Sending via n8n...';
       btn.disabled = true;
 
+      // Extract the EXACT subject and HTML body directly typed in the white box!
+      const currentSubject = document.getElementById('prev-subject').value;
+      const currentHtmlBody = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }
+    p { margin: 0 0 14px 0; }
+    a { color: #0066cc; text-decoration: none; }
+    .signature { margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444; }
+  </style>
+</head>
+<body>
+  ${document.getElementById('prev-body').innerHTML}
+</body>
+</html>`;
+
       try {
         const res = await fetch('http://localhost:5678/webhook/send-recruiter-outreach', {
           method: 'POST',
@@ -1105,7 +1126,8 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
             firstName: r.firstName,
             company: r.company,
             email: r.email,
-            companyFocus: r.focus,
+            customSubject: currentSubject,
+            customHtml: currentHtmlBody,
             resumeFile: r.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Resume.pdf"
           })
         });
@@ -1116,7 +1138,7 @@ I've previously worked with Uber, Pacific Life, Cognizant, and California State 
       } catch (err) {
         showToast(`❌ Error: ${err.message}`);
       } finally {
-        btn.innerText = '⚡ Trigger Outreach via n8n';
+        btn.innerText = '⚡ Send Outreach via n8n';
         btn.disabled = false;
       }
     }
