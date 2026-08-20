@@ -1359,13 +1359,21 @@
           onProfileStudioLiveInput();
         }
       } else {
+        if (fullStudio && fullStudio.style.display !== 'none') {
+          saveSenderProfileSilently();
+        }
         if (fullStudio) fullStudio.style.display = 'none';
         if (mainWs) mainWs.style.display = 'grid';
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         const targetTab = document.getElementById(`tab-${tabId}`);
         if (targetTab) targetTab.classList.add('active');
-        if (recruiters.length > 0 && recruiters[selectedIndex]) {
-          updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+        
+        if (tabId === 'queue') {
+          if (recruiters.length > 0 && recruiters[selectedIndex]) {
+            updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+          } else {
+            onFormLiveInput();
+          }
         }
       }
     }
@@ -1406,6 +1414,9 @@
 
       const prevBody = document.getElementById('studio-prev-body');
       if (prevBody) prevBody.innerHTML = renderedHtml;
+
+      // Auto-save silently so whatever is typed immediately updates the main email template
+      saveSenderProfileSilently();
     }
 
     function renderQueue() {
@@ -1648,7 +1659,7 @@ Best regards,
 
     function getMasterSubjectTemplate() {
       const stored = localStorage.getItem('custom_master_subject');
-      if (stored && stored.trim().length > 5) {
+      if (stored && stored.trim().length > 2) {
         return stored.trim();
       }
       return DEFAULT_MASTER_SUBJECT;
@@ -1681,6 +1692,7 @@ Best regards,
       const area = document.getElementById('prof-subject');
       if (area) {
         area.value = tpl;
+        saveSenderProfileSilently();
         onProfileStudioLiveInput();
         showAppleToast(`Loaded "${key}" subject preset.`);
       }
@@ -1688,7 +1700,7 @@ Best regards,
 
     function getMasterTemplate() {
       const stored = localStorage.getItem('custom_master_template');
-      if (stored && stored.trim().length > 60) {
+      if (stored && stored.trim().length > 10) {
         return htmlToPlainText(stored);
       }
       return DEFAULT_MASTER_TEMPLATE;
@@ -1719,6 +1731,7 @@ Best regards,
       const area = document.getElementById('prof-template');
       if (area) {
         area.value = tpl;
+        saveSenderProfileSilently();
         onProfileStudioLiveInput();
         showAppleToast(`Loaded "${presetKey}" template preset.`);
       }
@@ -1749,7 +1762,7 @@ Best regards,
       setVal('prof-template', htmlToPlainText(getMasterTemplate()));
     }
 
-    function saveSenderProfile() {
+    function saveSenderProfileSilently() {
       const getVal = (id, def) => { const el = document.getElementById(id); return (el && el.value.trim()) || def; };
       const updated = {
         name: getVal('prof-name', DEFAULT_SENDER_PROFILE.name),
@@ -1761,22 +1774,33 @@ Best regards,
       };
       localStorage.setItem('sender_profile', JSON.stringify(updated));
 
-      const subVal = document.getElementById('prof-subject').value.trim();
-      if (subVal && subVal.length > 5) {
-        localStorage.setItem('custom_master_subject', subVal);
+      const subEl = document.getElementById('prof-subject');
+      if (subEl) {
+        const subVal = subEl.value.trim();
+        if (subVal && subVal.length > 2) {
+          localStorage.setItem('custom_master_subject', subVal);
+        }
       }
 
-      const tplVal = document.getElementById('prof-template').value.trim();
-      if (tplVal && tplVal.length > 30) {
-        localStorage.setItem('custom_master_template', htmlToPlainText(tplVal));
+      const tplEl = document.getElementById('prof-template');
+      if (tplEl) {
+        const tplVal = tplEl.value.trim();
+        if (tplVal && tplVal.length > 10) {
+          localStorage.setItem('custom_master_template', htmlToPlainText(tplVal));
+        }
       }
 
-      showAppleToast('Profile, Subject & Master Template saved!');
-      if (recruiters.length > 0) {
+      // Immediately synchronize main compose canvas
+      if (recruiters.length > 0 && recruiters[selectedIndex]) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       } else {
         updateComposeCanvasForRecruiter(null);
       }
+    }
+
+    function saveSenderProfile() {
+      saveSenderProfileSilently();
+      showAppleToast('Profile, Subject & Master Template saved!');
     }
 
     function resetProfileDefaults() {
