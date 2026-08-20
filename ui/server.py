@@ -454,7 +454,15 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
 
 if __name__ == "__main__":
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"UI Server with Persistent SQLite Database running at http://localhost:{PORT}")
+    try:
+        from http.server import ThreadingHTTPServer
+        server_class = ThreadingHTTPServer
+    except ImportError:
+        class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+            daemon_threads = True
+        server_class = ThreadedTCPServer
+
+    server_class.allow_reuse_address = True
+    with server_class(("", PORT), CustomHandler) as httpd:
+        print(f"Multi-Threaded UI Server with Persistent SQLite Database running at http://localhost:{PORT}")
         httpd.serve_forever()
