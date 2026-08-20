@@ -208,7 +208,9 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                                 first_name=excluded.first_name,
                                 company=excluded.company,
                                 focus=excluded.focus,
-                                resume_file=excluded.resume_file
+                                resume_file=excluded.resume_file,
+                                status=excluded.status,
+                                sent_at=CASE WHEN excluded.status='Pending' THEN '' ELSE leads.sent_at END
                             ''', (fn, comp, em, focus, res_file, status, sent_at, now_str))
 
                 conn.commit()

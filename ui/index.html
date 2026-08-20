@@ -973,12 +973,7 @@
       }
     }
 
-    function setQueueFilter(filter, evt) {
-      currentQueueFilter = filter;
-      document.querySelectorAll('.queue-subtab').forEach(b => b.classList.remove('active'));
-      if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
-      renderQueue();
-    }
+
 
     async function loadResumes() {
       try {
@@ -1365,6 +1360,15 @@
       showAppleToast('Ready for new lead entry');
     }
 
+    function setQueueFilter(filter, evt) {
+      currentQueueFilter = filter;
+      document.querySelectorAll('.queue-subtab').forEach(b => {
+        b.classList.remove('active');
+        if (b.innerText.toLowerCase().startsWith(filter)) b.classList.add('active');
+      });
+      renderQueue();
+    }
+
     async function addRecruiter() {
       const fn = document.getElementById('fn').value.trim();
       const comp = document.getElementById('comp').value.trim();
@@ -1384,8 +1388,11 @@
       const newLead = { firstName: fn, company: comp, email, resumeFile: resFile, status: "Pending" };
       await saveRecruitersState([newLead]);
       await loadLeadsFromDatabase();
-      selectRecruiter(0);
-      showAppleToast(`Added ${fn} @ ${comp} to Persistent Queue.`);
+      setQueueFilter('unsent');
+
+      const foundIdx = recruiters.findIndex(r => r.email.toLowerCase() === email.toLowerCase());
+      selectRecruiter(foundIdx !== -1 ? foundIdx : 0);
+      showAppleToast(`Added ${fn} @ ${comp} to Unsent Queue.`);
     }
 
     // ==========================================
