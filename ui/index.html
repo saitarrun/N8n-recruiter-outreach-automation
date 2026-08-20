@@ -1639,7 +1639,7 @@
       document.getElementById('pdf-modal-frame').src = '';
     }
 
-    // SINGLE SEND OUTREACH
+    // SINGLE SEND OUTREACH (Bulletproof with Timeout)
     async function sendOutreach() {
       const r = recruiters[selectedIndex];
       if (!r) return;
@@ -1670,10 +1670,14 @@
 </body>
 </html>`;
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
+
       try {
         const res = await fetch('/api/send-outreach', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             firstName: r.firstName,
             company: r.company,
@@ -1683,29 +1687,34 @@
             resumeFile: r.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Resume.pdf"
           })
         });
-        const data = await res.json();
-        if (data.id || data.threadId || res.ok) {
+        clearTimeout(timeoutId);
+
+        let data = {};
+        try { data = await res.json(); } catch(e) {}
+
+        if (res.ok && (data.id || data.threadId || data.success !== false)) {
           r.status = 'Sent';
           await loadLeadsFromDatabase();
           showAppleToast(`Sent to ${r.firstName} (${r.company}) & saved to DB.`);
         } else {
           r.status = 'Failed';
-          showAppleToast(`Delivery failed for ${r.email}.`);
+          showAppleToast(`Delivery failed for ${r.email}: ${data.error || 'Server error'}`);
         }
       } catch (err) {
+        clearTimeout(timeoutId);
         r.status = 'Failed';
-        showAppleToast(`Error: ${err.message}`);
+        showAppleToast(err.name === 'AbortError' ? 'Send request timed out.' : `Error: ${err.message}`);
       } finally {
         btn.disabled = false;
         selectRecruiter(selectedIndex);
       }
     }
 
-    // BULK SEND ONLY UNSENT LEADS
+    // BULK SEND ONLY UNSENT LEADS (Live Progress & Anti-Freeze Guarantee)
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
-        alert('All leads in your database have already been sent.');
+        alert('All leads in your queue have already been sent.');
         return;
       }
 
@@ -1714,20 +1723,28 @@
       const btn = document.getElementById('btn-bulk-send');
       btn.disabled = true;
 
+      let sentSuccessCount = 0;
+      let totalToProcess = unsentLeads.length;
+      let processedCount = 0;
+
       try {
         for (let i = 0; i < recruiters.length; i++) {
           const r = recruiters[i];
           if (r.status === 'Sent') continue;
 
+          processedCount++;
+          btn.innerText = `Sending (${processedCount}/${totalToProcess}): ${r.firstName}...`;
           selectRecruiter(i);
-          btn.innerText = `Sending to ${r.firstName}...`;
 
           const payload = buildEmailPayloadForRecruiter(r);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 18000);
 
           try {
             const res = await fetch('/api/send-outreach', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              signal: controller.signal,
               body: JSON.stringify({
                 firstName: r.firstName,
                 company: r.company,
@@ -1737,25 +1754,38 @@
                 resumeFile: r.resumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf"
               })
             });
-            const data = await res.json();
-            if (data.id || data.threadId || res.ok) {
+            clearTimeout(timeoutId);
+
+            let data = {};
+            try { data = await res.json(); } catch (e) {}
+
+            if (res.ok && (data.id || data.threadId || data.success !== false)) {
               r.status = 'Sent';
+              sentSuccessCount++;
             } else {
               r.status = 'Failed';
             }
           } catch (e) {
+            clearTimeout(timeoutId);
             r.status = 'Failed';
           }
 
-          await new Promise(res => setTimeout(res, 2000));
+          // Live UI update for each lead
+          renderQueue();
+
+          // Spacing pause between emails
+          if (processedCount < totalToProcess) {
+            btn.innerText = `Waiting 3s spacing (${processedCount}/${totalToProcess})...`;
+            await new Promise(res => setTimeout(res, 3000));
+          }
         }
       } finally {
-        btn.disabled = false;
         await loadLeadsFromDatabase();
-        selectRecruiter(selectedIndex);
+        btn.disabled = false;
         const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
         btn.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
-        showAppleToast('Outreach batch complete and recorded in Database.');
+        selectRecruiter(selectedIndex);
+        showAppleToast(`Bulk dispatch finished: ${sentSuccessCount} sent successfully.`);
       }
     }
 
