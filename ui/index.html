@@ -1387,12 +1387,12 @@
 </head>
 <body>
 ${tpl
-  .replace(/\{\{\s*(company|target_?company)\s*\}\}|\{\s*(company|target_?company)\s*\}/gi, `<strong>${comp}</strong>`)
-  .replace(/\{\{\s*(recruiter_?name|first_?name|name)\s*\}\}|\{\s*(recruiter_?name|first_?name|name)\s*\}/gi, fn)
-  .replace(/\{\{\s*(recruiter_?email|email)\s*\}\}|\{\s*(recruiter_?email|email)\s*\}/gi, email)
-  .replace(/\{\{\s*past_?companies\s*\}\}|\{\s*past_?companies\s*\}/gi, `<strong>${profile.pastCompanies}</strong>`)
-  .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
-  .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name)}
+  .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${comp}</strong>`)
+  .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?\s*name|name)\s*(?:\}\}|\}|\])/gi, fn)
+  .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, email)
+  .replace(/(?:\{\{|\{|\[)\s*past_?companies\s*(?:\}\}|\}|\])/gi, `<strong>${profile.pastCompanies}</strong>`)
+  .replace(/(?:\{\{|\{|\[)\s*skills\s*(?:\}\}|\}|\])/gi, profile.techStack)
+  .replace(/(?:\{\{|\{|\[)\s*sender_?name\s*(?:\}\}|\}|\])/gi, profile.name)}
 </body>
 </html>`;
 
@@ -1404,7 +1404,11 @@ ${tpl
       const currentRecruiter = recruiters[selectedIndex] || { firstName: 'Recruiter', company: 'Company' };
       
       // Auto-tokenize current recruiter's company & name into placeholders
-      let tpl = currentBody;
+      let tpl = currentBody
+        .replace(/\[\s*(recruiter_?\s*name|first_?\s*name|name)\s*\]/gi, '{RecruiterName}')
+        .replace(/\[\s*(company|target_?company)\s*\]/gi, '{Company}')
+        .replace(/\[\s*(email|recruiter_?\s*email)\s*\]/gi, '{Email}');
+
       if (currentRecruiter.company && currentRecruiter.company !== 'Company') {
         const compRegex = new RegExp(currentRecruiter.company, 'g');
         tpl = tpl.replace(compRegex, '{Company}');
@@ -1477,12 +1481,12 @@ ${tpl
 
       const tpl = getMasterTemplate();
       const renderedBody = tpl
-        .replace(/\{\{\s*(company|target_?company)\s*\}\}|\{\s*(company|target_?company)\s*\}/gi, `<strong>${payload.comp}</strong>`)
-        .replace(/\{\{\s*(recruiter_?name|first_?name|name)\s*\}\}|\{\s*(recruiter_?name|first_?name|name)\s*\}/gi, payload.fn)
-        .replace(/\{\{\s*(recruiter_?email|email)\s*\}\}|\{\s*(recruiter_?email|email)\s*\}/gi, payload.email)
-        .replace(/\{\{\s*past_?companies\s*\}\}|\{\s*past_?companies\s*\}/gi, `<strong>${profile.pastCompanies}</strong>`)
-        .replace(/\{\{\s*skills\s*\}\}|\{\s*skills\s*\}/gi, profile.techStack)
-        .replace(/\{\{\s*sender_?name\s*\}\}|\{\s*sender_?name\s*\}/gi, profile.name);
+        .replace(/(?:\{\{|\{|\[)\s*(company|target_?company)\s*(?:\}\}|\}|\])/gi, `<strong>${payload.comp}</strong>`)
+        .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*name|first_?name|name)\s*(?:\}\}|\}|\])/gi, payload.fn)
+        .replace(/(?:\{\{|\{|\[)\s*(recruiter_?\s*email|email)\s*(?:\}\}|\}|\])/gi, payload.email)
+        .replace(/(?:\{\{|\{|\[)\s*past_?companies\s*(?:\}\}|\}|\])/gi, `<strong>${profile.pastCompanies}</strong>`)
+        .replace(/(?:\{\{|\{|\[)\s*skills\s*(?:\}\}|\}|\])/gi, profile.techStack)
+        .replace(/(?:\{\{|\{|\[)\s*sender_?name\s*(?:\}\}|\}|\])/gi, profile.name);
 
       const bodyEl = document.getElementById('prev-body');
       if (bodyEl) bodyEl.innerHTML = renderedBody;
