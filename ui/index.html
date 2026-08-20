@@ -1214,21 +1214,10 @@
       return { subject, bodyHtml, fn, comp, email, focus, focusText };
     }
 
-    function selectRecruiter(idx) {
-      if (idx < 0 || idx >= recruiters.length) idx = 0;
-      selectedIndex = idx;
-      const r = recruiters[idx];
+    // Updates right Apple Mail Compose Pane without touching Add Lead Form
+    function updateComposeCanvasForRecruiter(r) {
       if (!r) return;
 
-      // 1. Sync Left Form Inputs
-      document.getElementById('fn').value = r.firstName || '';
-      document.getElementById('comp').value = r.company || '';
-      document.getElementById('email').value = r.email || '';
-      if (r.resumeFile) {
-        document.getElementById('resume-select').value = r.resumeFile;
-      }
-
-      // 2. Sync Status Banner & Single Send Button
       const noticeBanner = document.getElementById('sent-notice-banner');
       const noticeText = document.getElementById('sent-notice-text');
       const sendBtn = document.getElementById('btn-send-single');
@@ -1242,11 +1231,15 @@
         sendBtn.innerText = 'Send Email';
       }
 
-      // 3. Sync Right Compose Pane
       const payload = buildEmailPayloadForRecruiter(r);
       document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
       document.getElementById('prev-subject').value = payload.subject;
-      updateAttachmentUI();
+      
+      const resumeName = r.resumeFile || selectedResumeFile || "Sai_Tarrun_Pitta_Backend_Resume.pdf";
+      const matched = resumeLibrary.find(x => x.filename === resumeName);
+      const resumeSize = matched ? matched.size : "60.3 KB";
+      document.getElementById('prev-attach-name').innerText = resumeName;
+      document.getElementById('prev-attach-size').innerText = `(${resumeSize})`;
 
       document.getElementById('prev-body').innerHTML = `
         <p>Hi ${payload.fn},</p>
@@ -1268,43 +1261,16 @@
           Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
         </div>
       `;
-
-      // 4. Update Queue Highlights
-      renderQueue();
     }
 
-    // In-memory real-time sync (does NOT spam database on keystrokes)
-    function handleLeadInputChange() {
-      const r = recruiters[selectedIndex];
+    function selectRecruiter(idx) {
+      if (idx < 0 || idx >= recruiters.length) idx = 0;
+      selectedIndex = idx;
+      const r = recruiters[idx];
       if (!r) return;
 
-      const fn = document.getElementById('fn').value.trim() || 'Recruiter';
-      const comp = document.getElementById('comp').value.trim() || 'Company';
-      const email = document.getElementById('email').value.trim() || 'email@example.com';
-      
-      r.firstName = fn;
-      r.company = comp;
-      r.email = email;
-
-      // Live update right compose pane
-      const payload = buildEmailPayloadForRecruiter(r);
-      document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
-      document.getElementById('prev-subject').value = payload.subject;
-
-      // Update salutation inline
-      const bodyEl = document.getElementById('prev-body');
-      const firstP = bodyEl.querySelector('p');
-      if (firstP) firstP.innerText = `Hi ${payload.fn},`;
-
+      updateComposeCanvasForRecruiter(r);
       renderQueue();
-    }
-
-    // Persist to SQLite only when leaving the input with valid email
-    async function persistCurrentLead() {
-      const r = recruiters[selectedIndex];
-      if (r && r.email && r.email.includes('@') && r.email.includes('.')) {
-        await saveRecruitersState([r]);
-      }
     }
 
     async function deleteLead(idx) {
@@ -1697,7 +1663,7 @@
 
         if (res.ok && (data.id || data.threadId || data.success !== false)) {
           r.status = 'Sent';
-          await loadLeadsFromDatabase();
+          await loadLeadsFromDatabase(true);
           showAppleToast(`Sent to ${r.firstName} (${r.company}) & saved to DB.`);
         } else {
           r.status = 'Failed';
