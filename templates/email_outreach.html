@@ -14,9 +14,9 @@
 <body>
   <p>Hi {{FirstName}},</p>
   <p>I hope you're doing well.</p>
-  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-  <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-  <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+  <p>My name is <strong>{{SenderName}}</strong>, and I'm a {{SenderTitle}} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+  <p>I've previously worked with <strong>{{SenderPastCompanies}}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+  <p>My technical background includes {{SenderTechStack}}.</p>
   <p>I'm currently exploring Software Engineering opportunities at <strong>{{Company}}</strong>.</p>
   {{#if PersonalizedSentence}}<p>{{PersonalizedSentence}}</p>{{/if}}
   <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
@@ -24,11 +24,11 @@
   <p>Thank you for your time and consideration.</p>
   <p>Best regards,</p>
   <div class="signature">
-    <strong>Sai Tarrun Pitta</strong><br>
-    Email: <a href="mailto:saitarrunpitta@gmail.com">saitarrunpitta@gmail.com</a><br>
-    LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
-    GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
-    Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+    <strong>{{SenderName}}</strong><br>
+    Email: <a href="mailto:{{SenderEmail}}">{{SenderEmail}}</a><br>
+    LinkedIn: <a href="{{SenderLinkedIn}}" target="_blank">{{SenderLinkedIn}}</a><br>
+    GitHub: <a href="{{SenderGitHub}}" target="_blank">{{SenderGitHub}}</a><br>
+    Portfolio: <a href="{{SenderPortfolio}}" target="_blank">{{SenderPortfolio}}</a>
   </div>
 </body>
 </html>

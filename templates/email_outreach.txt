@@ -2,11 +2,11 @@ Hi {{FirstName}},
 
 I hope you're doing well.
 
-My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
+My name is {{SenderName}}, and I'm a {{SenderTitle}} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
 
-I've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.
+I've previously worked with {{SenderPastCompanies}}, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.
 
-My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.
+My technical background includes {{SenderTechStack}}.
 
 I'm currently exploring Software Engineering opportunities at {{Company}}.
 
@@ -20,8 +20,8 @@ Thank you for your time and consideration.
 
 Best regards,
 
-Sai Tarrun Pitta
-Email: saitarrunpitta@gmail.com
-LinkedIn: linkedin.com/in/saitarrunpitta
-GitHub: github.com/saitarrun
-Portfolio: saitarrunpitta.vercel.app
+{{SenderName}}
+Email: {{SenderEmail}}
+LinkedIn: {{SenderLinkedIn}}
+GitHub: {{SenderGitHub}}
+Portfolio: {{SenderPortfolio}}

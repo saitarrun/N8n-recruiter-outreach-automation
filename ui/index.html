@@ -724,6 +724,9 @@
       <button class="segmented-item" onclick="setStudioTab('bulk', event)">
         Bulk Import
       </button>
+      <button class="segmented-item" onclick="setStudioTab('profile', event)">
+        Profile ⚙️
+      </button>
     </div>
 
     <div class="header-actions">
@@ -858,6 +861,64 @@
             <textarea id="bulk-text" class="apple-textarea" rows="4" placeholder="Sarah, Stripe, sarah@stripe.com&#10;Alex, Databricks, alex@databricks.com"></textarea>
             <button class="apple-btn btn-plain" style="width: 100%; margin-top: 10px;" onclick="parseBulkLeads()">
               Import Text Leads
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SENDER PROFILE & TEMPLATE SETTINGS -->
+      <div id="tab-profile" class="tab-content">
+        <div class="apple-card">
+          <div class="card-head">
+            <span class="card-head-title">Sender Profile & Template</span>
+            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="resetProfileDefaults()">Defaults</button>
+          </div>
+          <div class="card-content" style="padding: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+              <div>
+                <label class="form-label-text">Your Full Name</label>
+                <input type="text" id="prof-name" class="apple-input" value="Sai Tarrun Pitta">
+              </div>
+              <div>
+                <label class="form-label-text">Your Title</label>
+                <input type="text" id="prof-title" class="apple-input" value="Software Engineer">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label class="form-label-text">Previous Companies / Experience</label>
+              <input type="text" id="prof-companies" class="apple-input" value="Uber, Pacific Life, Cognizant, and California State University, Fullerton">
+            </div>
+
+            <div class="form-row">
+              <label class="form-label-text">Technical Skills / Core Tech Stack</label>
+              <textarea id="prof-skills" class="apple-textarea" rows="2">Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+              <div>
+                <label class="form-label-text">Contact Email</label>
+                <input type="email" id="prof-email" class="apple-input" value="saitarrunpitta@gmail.com">
+              </div>
+              <div>
+                <label class="form-label-text">LinkedIn URL</label>
+                <input type="text" id="prof-linkedin" class="apple-input" value="https://linkedin.com/in/saitarrunpitta">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+              <div>
+                <label class="form-label-text">GitHub URL</label>
+                <input type="text" id="prof-github" class="apple-input" value="https://github.com/saitarrun">
+              </div>
+              <div>
+                <label class="form-label-text">Portfolio URL</label>
+                <input type="text" id="prof-portfolio" class="apple-input" value="https://saitarrunpitta.vercel.app">
+              </div>
+            </div>
+
+            <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 13px;" onclick="saveSenderProfile()">
+              Save Profile & Update Templates
             </button>
           </div>
         </div>
@@ -1179,14 +1240,75 @@
       });
     }
 
+    const DEFAULT_SENDER_PROFILE = {
+      name: "Sai Tarrun Pitta",
+      title: "Software Engineer",
+      pastCompanies: "Uber, Pacific Life, Cognizant, and California State University, Fullerton",
+      techStack: "Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems",
+      email: "saitarrunpitta@gmail.com",
+      linkedin: "https://linkedin.com/in/saitarrunpitta",
+      github: "https://github.com/saitarrun",
+      portfolio: "https://saitarrunpitta.vercel.app"
+    };
+
+    function getSenderProfile() {
+      const saved = localStorage.getItem('sender_profile');
+      if (saved) {
+        try { return { ...DEFAULT_SENDER_PROFILE, ...JSON.parse(saved) }; } catch (e) {}
+      }
+      return DEFAULT_SENDER_PROFILE;
+    }
+
+    function loadSenderProfileToInputs() {
+      const p = getSenderProfile();
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+      setVal('prof-name', p.name);
+      setVal('prof-title', p.title);
+      setVal('prof-companies', p.pastCompanies);
+      setVal('prof-skills', p.techStack);
+      setVal('prof-email', p.email);
+      setVal('prof-linkedin', p.linkedin);
+      setVal('prof-github', p.github);
+      setVal('prof-portfolio', p.portfolio);
+    }
+
+    function saveSenderProfile() {
+      const getVal = (id, def) => { const el = document.getElementById(id); return (el && el.value.trim()) || def; };
+      const updated = {
+        name: getVal('prof-name', DEFAULT_SENDER_PROFILE.name),
+        title: getVal('prof-title', DEFAULT_SENDER_PROFILE.title),
+        pastCompanies: getVal('prof-companies', DEFAULT_SENDER_PROFILE.pastCompanies),
+        techStack: getVal('prof-skills', DEFAULT_SENDER_PROFILE.techStack),
+        email: getVal('prof-email', DEFAULT_SENDER_PROFILE.email),
+        linkedin: getVal('prof-linkedin', DEFAULT_SENDER_PROFILE.linkedin),
+        github: getVal('prof-github', DEFAULT_SENDER_PROFILE.github),
+        portfolio: getVal('prof-portfolio', DEFAULT_SENDER_PROFILE.portfolio)
+      };
+      localStorage.setItem('sender_profile', JSON.stringify(updated));
+      showAppleToast('Profile settings saved! Updated templates.');
+      if (recruiters.length > 0) {
+        updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      }
+    }
+
+    function resetProfileDefaults() {
+      localStorage.removeItem('sender_profile');
+      loadSenderProfileToInputs();
+      showAppleToast('Reset to default profile settings.');
+      if (recruiters.length > 0) {
+        updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+      }
+    }
+
     // PURE HELPER: Synchronously builds subject & HTML payload
     function buildEmailPayloadForRecruiter(r) {
+      const profile = getSenderProfile();
       const fn = (r && r.firstName) ? r.firstName : 'Recruiter';
       const comp = (r && r.company) ? r.company : 'Company';
       const email = (r && r.email) ? r.email : 'recruiter@example.com';
       const focus = (r && r.focus) ? r.focus : '';
 
-      const subject = `Software Engineering Opportunities at ${comp} — Sai Tarrun Pitta`;
+      const subject = `Software Engineering Opportunities at ${comp} — ${profile.name}`;
 
       const focusText = focus 
         ? `<p>I'm particularly interested in <strong>${comp}</strong> because of the work your engineering teams are doing in ${focus}, which aligns closely with my experience and technical interests.</p>`
@@ -1205,9 +1327,9 @@
 <body>
   <p>Hi ${fn},</p>
   <p>I hope you're doing well.</p>
-  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-  <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-  <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+  <p>My name is <strong>${profile.name}</strong>, and I'm a ${profile.title} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+  <p>I've previously worked with <strong>${profile.pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+  <p>My technical background includes ${profile.techStack}.</p>
   <p>I'm currently exploring Software Engineering opportunities at <strong>${comp}</strong>.</p>
   ${focusText}
   <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
@@ -1215,16 +1337,16 @@
   <p>Thank you for your time and consideration.</p>
   <p>Best regards,</p>
   <div class="mail-signature-block">
-    <strong>Sai Tarrun Pitta</strong><br>
-    Email: <a href="mailto:saitarrunpitta@gmail.com">saitarrunpitta@gmail.com</a><br>
-    LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
-    GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
-    Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+    <strong>${profile.name}</strong><br>
+    Email: <a href="mailto:${profile.email}">${profile.email}</a><br>
+    LinkedIn: <a href="${profile.linkedin}" target="_blank">${profile.linkedin}</a><br>
+    GitHub: <a href="${profile.github}" target="_blank">${profile.github}</a><br>
+    Portfolio: <a href="${profile.portfolio}" target="_blank">${profile.portfolio}</a>
   </div>
 </body>
 </html>`;
 
-      return { subject, bodyHtml, fn, comp, email, focus, focusText };
+      return { subject, bodyHtml, fn, comp, email, focus, focusText, profile };
     }
 
     // Updates right Apple Mail Compose Pane without touching Add Lead Form
@@ -1245,6 +1367,7 @@
       }
 
       const payload = buildEmailPayloadForRecruiter(r);
+      const profile = payload.profile || getSenderProfile();
       document.getElementById('prev-to').innerHTML = `${payload.fn} &lt;${payload.email}&gt;`;
       document.getElementById('prev-subject').value = payload.subject;
       
@@ -1257,9 +1380,9 @@
       document.getElementById('prev-body').innerHTML = `
         <p>Hi ${payload.fn},</p>
         <p>I hope you're doing well.</p>
-        <p>My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-        <p>I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-        <p>My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
+        <p>My name is <strong>${profile.name}</strong>, and I'm a ${profile.title} with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
+        <p>I've previously worked with <strong>${profile.pastCompanies}</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
+        <p>My technical background includes ${profile.techStack}.</p>
         <p>I'm currently exploring Software Engineering opportunities at <strong>${payload.comp}</strong>.</p>
         ${payload.focusText}
         <p>If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
@@ -1267,11 +1390,11 @@
         <p>Thank you for your time and consideration.</p>
         <p>Best regards,</p>
         <div class="mail-signature-block" contenteditable="false">
-          <strong>Sai Tarrun Pitta</strong><br>
-          Email: <a href="mailto:saitarrunpitta@gmail.com">saitarrunpitta@gmail.com</a><br>
-          LinkedIn: <a href="https://linkedin.com/in/saitarrunpitta" target="_blank">linkedin.com/in/saitarrunpitta</a><br>
-          GitHub: <a href="https://github.com/saitarrun" target="_blank">github.com/saitarrun</a><br>
-          Portfolio: <a href="https://saitarrunpitta.vercel.app" target="_blank">saitarrunpitta.vercel.app</a>
+          <strong>${profile.name}</strong><br>
+          Email: <a href="mailto:${profile.email}">${profile.email}</a><br>
+          LinkedIn: <a href="${profile.linkedin}" target="_blank">${profile.linkedin}</a><br>
+          GitHub: <a href="${profile.github}" target="_blank">${profile.github}</a><br>
+          Portfolio: <a href="${profile.portfolio}" target="_blank">${profile.portfolio}</a>
         </div>
       `;
     }
@@ -1807,6 +1930,7 @@
     }
 
     // Initialize application
+    loadSenderProfileToInputs();
     loadResumes();
     loadLeadsFromDatabase();
 
