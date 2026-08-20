@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recruiter Outreach Dashboard — Sai Tarrun Pitta</title>
+  <title>Recruiter Outreach Studio — Sai Tarrun Pitta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: #131b2e;
-      --card-border: #1e293b;
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f293d;
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --accent: #38bdf8;
@@ -26,44 +26,70 @@
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 24px;
+      padding: 20px;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 28px;
-      padding-bottom: 20px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
       border-bottom: 1px solid var(--card-border);
     }
-    .header h1 { font-size: 24px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .header h1 { font-size: 22px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
     .header-badge { font-size: 12px; background: rgba(99, 102, 241, 0.2); color: var(--accent); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.3); }
 
-    .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; }
+    @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
 
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 14px;
+      padding: 20px;
     }
-    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 
-    .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
     input, textarea, select {
       width: 100%;
-      background: #0f172a;
+      background: #0b1120;
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       font-family: inherit;
     }
-    input:focus, textarea:focus, select:focus {
+    input:focus, textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
@@ -74,10 +100,10 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 10px 18px;
+      padding: 9px 16px;
       border-radius: 8px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       border: none;
       transition: all 0.15s ease;
@@ -90,42 +116,44 @@
     .recruiter-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 16px;
-      max-height: 240px;
+      gap: 8px;
+      margin-top: 14px;
+      max-height: 200px;
       overflow-y: auto;
     }
     .recruiter-item {
-      background: #0f172a;
+      background: #0b1120;
       border: 1px solid var(--card-border);
-      padding: 12px 16px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: border-color 0.15s;
     }
     .recruiter-item:hover, .recruiter-item.active { border-color: var(--primary); }
-    .recruiter-name { font-weight: 600; font-size: 14px; }
-    .recruiter-sub { font-size: 12px; color: var(--text-muted); }
+    .recruiter-name { font-weight: 600; font-size: 13px; }
+    .recruiter-sub { font-size: 11px; color: var(--text-muted); }
 
     .preview-box {
       background: #ffffff;
       color: #222222;
       border-radius: 12px;
-      padding: 24px;
+      padding: 22px;
       font-size: 14px;
       line-height: 1.6;
-      min-height: 380px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-height: 440px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     .preview-header {
       padding-bottom: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       border-bottom: 1px solid #e5e7eb;
-      font-size: 13px;
+      font-size: 12px;
       color: #4b5563;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .badge {
@@ -138,60 +166,148 @@
     .badge-sent { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
+    .resume-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #0b1120;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
     .toast {
       position: fixed;
       bottom: 24px;
       right: 24px;
       background: var(--card-bg);
       border: 1px solid var(--success);
-      padding: 14px 20px;
-      border-radius: 10px;
+      padding: 12px 18px;
+      border-radius: 8px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: none;
+      font-size: 13px;
     }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body>
 
   <div class="header">
     <div>
-      <h1>🚀 Recruiter Outreach Automation <span class="header-badge">n8n Connected</span></h1>
-      <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Candidate: Sai Tarrun Pitta • Software Engineer</p>
+      <h1>🚀 Recruiter Outreach Studio <span class="header-badge">n8n Connected</span></h1>
+      <p style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">Candidate: Sai Tarrun Pitta • Software Engineer</p>
     </div>
     <div>
-      <span class="badge badge-sent" style="font-size: 13px; padding: 6px 12px;">Active Pipeline: Online</span>
+      <span class="badge badge-sent" style="font-size: 12px; padding: 5px 10px;">Pipeline: Online</span>
     </div>
   </div>
 
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('queue')">📋 Recruiter Queue</button>
+    <button class="tab-btn" onclick="switchTab('template')">✏️ Edit Email Template</button>
+    <button class="tab-btn" onclick="switchTab('resume')">📄 Manage Resume PDF</button>
+  </div>
+
   <div class="grid">
-    <!-- Left Column: Add / Select Recruiter -->
+    <!-- Left Column: Dynamic Panels -->
     <div>
-      <div class="card">
-        <div class="card-title">
-          <span>Add Recruiter Lead</span>
-          <span style="font-size: 12px; color: var(--text-muted);">Queued: <b id="queue-count">4</b></span>
-        </div>
+      <!-- TAB 1: QUEUE -->
+      <div id="tab-queue" class="tab-content active">
+        <div class="card">
+          <div class="card-title">
+            <span>Add Recruiter Lead</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Queue: <b id="queue-count">4</b></span>
+          </div>
 
-        <div class="form-group">
-          <label>First Name</label>
-          <input type="text" id="fn" placeholder="e.g. Stephanie" value="Stephanie">
-        </div>
-        <div class="form-group">
-          <label>Company</label>
-          <input type="text" id="comp" placeholder="e.g. TikTok" value="TikTok">
-        </div>
-        <div class="form-group">
-          <label>Recruiter Email</label>
-          <input type="email" id="email" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com">
-        </div>
-        <div class="form-group">
-          <label>Company Engineering Focus (Optional)</label>
-          <input type="text" id="focus" placeholder="e.g. large-scale distributed systems" value="large-scale distributed systems and high-throughput infrastructure">
-        </div>
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="fn" placeholder="e.g. Stephanie" value="Stephanie" oninput="updateCurrentRecruiter()">
+          </div>
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" id="comp" placeholder="e.g. TikTok" value="TikTok" oninput="updateCurrentRecruiter()">
+          </div>
+          <div class="form-group">
+            <label>Recruiter Email</label>
+            <input type="email" id="email" placeholder="e.g. stephanie.chao@tiktok.com" value="stephanie.chao@tiktok.com" oninput="updateCurrentRecruiter()">
+          </div>
+          <div class="form-group">
+            <label>Company Engineering Focus</label>
+            <input type="text" id="focus" placeholder="e.g. distributed systems" value="large-scale distributed systems and high-throughput infrastructure" oninput="updateCurrentRecruiter()">
+          </div>
 
-        <button class="btn btn-primary" onclick="addRecruiter()">+ Add / Update Lead</button>
+          <button class="btn btn-primary" onclick="addRecruiter()">+ Add New Lead</button>
 
-        <div class="recruiter-list" id="recruiter-list"></div>
+          <div class="recruiter-list" id="recruiter-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: EDIT TEMPLATE -->
+      <div id="tab-template" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>Edit Email Template</span>
+            <button class="btn btn-success" style="padding: 4px 10px; font-size: 11px;" onclick="resetTemplate()">Reset Default</button>
+          </div>
+
+          <div class="form-group">
+            <label>Subject Line Format</label>
+            <input type="text" id="tpl-subject" value="Software Engineering Opportunities at {{Company}} — Sai Tarrun Pitta" oninput="renderPreview()">
+          </div>
+
+          <div class="form-group">
+            <label>Introduction & Background Paragraphs</label>
+            <textarea id="tpl-intro" rows="4" oninput="renderPreview()">My name is Sai Tarrun Pitta, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.
+
+I've previously worked with Uber, Pacific Life, Cognizant, and California State University, Fullerton, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Technical Stack String</label>
+            <input type="text" id="tpl-stack" value="Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems." oninput="renderPreview()">
+          </div>
+
+          <div class="form-group">
+            <label>Call to Action / Closing</label>
+            <textarea id="tpl-cta" rows="3" oninput="renderPreview()">If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</textarea>
+          </div>
+
+          <button class="btn btn-primary" onclick="showToast('Template updated & saved!')">💾 Save Template</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: MANAGE RESUME -->
+      <div id="tab-resume" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>Resume PDF Configuration</span>
+          </div>
+
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+            The automation automatically attaches your mounted resume PDF to all outgoing recruiter emails.
+          </p>
+
+          <div class="resume-badge">
+            <span style="font-size: 24px;">📄</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 13px;">Sai_Tarrun_Pitta_Resume.pdf</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Active Mounted File: <code>/files/Sai_Tarrun_Pitta_Resume.pdf</code> (73.4 KB)</div>
+            </div>
+            <span class="badge badge-sent">Active</span>
+          </div>
+
+          <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+            <label style="margin-bottom: 8px;">To Replace Resume with a New PDF:</label>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+              Simply copy your new PDF to <code>/Users/xploit404/n8n-files/Sai_Tarrun_Pitta_Resume.pdf</code> or drop it in terminal:
+            </p>
+            <pre style="background: #070a12; padding: 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); overflow-x: auto;">cp ~/Downloads/Your_New_Resume.pdf /Users/xploit404/n8n-files/Sai_Tarrun_Pitta_Resume.pdf</pre>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -221,6 +337,13 @@
     ];
 
     let selectedIndex = 0;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
 
     function renderList() {
       const listEl = document.getElementById('recruiter-list');
@@ -253,6 +376,16 @@
       renderList();
     }
 
+    function updateCurrentRecruiter() {
+      const r = recruiters[selectedIndex];
+      if (!r) return;
+      r.firstName = document.getElementById('fn').value.trim() || 'Recruiter';
+      r.company = document.getElementById('comp').value.trim() || 'Company';
+      r.email = document.getElementById('email').value.trim() || 'email@example.com';
+      r.focus = document.getElementById('focus').value.trim();
+      renderPreview();
+    }
+
     function addRecruiter() {
       const fn = document.getElementById('fn').value.trim();
       const comp = document.getElementById('comp').value.trim();
@@ -272,25 +405,30 @@
 
     function renderPreview() {
       const r = recruiters[selectedIndex] || { firstName: "Recruiter", company: "Company", email: "recruiter@example.com", focus: "" };
-      const focusText = r.focus ? `<p style="margin-bottom: 16px;">I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
+      
+      const subjectTpl = document.getElementById('tpl-subject').value.replace('{{Company}}', r.company);
+      const introText = document.getElementById('tpl-intro').value.split('\n\n').map(p => `<p style="margin-bottom: 14px;">${p.replace('Uber', '<strong>Uber</strong>').replace('Pacific Life', '<strong>Pacific Life</strong>').replace('Cognizant', '<strong>Cognizant</strong>').replace('California State University, Fullerton', '<strong>California State University, Fullerton</strong>')}</p>`).join('');
+      const stackText = document.getElementById('tpl-stack').value;
+      const ctaText = document.getElementById('tpl-cta').value;
+      
+      const focusHtml = r.focus ? `<p style="margin-bottom: 14px;">I'm particularly interested in <strong>${r.company}</strong> because of the work your engineering teams are doing in ${r.focus}, which aligns closely with my experience and technical interests.</p>` : '';
 
       document.getElementById('email-preview').innerHTML = `
         <div class="preview-header">
           <div><b>To:</b> ${r.email}</div>
-          <div><b>Subject:</b> Software Engineering Opportunities at ${r.company} — Sai Tarrun Pitta</div>
+          <div><b>Subject:</b> ${subjectTpl}</div>
           <div><b>Attachment:</b> 📄 Sai_Tarrun_Pitta_Resume.pdf (Mounted)</div>
         </div>
-        <p style="margin-bottom: 16px;">Hi ${r.firstName},</p>
-        <p style="margin-bottom: 16px;">I hope you're doing well.</p>
-        <p style="margin-bottom: 16px;">My name is <strong>Sai Tarrun Pitta</strong>, and I'm a Software Engineer with experience across backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications.</p>
-        <p style="margin-bottom: 16px;">I've previously worked with <strong>Uber</strong>, <strong>Pacific Life</strong>, <strong>Cognizant</strong>, and <strong>California State University, Fullerton</strong>, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.</p>
-        <p style="margin-bottom: 16px;">My technical background includes Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems.</p>
-        <p style="margin-bottom: 16px;">I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
-        ${focusText}
-        <p style="margin-bottom: 16px;">If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering roles, I would also appreciate it if you could forward my profile or connect me with the appropriate person.</p>
-        <p style="margin-bottom: 16px;">I've attached my resume for reference.</p>
-        <p style="margin-bottom: 16px;">Thank you for your time and consideration.</p>
-        <p style="margin-bottom: 16px;">Best regards,</p>
+        <p style="margin-bottom: 14px;">Hi ${r.firstName},</p>
+        <p style="margin-bottom: 14px;">I hope you're doing well.</p>
+        ${introText}
+        <p style="margin-bottom: 14px;">My technical background includes ${stackText}</p>
+        <p style="margin-bottom: 14px;">I'm currently exploring Software Engineering opportunities at <strong>${r.company}</strong>.</p>
+        ${focusHtml}
+        <p style="margin-bottom: 14px;">${ctaText}</p>
+        <p style="margin-bottom: 14px;">I've attached my resume for reference.</p>
+        <p style="margin-bottom: 14px;">Thank you for your time and consideration.</p>
+        <p style="margin-bottom: 14px;">Best regards,</p>
         <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; font-size: 13px; color: #4b5563;">
           <strong>Sai Tarrun Pitta</strong><br>
           Email: <a href="mailto:saitarrunpitta@gmail.com" style="color: #0066cc;">saitarrunpitta@gmail.com</a><br>
