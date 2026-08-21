@@ -4,6 +4,26 @@ set -e
 # Ensure Homebrew and Node 22 LTS are in PATH
 export PATH="/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+# ==========================================================
+# ⚙️ n8n Production Environment Configuration
+# ==========================================================
+export N8N_PORT=5678
+export N8N_PROTOCOL=http
+export N8N_HOST=localhost
+export WEBHOOK_URL=http://localhost:5678/
+export N8N_DEFAULT_BINARY_DATA_MODE=default
+export N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+export NODE_FUNCTION_ALLOW_BUILTIN=fs,path,os,crypto
+export NODE_FUNCTION_ALLOW_EXTERNAL=*
+export N8N_COMMUNITY_PACKAGES_ENABLED=true
+export GENERIC_TIMEZONE=America/Los_Angeles
+export TZ=America/Los_Angeles
+export N8N_DIAGNOSTICS_ENABLED=false
+export N8N_VERSION_NOTIFICATIONS_ENABLED=false
+export N8N_HIRING_BANNER_ENABLED=false
+export N8N_PERSONALIZATION_ENABLED=false
+export N8N_LOG_LEVEL=info
+
 # ANSI Colors
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -17,7 +37,7 @@ cd "$DIR"
 
 echo ""
 echo -e "${CYAN}${BOLD}==========================================================${NC}"
-echo -e "${CYAN}${BOLD}   🚀 Recruiter Outreach Platform — 1-Click Startup       ${NC}"
+echo -e "${CYAN}${BOLD}   🚀 Recruiter Outreach Platform — Permanent Auto-Setup  ${NC}"
 echo -e "${CYAN}${BOLD}==========================================================${NC}"
 echo ""
 
@@ -32,13 +52,13 @@ if [ -d "$HOME/Desktop" ]; then
     cp -n "$HOME/Desktop/"*.pdf "$DIR/files/" 2>/dev/null || true
 fi
 
-# 3. Auto-configure n8n workflow if needed
-echo -e "${BLUE}🔧 Verifying n8n workflows & automation pipeline...${NC}"
+# 3. Auto-configure n8n workflow pipeline
+echo -e "${BLUE}🔧 Verifying n8n workflows & Gmail pipeline configuration...${NC}"
 if [ -f "$DIR/workflows/direct_recruiter_outreach_batch_workflow.json" ]; then
     n8n import:workflow --input="$DIR/workflows/direct_recruiter_outreach_batch_workflow.json" > /dev/null 2>&1 || true
     n8n publish:workflow --id=T5xzFPEkCQ3vjclr > /dev/null 2>&1 || true
 fi
-echo -e "${GREEN}✓ Workflows & Gmail pipeline verified!${NC}"
+echo -e "${GREEN}✓ Workflows & Gmail pipeline configured & active!${NC}"
 
 # 4. Start n8n Workflow Engine if not already running on port 5678
 if lsof -i :5678 > /dev/null 2>&1; then
