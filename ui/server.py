@@ -136,19 +136,22 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         # 3. List all resumes
         elif parsed.path == "/api/resumes":
             resumes = []
-            if os.path.exists(FILES_DIR):
-                for f in sorted(os.listdir(FILES_DIR)):
-                    if f.lower().endswith('.pdf'):
-                        fp = os.path.join(FILES_DIR, f)
-                        stat = os.stat(fp)
-                        size_kb = round(stat.st_size / 1024, 1)
-                        mod_time = time.strftime('%b %d, %Y at %I:%M %p', time.localtime(stat.st_mtime))
-                        resumes.append({
-                            "filename": f,
-                            "path": f"/files/{f}",
-                            "size": f"{size_kb} KB",
-                            "lastModified": mod_time
-                        })
+            seen = set()
+            for d in [LOCAL_FILES, FILES_DIR, "/Users/xploit404/n8n-files"]:
+                if os.path.exists(d):
+                    for f in sorted(os.listdir(d)):
+                        if f.lower().endswith('.pdf') and f not in seen:
+                            seen.add(f)
+                            fp = os.path.join(d, f)
+                            stat = os.stat(fp)
+                            size_kb = round(stat.st_size / 1024, 1)
+                            mod_time = time.strftime('%b %d, %Y at %I:%M %p', time.localtime(stat.st_mtime))
+                            resumes.append({
+                                "filename": f,
+                                "path": f"/files/{f}",
+                                "size": f"{size_kb} KB",
+                                "lastModified": mod_time
+                            })
             
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
@@ -161,10 +164,16 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             params = urllib.parse.parse_qs(parsed.query)
             target_file = params.get('file', ['Sai_Tarrun_Pitta_Resume.pdf'])[0]
             safe_filename = os.path.basename(target_file)
-            fp = os.path.join(FILES_DIR, safe_filename)
+            
+            found_fp = None
+            for d in [LOCAL_FILES, FILES_DIR, "/Users/xploit404/n8n-files"]:
+                fp = os.path.join(d, safe_filename)
+                if os.path.exists(fp):
+                    found_fp = fp
+                    break
 
-            if os.path.exists(fp):
-                with open(fp, "rb") as f:
+            if found_fp and os.path.exists(found_fp):
+                with open(found_fp, "rb") as f:
                     pdf_data = f.read()
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/pdf')
@@ -317,8 +326,10 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             os.makedirs(FILES_DIR, exist_ok=True)
 
             if body.startswith(b'%PDF'):
-                with open(dest_path, "wb") as f:
-                    f.write(body)
+                for target_dir in [LOCAL_FILES, FILES_DIR, "/Users/xploit404/n8n-files"]:
+                    if os.path.exists(target_dir):
+                        with open(os.path.join(target_dir, safe_filename), "wb") as f:
+                            f.write(body)
 
                 file_size_kb = round(len(body) / 1024, 1)
                 self.send_response(200)
@@ -345,9 +356,10 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                             if raw_file_data.endswith(b'--'): raw_file_data = raw_file_data[:-2]
                             if raw_file_data.endswith(b'\r\n'): raw_file_data = raw_file_data[:-2]
 
-                            dest_path = os.path.join(FILES_DIR, safe_filename)
-                            with open(dest_path, "wb") as f:
-                                f.write(raw_file_data)
+                            for target_dir in [LOCAL_FILES, FILES_DIR, "/Users/xploit404/n8n-files"]:
+                                if os.path.exists(target_dir):
+                                    with open(os.path.join(target_dir, safe_filename), "wb") as f:
+                                        f.write(raw_file_data)
 
                             file_size_kb = round(len(raw_file_data) / 1024, 1)
                             self.send_response(200)
@@ -374,10 +386,18 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     raise ValueError("Filename missing")
                 
                 safe_filename = os.path.basename(filename)
-                fp = os.path.join(FILES_DIR, safe_filename)
                 
-                if os.path.exists(fp):
-                    os.remove(fp)
+                deleted = False
+                for target_dir in [LOCAL_FILES, FILES_DIR, "/Users/xploit404/n8n-files"]:
+                    fp = os.path.join(target_dir, safe_filename)
+                    if os.path.exists(fp):
+                        try:
+                            os.remove(fp)
+                            deleted = True
+                        except Exception as e:
+                            print(f"[Delete err] {e}")
+
+                if deleted:
                     print(f"[Multi-Resume] Deleted {safe_filename}")
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/json')
