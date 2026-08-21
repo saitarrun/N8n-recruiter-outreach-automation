@@ -1,3 +1,2 @@
 #!/bin/bash
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-"$DIR/start.sh"
+/Users/xploit404/Projects/n8n-recruiter-outreach-automation/start.sh
