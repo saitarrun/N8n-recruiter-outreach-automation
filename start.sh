@@ -125,6 +125,7 @@ fi
 # 7. Open browser automatically
 if [[ "$OSTYPE" == "darwin"* ]]; then
     open "http://localhost:3000"
+    osascript -e 'display notification "n8n Engine & Gmail Authentication pre-configured & ready!" with title "Recruiter Outreach Studio"' 2>/dev/null || true
 fi
 
 echo ""
