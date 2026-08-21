@@ -21,29 +21,14 @@
     },
     {
       "parameters": {
-        "fileSelector": "={{ '/files/' + ($('Webhook Trigger').first().json.body.resumeFile || 'Sai_Tarrun_Pitta_Resume.pdf') }}",
-        "options": {}
-      },
-      "id": "node-read-resume",
-      "name": "Read Resume PDF",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [
-        320,
-        300
-      ],
-      "continueOnFail": true
-    },
-    {
-      "parameters": {
-        "jsCode": "const item = $input.first();\nconst body = $('Webhook Trigger').first().json.body;\n\nconst firstName = body.firstName;\nconst company = body.company;\nconst targetEmail = body.email;\n\nlet subject = body.customSubject || `Software Engineering Opportunities at ${company} \u2014 Sai Tarrun Pitta`;\nlet htmlBody = body.customHtml;\n\nif (!htmlBody) {\n  htmlBody = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #222222; margin: 0; padding: 0; }\n    p { margin: 0 0 16px 0; }\n    a { color: #0066cc; text-decoration: none; }\n  </style>\n</head>\n<body>\n  <p>Hi ${firstName},</p>\n  <p>I hope you\u2019re doing well.</p>\n  <p>My name is <strong>Sai Tarrun Pitta</strong>, and I\u2019m a Software Engineer with experience across <strong>backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications</strong>.</p>\n  <p>I\u2019ve previously worked with <strong>Uber, Pacific Life, Cognizant, and California State University, Fullerton</strong>, where I contributed to production systems involving scalable backend services, full-stack applications, distributed systems, AI/LLM workflows, RAG systems, cloud infrastructure, and observability.</p>\n  <p>My technical background includes <strong>Python, Java, TypeScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, REST APIs, microservices, and distributed systems</strong>.</p>\n  <p>I\u2019m currently exploring <strong>Software Engineering opportunities at ${company}</strong>. If there are any current or upcoming roles that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process. If another recruiter or hiring manager is responsible for relevant engineering positions, I\u2019d also appreciate it if you could connect me with the appropriate person.</p>\n  <p>I\u2019ve attached my resume for reference and would be happy to provide any additional information.</p>\n  <p>Thank you for your time and consideration.</p>\n  <p>Best regards,</p>\n  <div style=\"margin-top: 24px; border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 14px; color: #444444;\">\n    <strong>Sai Tarrun Pitta</strong><br>\n    saitarrunpitta@gmail.com<br>\n    <a href=\"https://linkedin.com/in/saitarrunpitta\" target=\"_blank\">linkedin.com/in/saitarrunpitta</a><br>\n    <a href=\"https://github.com/saitarrun\" target=\"_blank\">github.com/saitarrun</a><br>\n    <a href=\"https://saitarrunpitta.vercel.app\" target=\"_blank\">saitarrunpitta.vercel.app</a>\n  </div>\n</body>\n</html>`;\n}\n\nconst binaryData = item.binary ? (item.binary.data || item.binary.resume) : null;\n\nreturn {\n  json: {\n    sendTo: targetEmail,\n    subject: subject,\n    htmlBody: htmlBody\n  },\n  binary: binaryData ? { resume: binaryData } : {}\n};"
+        "jsCode": "const body = $('Webhook Trigger').first().json.body;\nconst firstName = body.firstName || 'Recruiter';\nconst company = body.company || 'Company';\nconst targetEmail = body.email;\n\nlet subject = body.customSubject || `Software Engineering Opportunities at ${company} \u2014 Sai Tarrun Pitta`;\nlet htmlBody = body.customHtml || `<p>Hi ${firstName},</p><p>I am exploring engineering roles at ${company}.</p>`;\n\nlet binaryObj = {};\nif (body.resumeBase64) {\n  binaryObj = {\n    resume: {\n      data: body.resumeBase64,\n      mimeType: 'application/pdf',\n      fileName: body.resumeFileName || 'Sai_Tarrun_Pitta_Resume.pdf'\n    }\n  };\n}\n\nreturn {\n  json: {\n    success: true,\n    sendTo: targetEmail,\n    subject: subject,\n    htmlBody: htmlBody\n  },\n  binary: binaryObj\n};"
       },
       "id": "node-prep-email",
       "name": "Prepare Email Content",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        540,
+        360,
         300
       ]
     },
@@ -69,7 +54,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        760,
+        620,
         300
       ],
       "credentials": {
@@ -79,24 +64,13 @@
         }
       },
       "webhookId": "e1fc3475-d9bf-4b31-91b2-8cb9663f4c51",
-      "continueOnFail": true,
+      "continueOnFail": false,
       "retryOnFail": true,
       "maxTries": 2
     }
   ],
   "connections": {
     "Webhook Trigger": {
-      "main": [
-        [
-          {
-            "node": "Read Resume PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Read Resume PDF": {
       "main": [
         [
           {

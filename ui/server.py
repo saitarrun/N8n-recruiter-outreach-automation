@@ -7,6 +7,7 @@ import time
 import sqlite3
 import urllib.parse
 import urllib.request
+import base64
 
 PORT = int(os.environ.get("PORT", 3000))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -409,9 +410,29 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 focus = req_data.get('focus', '')
                 res_file = req_data.get('resumeFile', 'Sai_Tarrun_Pitta_Backend_Resume.pdf')
 
+                # Locate and attach resume binary in base64
+                if res_file:
+                    safe_res_name = os.path.basename(res_file)
+                    possible_paths = [
+                        os.path.join(FILES_DIR, safe_res_name),
+                        os.path.join(LOCAL_FILES, safe_res_name),
+                        os.path.join("/Users/xploit404/n8n-files", safe_res_name)
+                    ]
+                    for p in possible_paths:
+                        if os.path.exists(p):
+                            try:
+                                with open(p, "rb") as rf:
+                                    req_data['resumeBase64'] = base64.b64encode(rf.read()).decode('utf-8')
+                                req_data['resumeFileName'] = safe_res_name
+                                break
+                            except Exception as read_err:
+                                print(f"[Resume Read Err] {read_err}")
+
+                forward_bytes = json.dumps(req_data).encode('utf-8')
+
                 req = urllib.request.Request(
                     "http://127.0.0.1:5678/webhook/send-recruiter-outreach",
-                    data=body_bytes,
+                    data=forward_bytes,
                     headers={"Content-Type": "application/json"},
                     method="POST"
                 )
