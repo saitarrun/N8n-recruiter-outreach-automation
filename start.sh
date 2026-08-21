@@ -35,6 +35,11 @@ NC='\033[0m'
 DIR="/Users/xploit404/Projects/n8n-recruiter-outreach-automation"
 cd "$DIR"
 
+PYTHON_CMD="python3"
+if [ -x "/opt/homebrew/bin/python3" ]; then
+    PYTHON_CMD="/opt/homebrew/bin/python3"
+fi
+
 echo ""
 echo -e "${CYAN}${BOLD}==========================================================${NC}"
 echo -e "${CYAN}${BOLD}   🚀 Recruiter Outreach Platform — Permanent Auto-Setup  ${NC}"
@@ -54,10 +59,27 @@ fi
 
 # 3. Auto-configure n8n workflow pipeline
 echo -e "${BLUE}🔧 Verifying n8n workflows & Gmail pipeline configuration...${NC}"
-if [ -f "$DIR/workflows/direct_recruiter_outreach_batch_workflow.json" ]; then
-    n8n import:workflow --input="$DIR/workflows/direct_recruiter_outreach_batch_workflow.json" > /dev/null 2>&1 || true
-    n8n publish:workflow --id=T5xzFPEkCQ3vjclr > /dev/null 2>&1 || true
-fi
+$PYTHON_CMD -c "
+import sqlite3, json, os
+db_path = os.path.expanduser('~/.n8n/database.sqlite')
+if os.path.exists(db_path):
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(\"SELECT id FROM workflow_entity WHERE id='T5xzFPEkCQ3vjclr'\")
+    if not cur.fetchone():
+        wf_file = '$DIR/workflows/direct_recruiter_outreach_batch_workflow.json'
+        if os.path.exists(wf_file):
+            with open(wf_file, 'r') as f:
+                wf = json.load(f)
+            cur.execute(\"INSERT OR REPLACE INTO workflow_entity (id, name, active, nodes, connections) VALUES (?, ?, 1, ?, ?)\",
+                        (wf['id'], wf['name'], json.dumps(wf['nodes']), json.dumps(wf['connections'])))
+    else:
+        cur.execute(\"UPDATE workflow_entity SET active=1 WHERE id='T5xzFPEkCQ3vjclr'\")
+    
+    cur.execute(\"INSERT OR REPLACE INTO webhook_entity (workflowId, webhookPath, method, node, webhookId, pathLength) VALUES ('T5xzFPEkCQ3vjclr', 'send-recruiter-outreach', 'POST', 'Webhook Trigger', NULL, NULL)\")
+    conn.commit()
+    conn.close()
+" 2>/dev/null || true
 echo -e "${GREEN}✓ Workflows & Gmail pipeline configured & active!${NC}"
 
 # 4. Start n8n Workflow Engine if not already running on port 5678

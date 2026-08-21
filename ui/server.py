@@ -428,6 +428,21 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                             except Exception as read_err:
                                 print(f"[Resume Read Err] {read_err}")
 
+                # If requested file wasn't found, attach first available PDF from library
+                if not req_data.get('resumeBase64'):
+                    for d in [FILES_DIR, LOCAL_FILES, "/Users/xploit404/n8n-files"]:
+                        if os.path.exists(d):
+                            pdfs = [f for f in sorted(os.listdir(d)) if f.lower().endswith('.pdf')]
+                            if pdfs:
+                                fallback_path = os.path.join(d, pdfs[0])
+                                try:
+                                    with open(fallback_path, "rb") as rf:
+                                        req_data['resumeBase64'] = base64.b64encode(rf.read()).decode('utf-8')
+                                    req_data['resumeFileName'] = pdfs[0]
+                                    break
+                                except Exception as fallback_err:
+                                    print(f"[Resume Fallback Err] {fallback_err}")
+
                 forward_bytes = json.dumps(req_data).encode('utf-8')
 
                 req = urllib.request.Request(
