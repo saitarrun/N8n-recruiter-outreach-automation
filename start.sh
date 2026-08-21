@@ -74,8 +74,12 @@ fi
 if lsof -i :3000 > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Outreach Studio UI is already running (http://localhost:3000)${NC}"
 else
-    echo -e "${BLUE}🖥️  Starting Outreach Studio Server...${NC}"
-    nohup python3 "$DIR/ui/server.py" > "$DIR/ui.log" 2>&1 &
+    echo -e "${BLUE}🖥️  Starting Outreach Studio Server (Native Apple Silicon)...${NC}"
+    PYTHON_CMD="python3"
+    if [ -x "/opt/homebrew/bin/python3" ]; then
+        PYTHON_CMD="/opt/homebrew/bin/python3"
+    fi
+    nohup $PYTHON_CMD "$DIR/ui/server.py" > "$DIR/ui.log" 2>&1 &
     UI_PID=$!
     echo -e "${GREEN}✓ Outreach Studio launched (PID: $UI_PID)${NC}"
 fi
