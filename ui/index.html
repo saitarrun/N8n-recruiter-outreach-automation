@@ -756,6 +756,95 @@
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    /* Scheduler Studio Styles */
+    .scheduler-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .scheduler-stat-box {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .scheduler-stat-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--label-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+    }
+    .scheduler-stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--label-primary);
+      letter-spacing: -0.02em;
+    }
+    .scheduler-countdown-display {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      letter-spacing: -0.02em;
+    }
+    .scheduler-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .scheduler-status-idle { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+    .scheduler-status-armed { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .scheduler-status-running { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .scheduler-status-paused { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+
+    .scheduler-log-terminal {
+      background: #1e1e24;
+      color: #f3f4f6;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid #2d2d38;
+    }
+    .scheduler-log-entry { margin-bottom: 4px; word-break: break-all; }
+    .scheduler-log-time { color: #9ca3af; margin-right: 6px; }
+    .scheduler-log-success { color: #34d399; }
+    .scheduler-log-info { color: #60a5fa; }
+    .scheduler-log-warn { color: #fbbf24; }
+    .scheduler-log-err { color: #f87171; }
+
+    .scheduler-queue-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .scheduler-queue-table th {
+      text-align: left;
+      padding: 8px 10px;
+      color: var(--label-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .scheduler-queue-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--label-primary);
+    }
+    .scheduler-queue-table tr:last-child td { border-bottom: none; }
   </style>
 </head>
 <body>
@@ -788,6 +877,9 @@
       <button class="segmented-item" onclick="setStudioTab('profile', event)">
         Templates & Profile
       </button>
+      <button class="segmented-item" onclick="setStudioTab('scheduler', event)" id="tab-btn-scheduler">
+        Scheduler <span id="scheduler-header-dot" style="display:none; width:7px; height:7px; border-radius:50%; background:#10b981; margin-left:4px; box-shadow: 0 0 6px #10b981;"></span>
+      </button>
     </div>
 
     <div class="header-actions">
@@ -797,11 +889,226 @@
         <span id="n8n-health-label">n8n Connected</span>
       </div>
 
+      <button class="apple-btn btn-plain" onclick="setStudioTab('scheduler', null)" id="btn-header-scheduler" title="Open Automated Outreach Scheduler">
+        ⏱️ Schedule
+      </button>
+
       <button class="apple-btn btn-blue-primary" onclick="sendBulkUnsentQueue()" id="btn-bulk-send">
         Send Unsent in Bulk
       </button>
     </div>
   </header>
+
+  <!-- FULL-PAGE AUTOMATED OUTREACH SCHEDULER STUDIO -->
+  <div id="view-scheduler-studio" class="fullpage-studio" style="display: none;">
+    <!-- Scheduler Topbar -->
+    <div class="studio-topbar">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h2 style="font-size: 20px; font-weight: 700; color: var(--label-primary); margin: 0; letter-spacing: -0.02em;">Automated Outreach Scheduler</h2>
+          <span class="scheduler-status-pill scheduler-status-idle" id="sched-status-badge">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>
+            <span id="sched-status-text">Status: Idle</span>
+          </span>
+        </div>
+        <p style="font-size: 13px; color: var(--label-secondary); margin: 4px 0 0 0;">Intelligent time-delayed launches, natural drip intervals, and business-hours auto-pilot without modifying your database.</p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back to Leads</button>
+        <button class="apple-btn btn-destruct" id="btn-sched-stop" onclick="stopScheduler()" style="display: none;">Stop Schedule</button>
+        <button class="apple-btn btn-plain" id="btn-sched-pause" onclick="togglePauseScheduler()" style="display: none;">Pause</button>
+        <button class="apple-btn btn-blue-primary" id="btn-sched-arm" onclick="startScheduler()">▶️ Arm & Start Scheduler</button>
+      </div>
+    </div>
+
+    <!-- 4-Box Metrics Bar -->
+    <div class="scheduler-stat-grid">
+      <div class="scheduler-stat-box">
+        <div class="scheduler-stat-label">Unsent Leads in Queue</div>
+        <div class="scheduler-stat-value" id="sched-stat-unsent">0</div>
+      </div>
+      <div class="scheduler-stat-box">
+        <div class="scheduler-stat-label">Scheduled in Current Run</div>
+        <div class="scheduler-stat-value" id="sched-stat-scheduled" style="color: var(--accent-blue);">0</div>
+      </div>
+      <div class="scheduler-stat-box">
+        <div class="scheduler-stat-label">Dispatched this Session</div>
+        <div class="scheduler-stat-value" id="sched-stat-sent" style="color: var(--accent-green);">0</div>
+      </div>
+      <div class="scheduler-stat-box">
+        <div class="scheduler-stat-label">Countdown / Next Action</div>
+        <div class="scheduler-countdown-display" id="sched-countdown-display">--:--:--</div>
+      </div>
+    </div>
+
+    <!-- 2-Column Scheduler Grid -->
+    <div class="studio-grid">
+      <!-- LEFT: Mode & Schedule Configuration -->
+      <div class="studio-editor-pane">
+        
+        <!-- Mode Picker Card -->
+        <div class="apple-card" style="margin-bottom: 16px;">
+          <div class="card-head">
+            <span class="card-head-title">1. Select Scheduling Cadence</span>
+          </div>
+          <div class="card-content" style="padding: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+              <button class="apple-btn btn-tint active" id="sched-mode-btn-specific" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('specific')">
+                ⏱️ Delayed Launch<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Specific Date & Time</span>
+              </button>
+              <button class="apple-btn btn-plain" id="sched-mode-btn-drip" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('drip')">
+                💧 Smart Drip<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">1 Email every N mins</span>
+              </button>
+              <button class="apple-btn btn-plain" id="sched-mode-btn-recurring" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('recurring')">
+                📅 Daily Autopilot<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Optimal Recruiter Hours</span>
+              </button>
+            </div>
+
+            <!-- MODE 1: Specific Date/Time Launch Settings -->
+            <div id="sched-settings-specific" style="display: block;">
+              <label class="form-label-text">Target Launch Date & Time</label>
+              <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="datetime-local" id="sched-datetime-input" class="apple-input" style="font-size: 13.5px; padding: 8px 12px; font-weight: 500;" onchange="onSchedulerConfigChange()">
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); align-self: center;">Quick Presets:</span>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('in15m')">+15 Mins</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('in1h')">+1 Hour</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('tomorrow9am')">Tomorrow 9:00 AM</button>
+                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('tomorrow2pm')">Tomorrow 2:00 PM</button>
+              </div>
+            </div>
+
+            <!-- MODE 2: Smart Drip Settings -->
+            <div id="sched-settings-drip" style="display: none;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                <div>
+                  <label class="form-label-text">Interval Between Sends</label>
+                  <select id="sched-drip-interval" class="apple-select" onchange="onSchedulerConfigChange()">
+                    <option value="1">Every 1 minute</option>
+                    <option value="2">Every 2 minutes</option>
+                    <option value="3" selected>Every 3 minutes (Recommended)</option>
+                    <option value="5">Every 5 minutes</option>
+                    <option value="10">Every 10 minutes</option>
+                    <option value="15">Every 15 minutes</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label-text">Human Jitter Randomizer</label>
+                  <select id="sched-drip-jitter" class="apple-select" onchange="onSchedulerConfigChange()">
+                    <option value="true" selected>Enabled (± 30s organic variance)</option>
+                    <option value="false">Disabled (Exact strict timer)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- MODE 3: Daily Recurring Autopilot -->
+            <div id="sched-settings-recurring" style="display: none;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                <div>
+                  <label class="form-label-text">Daily Run Time</label>
+                  <input type="time" id="sched-recurring-time" class="apple-input" value="09:15" onchange="onSchedulerConfigChange()">
+                </div>
+                <div>
+                  <label class="form-label-text">Daily Max Dispatch Cap</label>
+                  <input type="number" id="sched-recurring-cap" class="apple-input" value="20" min="1" max="100" onchange="onSchedulerConfigChange()">
+                </div>
+              </div>
+              <div style="margin-bottom: 8px;">
+                <label class="form-label-text">Active Days (Peak Response Window)</label>
+                <div style="display: flex; gap: 12px; font-size: 13px; color: var(--label-primary);">
+                  <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-1" checked onchange="onSchedulerConfigChange()"> Mon</label>
+                  <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-2" checked onchange="onSchedulerConfigChange()"> Tue</label>
+                  <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-3" checked onchange="onSchedulerConfigChange()"> Wed</label>
+                  <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-4" checked onchange="onSchedulerConfigChange()"> Thu</label>
+                  <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-5" checked onchange="onSchedulerConfigChange()"> Fri</label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Target Scope & Delivery Safety Card -->
+        <div class="apple-card" style="margin-bottom: 16px;">
+          <div class="card-head">
+            <span class="card-head-title">2. Target Queue & Rate Safeguards</span>
+          </div>
+          <div class="card-content" style="padding: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label class="form-label-text">Target Leads Scope</label>
+                <select id="sched-scope-select" class="apple-select" onchange="onSchedulerConfigChange()">
+                  <option value="all" selected>All Currently Unsent Leads</option>
+                  <option value="5">Limit to Next 5 Unsent Leads</option>
+                  <option value="10">Limit to Next 10 Unsent Leads</option>
+                  <option value="15">Limit to Next 15 Unsent Leads</option>
+                  <option value="25">Limit to Next 25 Unsent Leads</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label-text">Intra-Batch Spacing Pause</label>
+                <select id="sched-spacing-select" class="apple-select" onchange="onSchedulerConfigChange()">
+                  <option value="2">2 seconds (Standard)</option>
+                  <option value="5" selected>5 seconds (Recommended)</option>
+                  <option value="10">10 seconds (Cautious)</option>
+                  <option value="20">20 seconds (High Anti-Spam)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--label-secondary); background: #f9f9fb; padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span style="font-size: 14px;">🛡️</span>
+              <span><strong>Sent History Protection:</strong> The scheduler strictly excludes all previously sent recruiters, ensuring zero duplicate dispatches.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Scheduler Activity Terminal -->
+        <div class="apple-card">
+          <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-head-title">3. Live Execution & Activity Log</span>
+            <button class="apple-btn btn-plain" style="padding: 2px 8px; font-size: 11px;" onclick="clearSchedulerLogs()">Clear Logs</button>
+          </div>
+          <div class="card-content" style="padding: 12px;">
+            <div class="scheduler-log-terminal" id="scheduler-log-box">
+              <div class="scheduler-log-entry"><span class="scheduler-log-time">[System]</span> <span class="scheduler-log-info">Automated Outreach Scheduler initialized and ready.</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Scheduled Queue Preview Pane -->
+      <div class="studio-preview-pane">
+        <div class="apple-card">
+          <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-head-title">Upcoming Scheduled Dispatches</span>
+            <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 3px 8px;" onclick="testDispatchSingleLead()">⚡ Test Send 1 Lead Now</button>
+          </div>
+          <div class="card-content" style="padding: 0; max-height: 540px; overflow-y: auto;">
+            <table class="scheduler-queue-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Recruiter & Company</th>
+                  <th>Email</th>
+                  <th>Projected Time</th>
+                </tr>
+              </thead>
+              <tbody id="scheduler-queue-tbody">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--label-secondary); padding: 24px;">No upcoming scheduled dispatches.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- FULL-PAGE TEMPLATE & PROFILE STUDIO (Clean, Spacious & Intuitive) -->
   <div id="view-profile-studio" class="fullpage-studio" style="display: none;">
@@ -1364,23 +1671,38 @@
 
     function setStudioTab(tabId, evt) {
       document.querySelectorAll('.segmented-item').forEach(b => b.classList.remove('active'));
-      if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+      if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+      } else {
+        const btn = document.getElementById(`tab-btn-${tabId}`) || document.querySelector(`.segmented-item[onclick*="'${tabId}'"]`);
+        if (btn) btn.classList.add('active');
+      }
 
       const mainWs = document.querySelector('.main-workspace');
       const fullStudio = document.getElementById('view-profile-studio');
+      const schedStudio = document.getElementById('view-scheduler-studio');
 
       if (tabId === 'profile') {
         if (mainWs) mainWs.style.display = 'none';
+        if (schedStudio) schedStudio.style.display = 'none';
         if (fullStudio) {
           fullStudio.style.display = 'block';
           loadSenderProfileToInputs();
           onProfileStudioLiveInput();
+        }
+      } else if (tabId === 'scheduler') {
+        if (mainWs) mainWs.style.display = 'none';
+        if (fullStudio) fullStudio.style.display = 'none';
+        if (schedStudio) {
+          schedStudio.style.display = 'block';
+          renderSchedulerUI();
         }
       } else {
         if (fullStudio && fullStudio.style.display !== 'none') {
           saveSenderProfileSilently();
         }
         if (fullStudio) fullStudio.style.display = 'none';
+        if (schedStudio) schedStudio.style.display = 'none';
         if (mainWs) mainWs.style.display = 'grid';
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         const targetTab = document.getElementById(`tab-${tabId}`);
@@ -2531,11 +2853,557 @@ ${contentHtml}
       }
     }
 
+    // ==========================================================
+    // ⏱️ AUTOMATED OUTREACH SCHEDULER ENGINE (Pure Client Orchestration)
+    // ==========================================================
+    const SCHEDULER_STORAGE_KEY = 'recruiter_outreach_scheduler_cfg_v1';
+
+    let schedulerConfig = {
+      status: 'idle', // 'idle' | 'armed' | 'running' | 'paused'
+      mode: 'specific', // 'specific' | 'drip' | 'recurring'
+      targetDateTime: '',
+      dripIntervalMinutes: 3,
+      humanJitter: true,
+      scope: 'all',
+      spacingSeconds: 5,
+      recurringTime: '09:15',
+      recurringCap: 20,
+      recurringDays: [1, 2, 3, 4, 5]
+    };
+
+    let schedulerRuntime = {
+      timerId: null,
+      nextActionTimestamp: null,
+      sessionDispatched: 0,
+      logs: [],
+      isExecutingBatch: false,
+      lastRecurringRunDate: ''
+    };
+
+    function initScheduler() {
+      try {
+        const saved = localStorage.getItem(SCHEDULER_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          schedulerConfig = { ...schedulerConfig, ...parsed, status: 'idle' };
+        }
+      } catch (e) {}
+
+      // Default target date to tomorrow 9:00 AM if empty or past
+      if (!schedulerConfig.targetDateTime || new Date(schedulerConfig.targetDateTime).getTime() < Date.now()) {
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        d.setHours(9, 0, 0, 0);
+        const iso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        schedulerConfig.targetDateTime = iso;
+      }
+
+      // Populate UI input elements
+      const dtInput = document.getElementById('sched-datetime-input');
+      if (dtInput) dtInput.value = schedulerConfig.targetDateTime;
+
+      const dripInt = document.getElementById('sched-drip-interval');
+      if (dripInt) dripInt.value = schedulerConfig.dripIntervalMinutes;
+
+      const dripJit = document.getElementById('sched-drip-jitter');
+      if (dripJit) dripJit.value = schedulerConfig.humanJitter ? "true" : "false";
+
+      const recTime = document.getElementById('sched-recurring-time');
+      if (recTime) recTime.value = schedulerConfig.recurringTime;
+
+      const recCap = document.getElementById('sched-recurring-cap');
+      if (recCap) recCap.value = schedulerConfig.recurringCap;
+
+      const scopeSel = document.getElementById('sched-scope-select');
+      if (scopeSel) scopeSel.value = schedulerConfig.scope;
+
+      const spaceSel = document.getElementById('sched-spacing-select');
+      if (spaceSel) spaceSel.value = schedulerConfig.spacingSeconds;
+
+      for (let day = 1; day <= 5; day++) {
+        const cb = document.getElementById(`sched-day-${day}`);
+        if (cb) cb.checked = schedulerConfig.recurringDays.includes(day);
+      }
+
+      setSchedulerMode(schedulerConfig.mode, false);
+      renderSchedulerUI();
+
+      // Start tick heartbeat
+      setInterval(schedulerHeartbeatTick, 1000);
+    }
+
+    function saveSchedulerConfig() {
+      try {
+        localStorage.setItem(SCHEDULER_STORAGE_KEY, JSON.stringify({
+          mode: schedulerConfig.mode,
+          targetDateTime: schedulerConfig.targetDateTime,
+          dripIntervalMinutes: schedulerConfig.dripIntervalMinutes,
+          humanJitter: schedulerConfig.humanJitter,
+          scope: schedulerConfig.scope,
+          spacingSeconds: schedulerConfig.spacingSeconds,
+          recurringTime: schedulerConfig.recurringTime,
+          recurringCap: schedulerConfig.recurringCap,
+          recurringDays: schedulerConfig.recurringDays
+        }));
+      } catch (e) {}
+    }
+
+    function setSchedulerMode(mode, triggerRender = true) {
+      schedulerConfig.mode = mode;
+      ['specific', 'drip', 'recurring'].forEach(m => {
+        const btn = document.getElementById(`sched-mode-btn-${m}`);
+        const panel = document.getElementById(`sched-settings-${m}`);
+        if (btn) {
+          btn.className = (m === mode) ? 'apple-btn btn-tint active' : 'apple-btn btn-plain';
+        }
+        if (panel) {
+          panel.style.display = (m === mode) ? 'block' : 'none';
+        }
+      });
+      saveSchedulerConfig();
+      if (triggerRender) renderSchedulerUI();
+    }
+
+    function setQuickSchedTime(preset) {
+      const now = new Date();
+      if (preset === 'in15m') {
+        now.setMinutes(now.getMinutes() + 15);
+      } else if (preset === 'in1h') {
+        now.setHours(now.getHours() + 1);
+      } else if (preset === 'tomorrow9am') {
+        now.setDate(now.getDate() + 1);
+        now.setHours(9, 0, 0, 0);
+      } else if (preset === 'tomorrow2pm') {
+        now.setDate(now.getDate() + 1);
+        now.setHours(14, 0, 0, 0);
+      }
+      const iso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+      schedulerConfig.targetDateTime = iso;
+      const dtInput = document.getElementById('sched-datetime-input');
+      if (dtInput) dtInput.value = iso;
+      onSchedulerConfigChange();
+      showAppleToast(`Set launch time to ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}`);
+    }
+
+    function onSchedulerConfigChange() {
+      const dtInput = document.getElementById('sched-datetime-input');
+      if (dtInput && dtInput.value) schedulerConfig.targetDateTime = dtInput.value;
+
+      const dripInt = document.getElementById('sched-drip-interval');
+      if (dripInt) schedulerConfig.dripIntervalMinutes = parseInt(dripInt.value, 10) || 3;
+
+      const dripJit = document.getElementById('sched-drip-jitter');
+      if (dripJit) schedulerConfig.humanJitter = (dripJit.value === 'true');
+
+      const recTime = document.getElementById('sched-recurring-time');
+      if (recTime) schedulerConfig.recurringTime = recTime.value || '09:15';
+
+      const recCap = document.getElementById('sched-recurring-cap');
+      if (recCap) schedulerConfig.recurringCap = parseInt(recCap.value, 10) || 20;
+
+      const scopeSel = document.getElementById('sched-scope-select');
+      if (scopeSel) schedulerConfig.scope = scopeSel.value;
+
+      const spaceSel = document.getElementById('sched-spacing-select');
+      if (spaceSel) schedulerConfig.spacingSeconds = parseInt(spaceSel.value, 10) || 5;
+
+      const days = [];
+      for (let day = 1; day <= 5; day++) {
+        const cb = document.getElementById(`sched-day-${day}`);
+        if (cb && cb.checked) days.push(day);
+      }
+      schedulerConfig.recurringDays = days;
+
+      saveSchedulerConfig();
+      renderSchedulerUI();
+    }
+
+    function getScheduledTargetLeads() {
+      const unsent = recruiters.filter(r => r.status !== 'Sent');
+      if (schedulerConfig.scope === 'all') return unsent;
+      const limit = parseInt(schedulerConfig.scope, 10) || unsent.length;
+      return unsent.slice(0, limit);
+    }
+
+    function startScheduler() {
+      const unsent = getScheduledTargetLeads();
+      if (unsent.length === 0) {
+        alert('All leads in your queue have already been sent. Import new leads to schedule.');
+        return;
+      }
+
+      if (schedulerConfig.mode === 'specific') {
+        const targetMs = new Date(schedulerConfig.targetDateTime).getTime();
+        if (isNaN(targetMs) || targetMs <= Date.now()) {
+          alert('Please select a future date and time for the delayed launch.');
+          return;
+        }
+        schedulerConfig.status = 'armed';
+        schedulerRuntime.nextActionTimestamp = targetMs;
+        addSchedulerLog(`Scheduler ARMED for ${unsent.length} leads. Launch scheduled for ${new Date(targetMs).toLocaleString()}.`, 'info');
+      } else if (schedulerConfig.mode === 'drip') {
+        schedulerConfig.status = 'running';
+        schedulerRuntime.nextActionTimestamp = Date.now() + 5000;
+        addSchedulerLog(`Smart Drip Engine STARTED. Dispathing 1 email every ~${schedulerConfig.dripIntervalMinutes}m (${unsent.length} total leads queued).`, 'info');
+      } else if (schedulerConfig.mode === 'recurring') {
+        schedulerConfig.status = 'armed';
+        schedulerRuntime.nextActionTimestamp = computeNextRecurringTimestamp();
+        addSchedulerLog(`Daily Autopilot ARMED. Daily batch of up to ${schedulerConfig.recurringCap} leads set for ${schedulerConfig.recurringTime}.`, 'info');
+      }
+
+      renderSchedulerUI();
+      showAppleToast(`Scheduler Activated: Mode [${schedulerConfig.mode.toUpperCase()}]`);
+
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+    }
+
+    function computeNextRecurringTimestamp() {
+      const parts = (schedulerConfig.recurringTime || '09:15').split(':');
+      const targetH = parseInt(parts[0], 10) || 9;
+      const targetM = parseInt(parts[1], 10) || 15;
+
+      const now = new Date();
+      const next = new Date();
+      next.setHours(targetH, targetM, 0, 0);
+
+      if (next.getTime() <= now.getTime()) {
+        next.setDate(next.getDate() + 1);
+      }
+
+      while (schedulerConfig.recurringDays.length > 0 && !schedulerConfig.recurringDays.includes(next.getDay())) {
+        next.setDate(next.getDate() + 1);
+      }
+
+      return next.getTime();
+    }
+
+    function togglePauseScheduler() {
+      if (schedulerConfig.status === 'paused') {
+        schedulerConfig.status = (schedulerConfig.mode === 'drip') ? 'running' : 'armed';
+        addSchedulerLog('Scheduler Resumed.', 'info');
+        showAppleToast('Scheduler Resumed');
+      } else if (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') {
+        schedulerConfig.status = 'paused';
+        addSchedulerLog('Scheduler Paused by user.', 'warn');
+        showAppleToast('Scheduler Paused');
+      }
+      renderSchedulerUI();
+    }
+
+    function stopScheduler() {
+      schedulerConfig.status = 'idle';
+      schedulerRuntime.nextActionTimestamp = null;
+      schedulerRuntime.isExecutingBatch = false;
+      addSchedulerLog('Scheduler Stopped.', 'warn');
+      renderSchedulerUI();
+      showAppleToast('Scheduler Deactivated');
+    }
+
+    function clearSchedulerLogs() {
+      schedulerRuntime.logs = [];
+      const box = document.getElementById('scheduler-log-box');
+      if (box) box.innerHTML = '<div class="scheduler-log-entry"><span class="scheduler-log-time">[System]</span> <span class="scheduler-log-info">Logs cleared.</span></div>';
+    }
+
+    function addSchedulerLog(msg, type = 'info') {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const entry = { time: timeStr, msg, type };
+      schedulerRuntime.logs.push(entry);
+      if (schedulerRuntime.logs.length > 80) schedulerRuntime.logs.shift();
+
+      const box = document.getElementById('scheduler-log-box');
+      if (box) {
+        const div = document.createElement('div');
+        div.className = 'scheduler-log-entry';
+        const typeClass = type === 'success' ? 'scheduler-log-success' : type === 'warn' ? 'scheduler-log-warn' : type === 'err' ? 'scheduler-log-err' : 'scheduler-log-info';
+        div.innerHTML = `<span class="scheduler-log-time">[${timeStr}]</span> <span class="${typeClass}">${msg}</span>`;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+
+    async function schedulerHeartbeatTick() {
+      if (schedulerConfig.status === 'idle' || schedulerConfig.status === 'paused' || schedulerRuntime.isExecutingBatch) {
+        renderSchedulerCountdown();
+        return;
+      }
+
+      const now = Date.now();
+
+      if (schedulerRuntime.nextActionTimestamp && now >= schedulerRuntime.nextActionTimestamp) {
+        if (schedulerConfig.mode === 'specific') {
+          schedulerRuntime.nextActionTimestamp = null;
+          await executeScheduledBatch();
+        } else if (schedulerConfig.mode === 'drip') {
+          await executeDripSingleLead();
+        } else if (schedulerConfig.mode === 'recurring') {
+          const todayKey = new Date().toDateString();
+          if (schedulerRuntime.lastRecurringRunDate !== todayKey) {
+            schedulerRuntime.lastRecurringRunDate = todayKey;
+            schedulerRuntime.nextActionTimestamp = null;
+            await executeScheduledBatch();
+            schedulerRuntime.nextActionTimestamp = computeNextRecurringTimestamp();
+            addSchedulerLog(`Daily Autopilot scheduled for next run at: ${new Date(schedulerRuntime.nextActionTimestamp).toLocaleString()}`, 'info');
+          }
+        }
+      }
+
+      renderSchedulerCountdown();
+    }
+
+    function renderSchedulerCountdown() {
+      const display = document.getElementById('sched-countdown-display');
+      if (!display) return;
+
+      if (schedulerConfig.status === 'idle') {
+        display.innerText = '--:--:--';
+        return;
+      }
+      if (schedulerConfig.status === 'paused') {
+        display.innerText = 'PAUSED';
+        return;
+      }
+      if (schedulerRuntime.isExecutingBatch) {
+        display.innerText = 'SENDING...';
+        return;
+      }
+
+      if (!schedulerRuntime.nextActionTimestamp) {
+        display.innerText = 'READY';
+        return;
+      }
+
+      const diffMs = Math.max(0, schedulerRuntime.nextActionTimestamp - Date.now());
+      const totalSec = Math.floor(diffMs / 1000);
+      const hrs = Math.floor(totalSec / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      const pad = (n) => String(n).padStart(2, '0');
+      display.innerText = `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+    }
+
+    async function executeScheduledBatch() {
+      const unsent = getScheduledTargetLeads();
+      if (unsent.length === 0) {
+        addSchedulerLog('Target queue empty. All leads have already been sent.', 'warn');
+        stopScheduler();
+        return;
+      }
+
+      schedulerRuntime.isExecutingBatch = true;
+      addSchedulerLog(`🚀 LAUNCHING SCHEDULED BATCH: ${unsent.length} leads to process...`, 'info');
+
+      for (let i = 0; i < unsent.length; i++) {
+        if (schedulerConfig.status === 'idle') break;
+        const lead = unsent[i];
+        addSchedulerLog(`Sending (${i + 1}/${unsent.length}): ${lead.firstName} @ ${lead.company}...`, 'info');
+        await dispatchSingleLeadFromScheduler(lead);
+
+        if (i < unsent.length - 1) {
+          const pauseSec = schedulerConfig.spacingSeconds || 5;
+          await new Promise(r => setTimeout(r, pauseSec * 1000));
+        }
+      }
+
+      schedulerRuntime.isExecutingBatch = false;
+      addSchedulerLog(`🎉 Scheduled batch finished! Session total: ${schedulerRuntime.sessionDispatched} dispatched.`, 'success');
+
+      if (schedulerConfig.mode === 'specific') {
+        stopScheduler();
+      }
+
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("Outreach Batch Complete", {
+          body: `Successfully dispatched outreach emails to scheduled recruiters.`,
+          icon: "/files/app_icon_1024.png"
+        });
+      }
+    }
+
+    async function executeDripSingleLead() {
+      const unsent = recruiters.filter(r => r.status !== 'Sent');
+      if (unsent.length === 0) {
+        addSchedulerLog('All leads in queue sent. Smart Drip completed.', 'success');
+        stopScheduler();
+        return;
+      }
+
+      const nextLead = unsent[0];
+      schedulerRuntime.isExecutingBatch = true;
+      addSchedulerLog(`💧 Drip Dispatch: ${nextLead.firstName} @ ${nextLead.company}...`, 'info');
+      await dispatchSingleLeadFromScheduler(nextLead);
+      schedulerRuntime.isExecutingBatch = false;
+
+      const remaining = recruiters.filter(r => r.status !== 'Sent').length;
+      if (remaining === 0) {
+        addSchedulerLog('All leads sent! Smart Drip finished.', 'success');
+        stopScheduler();
+        return;
+      }
+
+      let baseSec = (schedulerConfig.dripIntervalMinutes || 3) * 60;
+      if (schedulerConfig.humanJitter) {
+        const jitter = Math.floor(Math.random() * 60) - 30;
+        baseSec = Math.max(20, baseSec + jitter);
+      }
+      schedulerRuntime.nextActionTimestamp = Date.now() + (baseSec * 1000);
+      addSchedulerLog(`Next drip in ~${Math.round(baseSec / 60)}m (${remaining} leads remaining in queue).`, 'info');
+      renderSchedulerUI();
+    }
+
+    async function dispatchSingleLeadFromScheduler(lead) {
+      const payload = buildEmailPayloadForRecruiter(lead);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+      try {
+        const res = await fetch('/api/send-outreach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            firstName: lead.firstName,
+            company: lead.company,
+            email: lead.email,
+            customSubject: payload.subject,
+            customHtml: payload.bodyHtml,
+            resumeFile: lead.resumeFile || selectedResumeFile || "PittaSaiTarrun_SoftwareEngineer_Resume.pdf"
+          })
+        });
+        clearTimeout(timeoutId);
+        let data = {};
+        try { data = await res.json(); } catch(e) {}
+
+        if (res.ok && (data.id || data.threadId || data.success !== false)) {
+          lead.status = 'Sent';
+          lead.sentAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          schedulerRuntime.sessionDispatched++;
+          addSchedulerLog(`✓ Delivered to ${lead.firstName} (${lead.company}) — Gmail ID: ${data.id || 'OK'}`, 'success');
+        } else {
+          lead.status = 'Failed';
+          addSchedulerLog(`❌ Failed to send to ${lead.email}: ${data.error || 'Server error'}`, 'err');
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+        lead.status = 'Failed';
+        addSchedulerLog(`❌ Delivery error for ${lead.email}: ${err.message}`, 'err');
+      } finally {
+        await loadLeadsFromDatabase(true);
+        renderQueue();
+        renderSchedulerUI();
+      }
+    }
+
+    async function testDispatchSingleLead() {
+      const unsent = recruiters.filter(r => r.status !== 'Sent');
+      if (unsent.length === 0) {
+        alert('All leads in queue have already been sent.');
+        return;
+      }
+      const lead = unsent[0];
+      if (!confirm(`Send immediate test outreach email to ${lead.firstName} @ ${lead.company} (${lead.email})?`)) return;
+      addSchedulerLog(`Testing immediate dispatch to ${lead.firstName}...`, 'info');
+      await dispatchSingleLeadFromScheduler(lead);
+      showAppleToast(`Test dispatch completed for ${lead.firstName}`);
+    }
+
+    function renderSchedulerUI() {
+      const unsent = recruiters.filter(r => r.status !== 'Sent');
+      const targetLeads = getScheduledTargetLeads();
+
+      const unsentEl = document.getElementById('sched-stat-unsent');
+      if (unsentEl) unsentEl.innerText = unsent.length;
+
+      const schedEl = document.getElementById('sched-stat-scheduled');
+      if (schedEl) schedEl.innerText = targetLeads.length;
+
+      const sentEl = document.getElementById('sched-stat-sent');
+      if (sentEl) sentEl.innerText = schedulerRuntime.sessionDispatched;
+
+      // Status Pill & Buttons
+      const badge = document.getElementById('sched-status-badge');
+      const badgeText = document.getElementById('sched-status-text');
+      const btnArm = document.getElementById('btn-sched-arm');
+      const btnPause = document.getElementById('btn-sched-pause');
+      const btnStop = document.getElementById('btn-sched-stop');
+      const headerDot = document.getElementById('scheduler-header-dot');
+
+      if (badge && badgeText) {
+        badge.className = `scheduler-status-pill scheduler-status-${schedulerConfig.status}`;
+        badgeText.innerText = `Status: ${schedulerConfig.status.toUpperCase()}`;
+      }
+
+      if (headerDot) {
+        headerDot.style.display = (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') ? 'inline-block' : 'none';
+      }
+
+      if (btnArm && btnPause && btnStop) {
+        if (schedulerConfig.status === 'idle') {
+          btnArm.style.display = 'inline-block';
+          btnArm.innerText = '▶️ Arm & Start Scheduler';
+          btnPause.style.display = 'none';
+          btnStop.style.display = 'none';
+        } else if (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') {
+          btnArm.style.display = 'none';
+          btnPause.style.display = 'inline-block';
+          btnPause.innerText = 'Pause';
+          btnStop.style.display = 'inline-block';
+        } else if (schedulerConfig.status === 'paused') {
+          btnArm.style.display = 'none';
+          btnPause.style.display = 'inline-block';
+          btnPause.innerText = 'Resume';
+          btnStop.style.display = 'inline-block';
+        }
+      }
+
+      // Upcoming Queue Preview Table
+      const tbody = document.getElementById('scheduler-queue-tbody');
+      if (tbody) {
+        tbody.innerHTML = '';
+        if (targetLeads.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--label-secondary); padding: 24px;">No upcoming scheduled dispatches. All leads sent or none queued.</td></tr>';
+        } else {
+          let runningOffsetSec = 0;
+          const baseStartTime = (schedulerRuntime.nextActionTimestamp && schedulerRuntime.nextActionTimestamp > Date.now())
+            ? schedulerRuntime.nextActionTimestamp
+            : Date.now();
+
+          targetLeads.forEach((lead, idx) => {
+            const tr = document.createElement('tr');
+            let projTimeStr = 'Scheduled';
+
+            if (schedulerConfig.mode === 'specific') {
+              const estMs = baseStartTime + (runningOffsetSec * 1000);
+              projTimeStr = new Date(estMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+              runningOffsetSec += (schedulerConfig.spacingSeconds || 5);
+            } else if (schedulerConfig.mode === 'drip') {
+              const estMs = baseStartTime + (idx * (schedulerConfig.dripIntervalMinutes || 3) * 60 * 1000);
+              projTimeStr = new Date(estMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else if (schedulerConfig.mode === 'recurring') {
+              projTimeStr = `Daily at ${schedulerConfig.recurringTime}`;
+            }
+
+            tr.innerHTML = `
+              <td style="font-weight: 600; color: var(--label-secondary);">#${idx + 1}</td>
+              <td><strong>${lead.firstName}</strong> @ ${lead.company}</td>
+              <td style="color: var(--accent-blue); font-family: monospace; font-size: 11.5px;">${lead.email}</td>
+              <td><span style="background: #eff6ff; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px;">${projTimeStr}</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      }
+    }
+
     // Initialize application
     loadSenderProfileToInputs();
     loadResumes();
     onFormLiveInput();
     loadLeadsFromDatabase();
+    initScheduler();
 
     // Initial check & real-time polling every 4 seconds
     checkN8nHealth();

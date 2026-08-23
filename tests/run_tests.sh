@@ -39,6 +39,6 @@ node "$DIR/tests/test_client_logic.js"
 
 echo ""
 echo -e "${GREEN}${BOLD}==========================================================${NC}"
-echo -e "${GREEN}${BOLD}   🎉 ALL 15 PLATFORM TESTS PASSED SUCCESSFULLY!          ${NC}"
+echo -e "${GREEN}${BOLD}   🎉 ALL 18 PLATFORM & SCHEDULER TESTS PASSED!           ${NC}"
 echo -e "${GREEN}${BOLD}==========================================================${NC}"
 echo ""
