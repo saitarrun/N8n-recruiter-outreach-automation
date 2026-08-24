@@ -6,7 +6,28 @@ cd /d "%~dp0"
 :: 1. Ensure Windows Node, Python, and npm PATHs are included
 set "PATH=%APPDATA%\npm;%ProgramFiles%\nodejs;%LOCALAPPDATA%\Programs\Python\Python312;%LOCALAPPDATA%\Programs\Python\Python311;%LOCALAPPDATA%\Programs\Python\Launcher;%PATH%"
 
-:: 2. Auto-detect Python executable command (python, py, or python3)
+:: 2. Check if Node, Python, or n8n are missing; if so, auto-install all environments
+where node >nul 2>&1
+set "NODE_EXISTS=%ERRORLEVEL%"
+where python >nul 2>&1
+set "PY_EXISTS=%ERRORLEVEL%"
+where n8n >nul 2>&1
+set "N8N_EXISTS=%ERRORLEVEL%"
+
+if %NODE_EXISTS% NEQ 0 (
+    echo [Setup] Missing runtime components detected. Auto-installing environment...
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\setup-windows.ps1"
+) else if %PY_EXISTS% NEQ 0 (
+    echo [Setup] Missing runtime components detected. Auto-installing environment...
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\setup-windows.ps1"
+) else if %N8N_EXISTS% NEQ 0 (
+    echo [Setup] Missing n8n engine. Auto-installing packages...
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\setup-windows.ps1"
+)
+
+:: 3. Re-evaluate PATH and Python executable command
+set "PATH=%APPDATA%\npm;%ProgramFiles%\nodejs;%LOCALAPPDATA%\Programs\Python\Python312;%LOCALAPPDATA%\Programs\Python\Python312\Scripts;%LOCALAPPDATA%\Programs\Python\Python311;%LOCALAPPDATA%\Programs\Python\Launcher;%ProgramFiles%\Python312;%PATH%"
+
 set "PYTHON_CMD=python"
 where python >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
