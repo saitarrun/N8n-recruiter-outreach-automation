@@ -124,21 +124,42 @@ if os.path.exists(db_path):
 :: 10. Start n8n Automation Engine if not already running on port 5678
 netstat -ano | findstr :5678 >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo Starting n8n Automation Engine...
-    start /b "" cmd /c "n8n start > n8n.log 2>&1"
+    echo [1/3] Starting n8n Automation Engine in background...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process cmd.exe -ArgumentList '/c n8n start > n8n.log 2>&1' -WindowStyle Hidden"
+) else (
+    echo [1/3] n8n Engine is already running (http://localhost:5678)
 )
 
 :: 11. Start Outreach Studio Server if not already running on port 3000
 netstat -ano | findstr :3000 >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo Starting Outreach Studio Web Server...
-    start /b "" cmd /c "%PYTHON_CMD% ui\server.py > ui.log 2>&1"
+    echo [2/3] Starting Outreach Studio Web Server in background...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process cmd.exe -ArgumentList '/c %PYTHON_CMD% ui\server.py > ui.log 2>&1' -WindowStyle Hidden"
+) else (
+    echo [2/3] Outreach Studio is already running (http://localhost:3000)
 )
 
-:: 12. Open default web browser directly to UI Studio
-timeout /t 3 /nobreak >nul
-start "" "http://localhost:3000"
+:: 12. Verify server connectivity before opening browser
+echo [3/3] Waiting for services to initialize...
+for /l %%i in (1, 1, 10) do (
+    curl -s http://localhost:3000/api/health >nul 2>&1
+    if !ERRORLEVEL! EQU 0 goto :LAUNCH_BROWSER
+    timeout /t 1 /nobreak >nul
+)
 
+:LAUNCH_BROWSER
+echo Opening default web browser to http://localhost:3000...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process 'http://localhost:3000'" 2>nul || explorer "http://localhost:3000" 2>nul || start "" "http://localhost:3000"
+
+echo.
 echo ==========================================================
-echo    🎉 Outreach Studio is LIVE at http://localhost:3000
+echo    🎉 Recruiter Outreach Platform is ONLINE!
 echo ==========================================================
+echo    * Outreach Studio UI: http://localhost:3000
+echo    * n8n Automation:     http://localhost:5678
+echo ==========================================================
+echo.
+echo The platform is running in the background.
+echo To stop services anytime, double-click stop.bat
+echo.
+pause
