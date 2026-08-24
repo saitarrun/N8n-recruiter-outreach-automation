@@ -38,7 +38,11 @@ echo -e "${BLUE}2. Running Client-Side Parser & Logic Test Suite (Node.js)...${N
 node "$DIR/tests/test_client_logic.js"
 
 echo ""
+echo -e "${BLUE}3. Running Windows Sandbox & Compatibility Test Suite (Python)...${NC}"
+$PYTHON_CMD "$DIR/tests/test_windows_compatibility.py"
+
+echo ""
 echo -e "${GREEN}${BOLD}==========================================================${NC}"
-echo -e "${GREEN}${BOLD}   🎉 ALL 18 PLATFORM & SCHEDULER TESTS PASSED!           ${NC}"
+echo -e "${GREEN}${BOLD}   🎉 ALL 22 PLATFORM, SCHEDULER & WINDOWS TESTS PASSED!  ${NC}"
 echo -e "${GREEN}${BOLD}==========================================================${NC}"
 echo ""
