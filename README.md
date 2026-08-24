@@ -16,9 +16,9 @@ An autonomous, full-stack recruitment outreach and cold email automation platfor
 
 ---
 
-## ⚡ 1-Command Turnkey Installation
+## ⚡ 1-Command Turnkey Installation (macOS, Windows, Linux)
 
-You can run the entire platform (n8n Engine + UI Studio + SQLite Storage) locally in under 60 seconds with **zero configuration**:
+You can run the entire platform (n8n Engine + UI Studio + SQLite Storage + Native Desktop App) locally in under 60 seconds with **zero configuration**:
 
 ### 1. Clone the Repository
 ```bash
@@ -26,11 +26,21 @@ git clone https://github.com/saitarrun/n8n-recruiter-outreach-automation.git
 cd n8n-recruiter-outreach-automation
 ```
 
-### 2. Start Platform
-```bash
-./start.sh
-```
-*(Or if you prefer native Docker Compose: `docker compose up -d`)*
+### 2. Launch on Your Operating System
+
+* **🍎 macOS**:
+  ```bash
+  ./start.sh
+  ```
+  *(Or double-click `start.command` — automatically creates the native **Recruiter Outreach** app on your Desktop with high-res icon!)*
+
+* **🪟 Windows**:
+  Double-click **`start.bat`** *(automatically creates a **Recruiter Outreach** shortcut on your Windows Desktop with the `.ico` icon!)*
+
+* **🐳 Docker Compose** (Any OS):
+  ```bash
+  docker compose up -d
+  ```
 
 ### 3. Open the Apps
 * **🖥️ Outreach UI Studio**: [http://localhost:3000](http://localhost:3000)
