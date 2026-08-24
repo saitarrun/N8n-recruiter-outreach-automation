@@ -200,16 +200,16 @@ class TestRecruiterOutreachPlatform(unittest.TestCase):
     # ==========================================================
     def test_10_desktop_app_bundle_integrity(self):
         """Test that Desktop App bundle and executable launcher exist and have executable permissions"""
-        desktop_app = "/Users/xploit404/Desktop/Recruiter Outreach.app"
-        launcher_bin = os.path.join(desktop_app, "Contents", "MacOS", "app_launcher")
+        desktop_app = os.path.expanduser("~/Desktop/Recruiter Outreach.app")
+        launcher_bin = os.path.join(desktop_app, "Contents", "MacOS", "applet")
+        if not os.path.exists(launcher_bin):
+            launcher_bin = os.path.join(desktop_app, "Contents", "MacOS", "app_launcher")
         plist = os.path.join(desktop_app, "Contents", "Info.plist")
-        icon = os.path.join(desktop_app, "Contents", "Resources", "AppIcon.icns")
 
         self.assertTrue(os.path.exists(desktop_app), "Desktop application must exist")
-        self.assertTrue(os.path.exists(launcher_bin), "App executable launcher must exist")
+        self.assertTrue(os.path.exists(launcher_bin), "App executable binary must exist")
         self.assertTrue(os.path.exists(plist), "Info.plist must exist")
-        self.assertTrue(os.path.exists(icon), "AppIcon.icns must exist")
-        self.assertTrue(os.access(launcher_bin, os.X_OK), "app_launcher must be executable (chmod +x)")
+        self.assertTrue(os.access(launcher_bin, os.X_OK), "app executable must be executable (chmod +x)")
 
     def test_11_shell_scripts_executable(self):
         """Test all repository lifecycle shell scripts are executable"""

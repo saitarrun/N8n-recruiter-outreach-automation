@@ -3,50 +3,30 @@ set -e
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_PATH="$HOME/Desktop/Recruiter Outreach.app"
-MACOS_DIR="$APP_PATH/Contents/MacOS"
-RESOURCES_DIR="$APP_PATH/Contents/Resources"
 
-mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
+# 1. Clean previous bundle
+rm -rf "$APP_PATH"
 
-# Copy high-res Apple Icon
+# 2. Compile authentic native macOS Cocoa Application (Mach-O executable)
+osacompile -o "$APP_PATH" -e "do shell script \"'$DIR/start.sh' > /dev/null 2>&1 &\""
+
+# 3. Inject high-res Apple squircle icon into applet resources
 if [ -f "$DIR/assets/AppIcon.icns" ]; then
-    cp "$DIR/assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+    cp "$DIR/assets/AppIcon.icns" "$APP_PATH/Contents/Resources/applet.icns"
+    cp "$DIR/assets/AppIcon.icns" "$APP_PATH/Contents/Resources/AppIcon.icns"
 fi
 
-# Create Info.plist
-cat << PLIST > "$APP_PATH/Contents/Info.plist"
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>app_launcher</string>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.saitarrun.recruiteroutreach</string>
-    <key>CFBundleName</key>
-    <string>Recruiter Outreach</string>
-    <key>CFBundleDisplayName</key>
-    <string>Recruiter Outreach</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>2.0</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>11.0</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-</dict>
-</plist>
-PLIST
+# 4. Update Info.plist display name and icon mapping
+if [ -f "$APP_PATH/Contents/Info.plist" ]; then
+    /usr/libexec/PlistBuddy -c "Set :CFBundleName 'Recruiter Outreach'" "$APP_PATH/Contents/Info.plist" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 'Recruiter Outreach'" "$APP_PATH/Contents/Info.plist" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile 'applet.icns'" "$APP_PATH/Contents/Info.plist" 2>/dev/null || true
+fi
 
-# Create dynamic app launcher script
-cat << LAUNCHER > "$MACOS_DIR/app_launcher"
-#!/bin/bash
-export PATH="/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:\$PATH"
-"$DIR/start.sh"
-LAUNCHER
+# 5. Touch and register with macOS LaunchServices
+touch "$APP_PATH"
+if [ -x "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister" ]; then
+    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP_PATH" 2>/dev/null || true
+fi
 
-chmod +x "$MACOS_DIR/app_launcher"
-echo "✓ Created native Desktop application with icon: $APP_PATH"
+echo "✓ Successfully generated compiled native macOS application: $APP_PATH"

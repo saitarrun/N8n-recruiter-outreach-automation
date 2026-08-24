@@ -127,9 +127,23 @@ if [ "$HEALTHY" = false ]; then
     echo -e "\r${YELLOW}⚠️  Services starting up, opening browser...              ${NC}"
 fi
 
-# 7. Open browser automatically
+# 7. Open browser automatically and bring window to front
 if [[ "$OSTYPE" == "darwin"* ]]; then
     open "http://localhost:3000"
+    osascript -e '
+        tell application "System Events"
+            set procList to name of every process
+        end tell
+        if procList contains "Google Chrome" then
+            tell application "Google Chrome" to activate
+        else if procList contains "Safari" then
+            tell application "Safari" to activate
+        else if procList contains "Brave Browser" then
+            tell application "Brave Browser" to activate
+        else if procList contains "Arc" then
+            tell application "Arc" to activate
+        end if
+    ' 2>/dev/null || true
     osascript -e 'display notification "n8n Engine & Gmail Authentication pre-configured & ready!" with title "Recruiter Outreach Studio"' 2>/dev/null || true
 fi
 
