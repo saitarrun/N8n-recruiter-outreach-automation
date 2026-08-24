@@ -32,12 +32,17 @@ YELLOW='\033[1;33m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-DIR="/Users/xploit404/Projects/n8n-recruiter-outreach-automation"
+DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 
 PYTHON_CMD="python3"
 if [ -x "/opt/homebrew/bin/python3" ]; then
     PYTHON_CMD="/opt/homebrew/bin/python3"
+fi
+
+# Auto-generate macOS desktop application with native icon for any user
+if [[ "$OSTYPE" == "darwin"* ]] && [ -d "$HOME/Desktop" ] && [ -f "$DIR/scripts/create-desktop-app.sh" ]; then
+    "$DIR/scripts/create-desktop-app.sh" >/dev/null 2>&1 || true
 fi
 
 echo ""

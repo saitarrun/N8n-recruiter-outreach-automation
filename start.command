@@ -1,2 +1,3 @@
 #!/bin/bash
-/Users/xploit404/Projects/n8n-recruiter-outreach-automation/start.sh
+DIR="$(cd "$(dirname "$0")" && pwd)"
+"$DIR/start.sh"
