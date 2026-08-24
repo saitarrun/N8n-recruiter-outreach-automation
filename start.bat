@@ -3,21 +3,35 @@ setlocal enabledelayedexpansion
 title Recruiter Outreach Platform
 cd /d "%~dp0"
 
-echo ==========================================================
-echo    Recruiter Outreach Platform - Windows Auto-Setup
-echo ==========================================================
+:: 1. Ensure Windows Node, Python, and npm PATHs are included
+set "PATH=%APPDATA%\npm;%ProgramFiles%\nodejs;%LOCALAPPDATA%\Programs\Python\Python312;%LOCALAPPDATA%\Programs\Python\Python311;%LOCALAPPDATA%\Programs\Python\Launcher;%PATH%"
 
-:: 1. Ensure required folders exist
+:: 2. Auto-detect Python executable command (python, py, or python3)
+set "PYTHON_CMD=python"
+where python >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    where py >nul 2>&1
+    if %ERRORLEVEL% EQU 0 (
+        set "PYTHON_CMD=py"
+    ) else (
+        where python3 >nul 2>&1
+        if %ERRORLEVEL% EQU 0 (
+            set "PYTHON_CMD=python3"
+        )
+    )
+)
+
+:: 3. Ensure required folders exist
 if not exist "files" mkdir files
 if not exist "ui" mkdir ui
 if not exist "%USERPROFILE%\.n8n" mkdir "%USERPROFILE%\.n8n"
 
-:: 2. Auto-create Windows Desktop shortcut with icon if missing
+:: 4. Auto-create Windows Desktop shortcut with icon if missing
 if exist "scripts\create-windows-shortcut.bat" (
     call "scripts\create-windows-shortcut.bat" >nul 2>&1
 )
 
-:: 3. Configure n8n environment variables
+:: 5. Configure n8n environment variables
 set N8N_PORT=5678
 set N8N_PROTOCOL=http
 set N8N_HOST=localhost
@@ -28,11 +42,13 @@ set NODE_FUNCTION_ALLOW_BUILTIN=fs,path,os,crypto
 set NODE_FUNCTION_ALLOW_EXTERNAL=*
 set N8N_COMMUNITY_PACKAGES_ENABLED=true
 set N8N_DIAGNOSTICS_ENABLED=false
+set N8N_VERSION_NOTIFICATIONS_ENABLED=false
+set N8N_HIRING_BANNER_ENABLED=false
+set N8N_PERSONALIZATION_ENABLED=false
 set N8N_LOG_LEVEL=info
 
-:: 4. Auto-configure n8n workflow pipeline via Python
-echo [1/3] Verifying n8n workflows and database...
-python -c "
+:: 6. Auto-configure n8n workflow pipeline in SQLite database
+%PYTHON_CMD% -c "
 import sqlite3, json, os
 db_path = os.path.expanduser('~/.n8n/database.sqlite')
 if os.path.exists(db_path):
@@ -54,31 +70,20 @@ if os.path.exists(db_path):
     conn.close()
 " >nul 2>&1
 
-:: 5. Start n8n Automation Engine if not already running on port 5678
+:: 7. Start n8n Automation Engine if not already running on port 5678
 netstat -ano | findstr :5678 >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo [2/3] Starting n8n Automation Engine...
-    start /b "" n8n start > n8n.log 2>&1
-) else (
-    echo [2/3] n8n Engine is already running (http://localhost:5678)
+    start /b "" cmd /c "n8n start > n8n.log 2>&1"
 )
 
-:: 6. Start Outreach Studio Server if not already running on port 3000
+:: 8. Start Outreach Studio Server if not already running on port 3000
 netstat -ano | findstr :3000 >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo [3/3] Starting Outreach Studio Web Server...
-    start /b "" python ui\server.py > ui.log 2>&1
-) else (
-    echo [3/3] Outreach Studio is already running (http://localhost:3000)
+    start /b "" cmd /c "%PYTHON_CMD% ui\server.py > ui.log 2>&1"
 )
 
-:: 7. Wait and open browser
+:: 9. Wait for server and open default browser
 timeout /t 3 /nobreak >nul
-start http://localhost:3000
+start "" "http://localhost:3000"
 
-echo ==========================================================
-echo    Platform Ready - Outreach Studio is LIVE!
-echo ==========================================================
-echo   Outreach Studio UI: http://localhost:3000
-echo   n8n Automation:     http://localhost:5678
-echo ==========================================================
+exit /b 0

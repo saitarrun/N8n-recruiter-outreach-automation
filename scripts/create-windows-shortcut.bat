@@ -5,7 +5,7 @@ pushd "%SCRIPT_DIR%"
 set "PROJECT_DIR=%CD%"
 popd
 
-set "TARGET_PATH=%PROJECT_DIR%\start.bat"
+set "TARGET_PATH=%PROJECT_DIR%\scripts\launch-windows-app.vbs"
 set "ICON_PATH=%PROJECT_DIR%\assets\app_icon.ico"
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
@@ -13,7 +13,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$shortcutPath = Join-Path $desktop 'Recruiter Outreach.lnk'; " ^
   "$ws = New-Object -ComObject WScript.Shell; " ^
   "$s = $ws.CreateShortcut($shortcutPath); " ^
-  "$s.TargetPath = '%TARGET_PATH%'; " ^
+  "$s.TargetPath = 'wscript.exe'; " ^
+  "$s.Arguments = '\"%TARGET_PATH%\"'; " ^
   "$s.WorkingDirectory = '%PROJECT_DIR%'; " ^
   "$s.IconLocation = '%ICON_PATH%,0'; " ^
   "$s.Description = 'Recruiter Outreach Platform'; " ^
