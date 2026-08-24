@@ -213,7 +213,7 @@ class TestRecruiterOutreachPlatform(unittest.TestCase):
 
     def test_11_shell_scripts_executable(self):
         """Test all repository lifecycle shell scripts are executable"""
-        scripts = ["start.sh", "stop.sh", "restart.sh", "status.sh", "start.command"]
+        scripts = ["start.sh", "stop.sh", "restart.sh", "status.sh", "start.command", "update.sh"]
         for s in scripts:
             sp = os.path.join(PROJECT_ROOT, s)
             self.assertTrue(os.path.exists(sp), f"{s} must exist")
