@@ -12,51 +12,47 @@
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
   <style>
     :root {
-      /* Apple Dark Glass on Pure Pitch Black */
+      /* Sleek Minimalist Obsidian & Dark System */
       --system-bg: #000000;
-      --card-bg: rgba(16, 16, 22, 0.82);
-      --card-head-bg: rgba(255, 255, 255, 0.03);
-      --surface-elevated: rgba(255, 255, 255, 0.05);
-      --input-bg: rgba(10, 10, 14, 0.8);
+      --card-bg: #0d0d11;
+      --card-head-bg: #131318;
+      --surface-elevated: #17171e;
+      --input-bg: #121216;
       
-      --border-color: rgba(255, 255, 255, 0.09);
+      --border-color: rgba(255, 255, 255, 0.08);
       --border-subtle: rgba(255, 255, 255, 0.05);
-      --border-hover: rgba(255, 255, 255, 0.2);
+      --border-hover: rgba(255, 255, 255, 0.16);
       
-      /* Apple San Francisco Typography Contrast */
-      --label-primary: #f5f5f7;
-      --label-secondary: #a1a1a6;
-      --label-tertiary: #636366;
+      /* Crisp Apple San Francisco Typography Contrast */
+      --label-primary: #f4f4f6;
+      --label-secondary: #a1a1aa;
+      --label-tertiary: #71717a;
       
-      /* Vibrant Apple Glowing Accents */
-      --accent-blue: #2997ff;
-      --accent-blue-hover: #0077ed;
-      --accent-blue-tint: rgba(41, 151, 255, 0.14);
-      --accent-blue-border: rgba(41, 151, 255, 0.35);
+      /* Refined Minimalist Accents */
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-blue-tint: rgba(59, 130, 246, 0.12);
+      --accent-blue-border: rgba(59, 130, 246, 0.3);
       
-      --accent-green: #30d158;
-      --accent-green-tint: rgba(48, 209, 88, 0.14);
-      --accent-green-border: rgba(48, 209, 88, 0.3);
+      --accent-green: #22c55e;
+      --accent-green-tint: rgba(34, 197, 94, 0.12);
+      --accent-green-border: rgba(34, 197, 94, 0.25);
       
-      --accent-red: #ff453a;
-      --accent-red-tint: rgba(255, 69, 58, 0.14);
-      --accent-red-border: rgba(255, 69, 58, 0.3);
+      --accent-red: #ef4444;
+      --accent-red-tint: rgba(239, 68, 68, 0.12);
+      --accent-red-border: rgba(239, 68, 68, 0.25);
       
-      --accent-amber: #ffd60a;
-      --accent-amber-tint: rgba(255, 214, 10, 0.14);
-      --accent-amber-border: rgba(255, 214, 10, 0.3);
+      --accent-amber: #f59e0b;
+      --accent-amber-tint: rgba(245, 158, 11, 0.12);
+      --accent-amber-border: rgba(245, 158, 11, 0.25);
       
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
       --radius-full: 980px;
       
-      --glass-blur: blur(24px) saturate(180%);
-      --glass-blur-sm: blur(16px) saturate(180%);
-      
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
-      --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-      --shadow-float: 0 28px 72px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.6);
+      --shadow-float: 0 20px 48px rgba(0, 0, 0, 0.85);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,20 +68,19 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Apple Minimalist Glass Scrollbar */
+    /* Minimalist Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 4px; backdrop-filter: blur(8px); }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
-    * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
+    ::-webkit-scrollbar-thumb { background: #26262e; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a44; }
+    * { scrollbar-width: thin; scrollbar-color: #26262e transparent; }
 
-    /* Apple macOS Glass Header */
+    /* macOS Titlebar Header */
     .app-header {
-      background: rgba(10, 10, 15, 0.7);
-      backdrop-filter: blur(30px) saturate(200%);
-      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      background: rgba(12, 12, 16, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
       padding: 12px 32px;
       display: flex;
       justify-content: space-between;
@@ -100,18 +95,18 @@
       gap: 12px;
     }
     .app-icon-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
       flex-shrink: 0;
     }
     .app-title {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 600;
       letter-spacing: -0.015em;
       color: var(--label-primary);
@@ -125,42 +120,38 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
-    /* Apple Frosted Glass Segmented Control */
+    /* Minimalist Segmented Control */
     .segmented-control {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      background: #141418;
+      border: 1px solid var(--border-color);
       padding: 3px;
-      border-radius: 10px;
+      border-radius: 8px;
       display: inline-flex;
       gap: 2px;
     }
     .segmented-item {
-      padding: 6px 14px;
-      border-radius: 7px;
-      font-size: 13px;
+      padding: 6px 13px;
+      border-radius: 6px;
+      font-size: 12.5px;
       font-weight: 500;
       color: var(--label-secondary);
       border: 1px solid transparent;
       background: transparent;
       cursor: pointer;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
     }
     .segmented-item:hover {
       color: var(--label-primary);
-      background: rgba(255, 255, 255, 0.05);
     }
     .segmented-item.active {
-      background: rgba(255, 255, 255, 0.16);
+      background: #24242c;
       color: #ffffff;
       font-weight: 600;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
 
     /* Main App Layout */
@@ -179,18 +170,16 @@
       .main-workspace { grid-template-columns: 1fr; }
     }
 
-    /* macOS Frosted Glass Windows / Cards */
+    /* Clean Dark Cards */
     .apple-card {
       background: var(--card-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
       overflow: hidden;
     }
     .card-head {
-      padding: 16px 20px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       justify-content: space-between;
@@ -198,17 +187,17 @@
       background: var(--card-head-bg);
     }
     .card-head-title {
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--label-secondary);
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
     .card-content {
-      padding: 20px;
+      padding: 18px;
     }
 
-    /* Apple Glass Form Controls */
+    /* Form Controls */
     .form-row {
       margin-bottom: 14px;
     }
@@ -224,88 +213,69 @@
     .apple-input, .apple-select, .apple-textarea {
       width: 100%;
       background: var(--input-bg);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      padding: 9px 12px;
-      font-size: 13.5px;
+      padding: 8px 12px;
+      font-size: 13px;
       font-family: inherit;
       color: var(--label-primary);
-      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
-      transition: all 0.18s ease;
+      transition: all 0.15s ease;
     }
     .apple-input:focus, .apple-select:focus, .apple-textarea:focus {
       outline: none;
       border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.28), inset 0 1px 2px rgba(0, 0, 0, 0.3);
-      background: rgba(16, 16, 24, 0.75);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+      background: #15151b;
     }
 
-    /* Apple Glass Buttons */
+    /* Sleek Apple Buttons */
     .apple-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 500;
       cursor: pointer;
       border: 1px solid transparent;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
     }
     .btn-blue-primary {
-      background: linear-gradient(135deg, #0071e3 0%, #2997ff 100%);
+      background: #2563eb;
       color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 4px 18px rgba(41, 151, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
     .btn-blue-primary:hover {
-      background: linear-gradient(135deg, #1a82f7 0%, #47a7ff 100%);
-      box-shadow: 0 6px 22px rgba(41, 151, 255, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-      transform: translateY(-1px);
+      background: #3b82f6;
     }
     .btn-plain {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
+      background: #18181f;
       color: var(--label-primary);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
     }
     .btn-plain:hover {
-      background: rgba(255, 255, 255, 0.14);
-      border-color: rgba(255, 255, 255, 0.24);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-      transform: translateY(-1px);
+      background: #22222a;
+      border-color: var(--border-hover);
+      color: #ffffff;
     }
     .btn-tint {
       background: var(--accent-blue-tint);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
-      color: var(--accent-blue);
+      color: #60a5fa;
       border: 1px solid var(--accent-blue-border);
-      box-shadow: 0 2px 8px rgba(41, 151, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     .btn-tint:hover {
-      background: rgba(41, 151, 255, 0.24);
-      border-color: var(--accent-blue);
-      transform: translateY(-1px);
+      background: rgba(59, 130, 246, 0.2);
     }
     .btn-destruct {
       background: var(--accent-red-tint);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
-      color: var(--accent-red);
+      color: #f87171;
       border: 1px solid var(--accent-red-border);
-      box-shadow: 0 2px 8px rgba(255, 69, 58, 0.15);
     }
     .btn-destruct:hover {
-      background: rgba(255, 69, 58, 0.26);
-      transform: translateY(-1px);
+      background: rgba(239, 68, 68, 0.2);
     }
 
     /* Queue Filter Sub-Tabs */
@@ -313,9 +283,7 @@
       display: flex;
       gap: 6px;
       margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: #141418;
       padding: 3px;
       border-radius: 8px;
       border: 1px solid var(--border-subtle);
@@ -325,7 +293,7 @@
       text-align: center;
       padding: 5px 8px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
       color: var(--label-secondary);
       border-radius: 6px;
       cursor: pointer;
@@ -337,71 +305,61 @@
       color: var(--label-primary);
     }
     .queue-subtab.active {
-      background: rgba(255, 255, 255, 0.15);
+      background: #24242c;
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
     .token-chip {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 3px 8px;
+      background: #16161c;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 3px 7px;
       font-size: 11px;
-      font-weight: 600;
-      color: var(--accent-blue);
+      font-weight: 500;
+      color: #60a5fa;
       cursor: pointer;
       transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
     .token-chip:hover {
       background: var(--accent-blue-tint);
       border-color: var(--accent-blue);
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(41, 151, 255, 0.25);
+      color: #93c5fd;
     }
 
-    /* Clean Recruiter List with Glass Cards */
+    /* Sleek Recruiter List Cards */
     .recruiter-list-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-height: 250px;
+      gap: 6px;
+      max-height: 260px;
       overflow-y: auto;
       overflow-x: hidden;
       padding-right: 2px;
     }
     .recruiter-row {
-      background: rgba(255, 255, 255, 0.035);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #111115;
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      padding: 10px 12px;
+      padding: 9px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
       width: 100%;
       box-sizing: border-box;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .recruiter-row:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      background: #16161d;
+      border-color: var(--border-hover);
     }
     .recruiter-row.selected {
-      background: rgba(41, 151, 255, 0.18);
-      border-color: rgba(41, 151, 255, 0.7);
-      box-shadow: 0 0 24px rgba(41, 151, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      background: #141724;
+      border-color: rgba(59, 130, 246, 0.5);
     }
     .rec-left {
       min-width: 0;
@@ -425,13 +383,12 @@
       text-overflow: ellipsis;
     }
     .rec-badge {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 600;
       flex-shrink: 0;
       margin-left: 8px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      backdrop-filter: blur(8px);
+      padding: 2px 7px;
+      border-radius: 4px;
     }
     .badge-pending {
       background: var(--accent-amber-tint);
@@ -453,9 +410,9 @@
       background: transparent;
       border: none;
       color: var(--label-tertiary);
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1;
-      padding: 3px 6px;
+      padding: 2px 6px;
       border-radius: 4px;
       cursor: pointer;
       margin-left: 6px;
@@ -473,8 +430,7 @@
     .sent-notice-banner {
       background: var(--accent-green-tint);
       border-bottom: 1px solid var(--accent-green-border);
-      backdrop-filter: blur(12px);
-      padding: 8px 24px;
+      padding: 8px 20px;
       font-size: 12.5px;
       color: var(--accent-green);
       font-weight: 500;
@@ -483,55 +439,48 @@
       gap: 6px;
     }
 
-    /* Resume Card in List */
+    /* Clean Resume Card in List */
     .resume-list-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-height: 250px;
+      gap: 6px;
+      max-height: 260px;
       overflow-y: auto;
       overflow-x: hidden;
       padding-right: 2px;
     }
     .resume-row-card {
-      background: rgba(255, 255, 255, 0.035);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #111115;
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      padding: 10px 12px;
+      padding: 9px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
       width: 100%;
       box-sizing: border-box;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .resume-row-card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      background: #16161d;
+      border-color: var(--border-hover);
     }
     .resume-row-card.selected {
-      background: rgba(41, 151, 255, 0.18);
-      border-color: rgba(41, 151, 255, 0.7);
-      box-shadow: 0 0 20px rgba(41, 151, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      background: #141724;
+      border-color: rgba(59, 130, 246, 0.5);
     }
     .file-tag-badge {
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
-      color: #70b7ff;
-      background: rgba(41, 151, 255, 0.18);
-      border: 1px solid rgba(41, 151, 255, 0.35);
+      color: #a1a1aa;
+      background: #1a1a20;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       padding: 2px 6px;
       border-radius: 4px;
       flex-shrink: 0;
-      letter-spacing: 0.02em;
-      backdrop-filter: blur(8px);
+      letter-spacing: 0.04em;
     }
     .resume-info {
       overflow: hidden;
@@ -552,22 +501,38 @@
       margin-top: 1px;
     }
 
+    .ghost-del-btn {
+      background: transparent;
+      border: none;
+      color: var(--label-tertiary);
+      font-size: 16px;
+      line-height: 1;
+      padding: 4px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .ghost-del-btn:hover {
+      background: var(--accent-red-tint);
+      color: var(--accent-red);
+    }
+
     /* Document Dropzone */
     .doc-dropzone {
-      border: 2px dashed rgba(255, 255, 255, 0.16);
+      border: 1.5px dashed rgba(255, 255, 255, 0.14);
       border-radius: var(--radius-md);
       padding: 20px 16px;
       text-align: center;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
+      background: #101014;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
     .doc-dropzone:hover, .doc-dropzone.dragover {
       border-color: var(--accent-blue);
-      background: rgba(41, 151, 255, 0.14);
-      box-shadow: 0 0 20px rgba(41, 151, 255, 0.2);
+      background: var(--accent-blue-tint);
     }
     .dropzone-title {
       font-size: 13px;
@@ -583,9 +548,7 @@
     /* Staged Document Preview Table */
     .staged-preview-box {
       margin-top: 14px;
-      background: rgba(10, 10, 16, 0.6);
-      backdrop-filter: var(--glass-blur-sm);
-      -webkit-backdrop-filter: var(--glass-blur-sm);
+      background: #101014;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       padding: 12px;
@@ -610,7 +573,7 @@
       gap: 4px;
     }
     .staged-row {
-      background: rgba(255, 255, 255, 0.05);
+      background: #16161c;
       padding: 6px 8px;
       border-radius: 4px;
       border: 1px solid var(--border-subtle);
@@ -620,22 +583,20 @@
       color: var(--label-secondary);
     }
 
-    /* Apple Mail Compose Frosted Glass Window */
+    /* Apple Mail Compose Window */
     .mail-window {
-      background: rgba(14, 14, 22, 0.72);
-      backdrop-filter: blur(32px) saturate(200%);
-      -webkit-backdrop-filter: blur(32px) saturate(200%);
-      border: 1px solid rgba(255, 255, 255, 0.13);
+      background: #0d0d11;
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      box-shadow: var(--shadow-card);
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
     .mail-toolbar {
-      background: rgba(255, 255, 255, 0.04);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 12px 20px;
+      background: #131318;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -649,25 +610,24 @@
       width: 11px;
       height: 11px;
       border-radius: 50%;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
     .dot-close { background: #ff5f56; }
     .dot-min { background: #ffbd2e; }
     .dot-max { background: #27c93f; }
 
     .mail-header-fields {
-      padding: 14px 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.25);
+      gap: 8px;
+      background: #101015;
     }
     .field-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 13.5px;
+      font-size: 13px;
     }
     .field-tag {
       width: 60px;
@@ -679,7 +639,7 @@
       flex: 1;
       border: 1px solid transparent;
       padding: 4px 8px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--label-primary);
       border-radius: 6px;
@@ -687,8 +647,8 @@
       transition: all 0.15s;
     }
     .field-subject-input:hover, .field-subject-input:focus {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.15);
+      background: #17171e;
+      border-color: var(--border-color);
       color: #ffffff;
       outline: none;
     }
@@ -697,9 +657,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 4px 10px;
+      background: #17171e;
+      border: 1px solid var(--border-color);
+      padding: 3px 8px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 500;
@@ -708,13 +668,11 @@
 
     /* Mail Editor Body & High-Contrast Typography */
     .mail-body-canvas {
-      padding: 26px 30px;
-      font-size: 14.5px;
-      line-height: 1.75;
+      padding: 24px 28px;
+      font-size: 14px;
+      line-height: 1.72;
       color: #9d9da6;
-      background: rgba(5, 5, 8, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: #08080b;
       min-height: 480px;
       outline: none;
       overflow-y: auto;
@@ -735,14 +693,14 @@
     .mail-body-canvas #dyn-lead-name,
     .mail-body-canvas #dyn-lead-comp,
     .mail-body-canvas #dyn-lead-comp-2 {
-      color: #70b7ff;
-      font-weight: 700;
+      color: #60a5fa;
+      font-weight: 600;
     }
     .mail-signature-block {
       margin-top: 24px;
       padding-top: 16px;
       border-top: 1px solid var(--border-subtle);
-      font-size: 13.5px;
+      font-size: 13px;
       color: #8e8e93;
       line-height: 1.55;
     }
@@ -759,9 +717,9 @@
     .pdf-modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.78);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       z-index: 999;
       display: none;
       align-items: center;
@@ -769,32 +727,30 @@
       padding: 30px;
     }
     .pdf-modal-card {
-      background: rgba(18, 18, 26, 0.85);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
+      background: #111116;
       width: 100%;
       max-width: 900px;
       height: 85vh;
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: var(--shadow-float);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
     .pdf-modal-head {
-      padding: 14px 20px;
+      padding: 12px 18px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(255, 255, 255, 0.04);
+      background: #16161c;
     }
     .pdf-frame-embed {
       width: 100%;
       flex: 1;
       border: none;
-      background: rgba(20, 20, 28, 0.8);
+      background: #16161c;
     }
 
     /* Toast Notification */
@@ -802,15 +758,13 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: rgba(26, 26, 36, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: #1c1c24;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: #ffffff;
-      padding: 12px 20px;
+      padding: 10px 18px;
       border-radius: var(--radius-full);
       box-shadow: var(--shadow-float);
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 500;
       display: none;
       z-index: 1000;
@@ -829,12 +783,10 @@
       padding: 5px 12px;
       border-radius: var(--radius-full);
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
       background: var(--accent-green-tint);
       color: var(--accent-green);
       border: 1px solid var(--accent-green-border);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       transition: all 0.2s ease;
     }
     .health-badge.offline {
@@ -847,12 +799,12 @@
       height: 7px;
       border-radius: 50%;
       background: var(--accent-green);
-      box-shadow: 0 0 8px var(--accent-green);
+      box-shadow: 0 0 6px var(--accent-green);
       animation: healthPulse 2s infinite ease-in-out;
     }
     .health-badge.offline .health-pulse-dot {
       background: var(--accent-red);
-      box-shadow: 0 0 8px var(--accent-red);
+      box-shadow: 0 0 6px var(--accent-red);
       animation: none;
     }
 
@@ -889,7 +841,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Scheduler Studio Glass Styles */
+    /* Scheduler Studio Styles */
     .scheduler-stat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -897,16 +849,14 @@
       margin-bottom: 16px;
     }
     .scheduler-stat-box {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #111115;
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 14px 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
     }
     .scheduler-stat-label {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--label-secondary);
       text-transform: uppercase;
@@ -934,17 +884,14 @@
       border-radius: var(--radius-full);
       font-size: 12px;
       font-weight: 600;
-      backdrop-filter: blur(12px);
     }
-    .scheduler-status-idle { background: rgba(255, 255, 255, 0.06); color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .scheduler-status-idle { background: #16161c; color: #9ca3af; border: 1px solid var(--border-color); }
     .scheduler-status-armed { background: var(--accent-blue-tint); color: var(--accent-blue); border: 1px solid var(--accent-blue-border); }
     .scheduler-status-running { background: var(--accent-green-tint); color: var(--accent-green); border: 1px solid var(--accent-green-border); }
     .scheduler-status-paused { background: var(--accent-amber-tint); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
 
     .scheduler-log-terminal {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: #08080a;
       color: #f3f4f6;
       border-radius: var(--radius-md);
       padding: 14px;
@@ -953,8 +900,7 @@
       line-height: 1.6;
       max-height: 220px;
       overflow-y: auto;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
     }
     .scheduler-log-entry { margin-bottom: 4px; word-break: break-all; }
     .scheduler-log-time { color: #6b7280; margin-right: 6px; }
@@ -1749,8 +1695,9 @@
       }
 
       resumeLibrary.forEach(r => {
+        const isAttached = (r.filename === selectedResumeFile);
         const item = document.createElement('div');
-        item.className = `resume-row-card ${r.filename === selectedResumeFile ? 'selected' : ''}`;
+        item.className = `resume-row-card ${isAttached ? 'selected' : ''}`;
         item.onclick = () => {
           selectedResumeFile = r.filename;
           renderResumeList();
@@ -1759,12 +1706,16 @@
         item.innerHTML = `
           <div class="file-tag-badge">PDF</div>
           <div class="resume-info">
-            <div class="resume-filename">${r.filename}</div>
+            <div class="resume-filename" title="${r.filename}">${r.filename}</div>
             <div class="resume-meta">${r.size} • ${r.lastModified}</div>
           </div>
-          <div style="display: flex; gap: 6px; flex-shrink: 0;">
-            <button class="apple-btn btn-tint" style="padding: 4px 8px; font-size: 11.5px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">Attach</button>
-            <button class="apple-btn btn-destruct" style="padding: 4px 8px; font-size: 11.5px;" onclick="event.stopPropagation(); deleteResume('${r.filename}')">Delete</button>
+          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            <button class="apple-btn ${isAttached ? 'btn-blue-primary' : 'btn-plain'}" style="padding: 3px 8px; font-size: 11px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
+              ${isAttached ? 'Attached ✓' : 'Attach'}
+            </button>
+            <button class="ghost-del-btn" title="Delete resume" onclick="event.stopPropagation(); deleteResume('${r.filename}')">
+              &times;
+            </button>
           </div>
         `;
         list.appendChild(item);
