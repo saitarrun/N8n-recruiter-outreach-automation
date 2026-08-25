@@ -12,48 +12,51 @@
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
   <style>
     :root {
-      /* Pure Minimalist Black & Obsidian System */
-      --system-bg: #09090b;
-      --card-bg: #121215;
-      --card-head-bg: #16161b;
-      --surface-elevated: #1a1a20;
-      --input-bg: #141418;
+      /* Apple Glassmorphism Design Tokens */
+      --system-bg: #070709;
+      --card-bg: rgba(18, 18, 25, 0.68);
+      --card-head-bg: rgba(255, 255, 255, 0.04);
+      --surface-elevated: rgba(255, 255, 255, 0.06);
+      --input-bg: rgba(10, 10, 16, 0.58);
       
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-subtle: rgba(255, 255, 255, 0.05);
-      --border-hover: rgba(255, 255, 255, 0.16);
+      --border-color: rgba(255, 255, 255, 0.11);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.22);
       
       /* Apple San Francisco Typography Contrast */
       --label-primary: #f5f5f7;
       --label-secondary: #a1a1a6;
       --label-tertiary: #636366;
       
-      /* Vibrant Apple Dark Accents */
+      /* Vibrant Apple Glowing Accents */
       --accent-blue: #2997ff;
       --accent-blue-hover: #0077ed;
-      --accent-blue-tint: rgba(41, 151, 255, 0.12);
-      --accent-blue-border: rgba(41, 151, 255, 0.35);
+      --accent-blue-tint: rgba(41, 151, 255, 0.16);
+      --accent-blue-border: rgba(41, 151, 255, 0.4);
       
       --accent-green: #30d158;
-      --accent-green-tint: rgba(48, 209, 88, 0.12);
-      --accent-green-border: rgba(48, 209, 88, 0.3);
+      --accent-green-tint: rgba(48, 209, 88, 0.16);
+      --accent-green-border: rgba(48, 209, 88, 0.35);
       
       --accent-red: #ff453a;
-      --accent-red-tint: rgba(255, 69, 58, 0.12);
-      --accent-red-border: rgba(255, 69, 58, 0.3);
+      --accent-red-tint: rgba(255, 69, 58, 0.16);
+      --accent-red-border: rgba(255, 69, 58, 0.35);
       
       --accent-amber: #ffd60a;
-      --accent-amber-tint: rgba(255, 214, 10, 0.12);
-      --accent-amber-border: rgba(255, 214, 10, 0.3);
+      --accent-amber-tint: rgba(255, 214, 10, 0.16);
+      --accent-amber-border: rgba(255, 214, 10, 0.35);
       
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --radius-full: 980px;
       
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
-      --shadow-float: 0 24px 64px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      --glass-blur: blur(28px) saturate(190%);
+      --glass-blur-sm: blur(16px) saturate(180%);
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+      --shadow-float: 0 28px 72px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.18);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,6 +64,13 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
       background-color: var(--system-bg);
+      background-image: 
+        radial-gradient(at 8% 12%, rgba(37, 99, 235, 0.22) 0px, transparent 48%),
+        radial-gradient(at 92% 16%, rgba(139, 92, 246, 0.18) 0px, transparent 50%),
+        radial-gradient(at 50% 88%, rgba(16, 185, 129, 0.12) 0px, transparent 52%),
+        radial-gradient(at 82% 82%, rgba(59, 130, 246, 0.14) 0px, transparent 46%);
+      background-attachment: fixed;
+      background-size: cover;
       color: var(--label-primary);
       min-height: 100vh;
       display: flex;
@@ -69,19 +79,20 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Apple Minimalist Scrollbar */
+    /* Apple Minimalist Glass Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #27272e; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3a3a44; }
-    * { scrollbar-width: thin; scrollbar-color: #27272e transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 4px; backdrop-filter: blur(8px); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+    * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
 
-    /* Apple macOS Titlebar */
+    /* Apple macOS Glass Header */
     .app-header {
-      background: rgba(9, 9, 11, 0.82);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: rgba(10, 10, 15, 0.7);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
       border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
       padding: 12px 32px;
       display: flex;
       justify-content: space-between;
@@ -103,7 +114,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 12px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
     }
     .app-title {
@@ -124,12 +135,15 @@
       gap: 12px;
     }
 
-    /* Apple Segmented Control */
+    /* Apple Frosted Glass Segmented Control */
     .segmented-control {
       background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
       padding: 3px;
-      border-radius: 9px;
+      border-radius: 10px;
       display: inline-flex;
       gap: 2px;
     }
@@ -139,19 +153,21 @@
       font-size: 13px;
       font-weight: 500;
       color: var(--label-secondary);
-      border: none;
+      border: 1px solid transparent;
       background: transparent;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .segmented-item:hover {
       color: var(--label-primary);
+      background: rgba(255, 255, 255, 0.05);
     }
     .segmented-item.active {
-      background: #24242c;
+      background: rgba(255, 255, 255, 0.16);
       color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.25);
     }
 
     /* Main App Layout */
@@ -170,9 +186,11 @@
       .main-workspace { grid-template-columns: 1fr; }
     }
 
-    /* macOS Window / Card Containers */
+    /* macOS Frosted Glass Windows / Cards */
     .apple-card {
       background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
@@ -197,7 +215,7 @@
       padding: 20px;
     }
 
-    /* Apple Form Controls */
+    /* Apple Glass Form Controls */
     .form-row {
       margin-bottom: 14px;
     }
@@ -213,21 +231,25 @@
     .apple-input, .apple-select, .apple-textarea {
       width: 100%;
       background: var(--input-bg);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       padding: 9px 12px;
       font-size: 13.5px;
       font-family: inherit;
       color: var(--label-primary);
-      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+      transition: all 0.18s ease;
     }
     .apple-input:focus, .apple-select:focus, .apple-textarea:focus {
       outline: none;
       border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.25);
+      box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.28), inset 0 1px 2px rgba(0, 0, 0, 0.3);
+      background: rgba(16, 16, 24, 0.75);
     }
 
-    /* Apple Buttons */
+    /* Apple Glass Buttons */
     .apple-btn {
       display: inline-flex;
       align-items: center;
@@ -239,42 +261,58 @@
       font-weight: 600;
       cursor: pointer;
       border: 1px solid transparent;
-      transition: all 0.15s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-blue-primary {
-      background: var(--accent-blue);
-      color: #09090b;
+      background: linear-gradient(135deg, #0071e3 0%, #2997ff 100%);
+      color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 2px 10px rgba(41, 151, 255, 0.25);
+      box-shadow: 0 4px 18px rgba(41, 151, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .btn-blue-primary:hover {
-      background: #52a9ff;
+      background: linear-gradient(135deg, #1a82f7 0%, #47a7ff 100%);
+      box-shadow: 0 6px 22px rgba(41, 151, 255, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
     }
     .btn-plain {
-      background: #18181e;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--label-primary);
-      border-color: var(--border-color);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.08);
     }
     .btn-plain:hover {
-      background: #22222a;
-      border-color: var(--border-hover);
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.24);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
     }
     .btn-tint {
       background: var(--accent-blue-tint);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--accent-blue);
-      border-color: var(--accent-blue-border);
+      border: 1px solid var(--accent-blue-border);
+      box-shadow: 0 2px 8px rgba(41, 151, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     .btn-tint:hover {
-      background: rgba(41, 151, 255, 0.2);
+      background: rgba(41, 151, 255, 0.24);
       border-color: var(--accent-blue);
+      transform: translateY(-1px);
     }
     .btn-destruct {
       background: var(--accent-red-tint);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--accent-red);
-      border-color: var(--accent-red-border);
+      border: 1px solid var(--accent-red-border);
+      box-shadow: 0 2px 8px rgba(255, 69, 58, 0.15);
     }
     .btn-destruct:hover {
-      background: rgba(255, 69, 58, 0.22);
+      background: rgba(255, 69, 58, 0.26);
+      transform: translateY(-1px);
     }
 
     /* Queue Filter Sub-Tabs */
@@ -282,7 +320,9 @@
       display: flex;
       gap: 6px;
       margin-bottom: 12px;
-      background: #141419;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       padding: 3px;
       border-radius: 8px;
       border: 1px solid var(--border-subtle);
@@ -296,7 +336,7 @@
       color: var(--label-secondary);
       border-radius: 6px;
       cursor: pointer;
-      border: none;
+      border: 1px solid transparent;
       background: transparent;
       transition: all 0.15s;
     }
@@ -304,14 +344,17 @@
       color: var(--label-primary);
     }
     .queue-subtab.active {
-      background: #24242c;
+      background: rgba(255, 255, 255, 0.15);
       color: #ffffff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
     }
 
     .token-chip {
-      background: #18181f;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 12px;
       padding: 3px 8px;
       font-size: 11px;
@@ -321,14 +364,16 @@
       transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
     .token-chip:hover {
       background: var(--accent-blue-tint);
       border-color: var(--accent-blue);
       transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(41, 151, 255, 0.25);
     }
 
-    /* Clean Recruiter List */
+    /* Clean Recruiter List with Glass Cards */
     .recruiter-list-group {
       display: flex;
       flex-direction: column;
@@ -339,26 +384,31 @@
       padding-right: 2px;
     }
     .recruiter-row {
-      background: #131317;
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.035);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-sm);
       padding: 10px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       width: 100%;
       box-sizing: border-box;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .recruiter-row:hover {
-      background: #1a1a20;
-      border-color: var(--border-hover);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
     }
     .recruiter-row.selected {
-      background: var(--accent-blue-tint);
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 12px rgba(41, 151, 255, 0.18);
+      background: rgba(41, 151, 255, 0.18);
+      border-color: rgba(41, 151, 255, 0.7);
+      box-shadow: 0 0 24px rgba(41, 151, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.25);
     }
     .rec-left {
       min-width: 0;
@@ -388,6 +438,7 @@
       margin-left: 8px;
       padding: 2px 8px;
       border-radius: 6px;
+      backdrop-filter: blur(8px);
     }
     .badge-pending {
       background: var(--accent-amber-tint);
@@ -429,6 +480,7 @@
     .sent-notice-banner {
       background: var(--accent-green-tint);
       border-bottom: 1px solid var(--accent-green-border);
+      backdrop-filter: blur(12px);
       padding: 8px 24px;
       font-size: 12.5px;
       color: var(--accent-green);
@@ -449,8 +501,10 @@
       padding-right: 2px;
     }
     .resume-row-card {
-      background: #131317;
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.035);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-sm);
       padding: 10px 12px;
       display: flex;
@@ -458,28 +512,33 @@
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       width: 100%;
       box-sizing: border-box;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .resume-row-card:hover {
-      background: #1a1a20;
-      border-color: var(--border-hover);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
     }
     .resume-row-card.selected {
-      background: var(--accent-blue-tint);
-      border-color: var(--accent-blue);
+      background: rgba(41, 151, 255, 0.18);
+      border-color: rgba(41, 151, 255, 0.7);
+      box-shadow: 0 0 20px rgba(41, 151, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.25);
     }
     .file-tag-badge {
       font-size: 10.5px;
       font-weight: 700;
       color: #70b7ff;
-      background: rgba(41, 151, 255, 0.15);
-      border: 1px solid rgba(41, 151, 255, 0.3);
+      background: rgba(41, 151, 255, 0.18);
+      border: 1px solid rgba(41, 151, 255, 0.35);
       padding: 2px 6px;
       border-radius: 4px;
       flex-shrink: 0;
       letter-spacing: 0.02em;
+      backdrop-filter: blur(8px);
     }
     .resume-info {
       overflow: hidden;
@@ -502,17 +561,20 @@
 
     /* Document Dropzone */
     .doc-dropzone {
-      border: 2px dashed rgba(255, 255, 255, 0.14);
+      border: 2px dashed rgba(255, 255, 255, 0.16);
       border-radius: var(--radius-md);
       padding: 20px 16px;
       text-align: center;
-      background: #101014;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .doc-dropzone:hover, .doc-dropzone.dragover {
       border-color: var(--accent-blue);
-      background: var(--accent-blue-tint);
+      background: rgba(41, 151, 255, 0.14);
+      box-shadow: 0 0 20px rgba(41, 151, 255, 0.2);
     }
     .dropzone-title {
       font-size: 13px;
@@ -528,7 +590,9 @@
     /* Staged Document Preview Table */
     .staged-preview-box {
       margin-top: 14px;
-      background: #101014;
+      background: rgba(10, 10, 16, 0.6);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       padding: 12px;
@@ -553,7 +617,7 @@
       gap: 4px;
     }
     .staged-row {
-      background: #17171d;
+      background: rgba(255, 255, 255, 0.05);
       padding: 6px 8px;
       border-radius: 4px;
       border: 1px solid var(--border-subtle);
@@ -563,19 +627,21 @@
       color: var(--label-secondary);
     }
 
-    /* Apple Mail Compose Window */
+    /* Apple Mail Compose Frosted Glass Window */
     .mail-window {
-      background: #0f0f13;
-      border: 1px solid var(--border-color);
+      background: rgba(14, 14, 22, 0.72);
+      backdrop-filter: blur(32px) saturate(200%);
+      -webkit-backdrop-filter: blur(32px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.13);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
     .mail-toolbar {
-      background: #15151a;
-      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
@@ -590,6 +656,7 @@
       width: 11px;
       height: 11px;
       border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
     .dot-close { background: #ff5f56; }
     .dot-min { background: #ffbd2e; }
@@ -597,11 +664,11 @@
 
     .mail-header-fields {
       padding: 14px 24px;
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
       display: flex;
       flex-direction: column;
       gap: 10px;
-      background: #121216;
+      background: rgba(0, 0, 0, 0.25);
     }
     .field-row {
       display: flex;
@@ -627,8 +694,8 @@
       transition: all 0.15s;
     }
     .field-subject-input:hover, .field-subject-input:focus {
-      background: #181820;
-      border-color: var(--border-color);
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.15);
       color: #ffffff;
       outline: none;
     }
@@ -637,8 +704,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #181820;
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       padding: 4px 10px;
       border-radius: 6px;
       font-size: 12px;
@@ -652,7 +719,9 @@
       font-size: 14.5px;
       line-height: 1.75;
       color: #9d9da6;
-      background: #0b0b0e;
+      background: rgba(5, 5, 8, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       min-height: 480px;
       outline: none;
       overflow-y: auto;
@@ -697,9 +766,9 @@
     .pdf-modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       z-index: 999;
       display: none;
       align-items: center;
@@ -707,12 +776,14 @@
       padding: 30px;
     }
     .pdf-modal-card {
-      background: #121216;
+      background: rgba(18, 18, 26, 0.85);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       width: 100%;
       max-width: 900px;
       height: 85vh;
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: var(--shadow-float);
       display: flex;
       flex-direction: column;
@@ -724,13 +795,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #16161b;
+      background: rgba(255, 255, 255, 0.04);
     }
     .pdf-frame-embed {
       width: 100%;
       flex: 1;
       border: none;
-      background: #1a1a20;
+      background: rgba(20, 20, 28, 0.8);
     }
 
     /* Toast Notification */
@@ -738,10 +809,10 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: rgba(26, 26, 32, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(26, 26, 36, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       color: #ffffff;
       padding: 12px 20px;
       border-radius: var(--radius-full);
@@ -769,6 +840,8 @@
       background: var(--accent-green-tint);
       color: var(--accent-green);
       border: 1px solid var(--accent-green-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       transition: all 0.2s ease;
     }
     .health-badge.offline {
@@ -823,7 +896,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Scheduler Studio Styles */
+    /* Scheduler Studio Glass Styles */
     .scheduler-stat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -831,11 +904,13 @@
       margin-bottom: 16px;
     }
     .scheduler-stat-box {
-      background: #131317;
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: var(--radius-md);
       padding: 14px 16px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     .scheduler-stat-label {
       font-size: 11.5px;
@@ -866,14 +941,17 @@
       border-radius: var(--radius-full);
       font-size: 12px;
       font-weight: 600;
+      backdrop-filter: blur(12px);
     }
-    .scheduler-status-idle { background: rgba(255, 255, 255, 0.06); color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.08); }
+    .scheduler-status-idle { background: rgba(255, 255, 255, 0.06); color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.1); }
     .scheduler-status-armed { background: var(--accent-blue-tint); color: var(--accent-blue); border: 1px solid var(--accent-blue-border); }
     .scheduler-status-running { background: var(--accent-green-tint); color: var(--accent-green); border: 1px solid var(--accent-green-border); }
     .scheduler-status-paused { background: var(--accent-amber-tint); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
 
     .scheduler-log-terminal {
-      background: #08080a;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       color: #f3f4f6;
       border-radius: var(--radius-md);
       padding: 14px;
@@ -882,7 +960,8 @@
       line-height: 1.6;
       max-height: 220px;
       overflow-y: auto;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
     }
     .scheduler-log-entry { margin-bottom: 4px; word-break: break-all; }
     .scheduler-log-time { color: #6b7280; margin-right: 6px; }
