@@ -148,4 +148,35 @@ const jitterDelay = computeDripDelaySeconds(3, true, 0.75); // 0.75*60 - 30 = +1
 assert.strictEqual(jitterDelay, 195, "Jittered 3 mins should be 195s");
 console.log("✓ Test 7 Passed: Scheduler Drip Interval & Jitter Logic");
 
-console.log("\n🎉 ALL 7 JAVASCRIPT CLIENT-SIDE & SCHEDULER TESTS PASSED!");
+// 8. Bulk Sender State Machine (Pause, Resume, Stop)
+let bulkState = { active: false, paused: false, stopped: false };
+function testPauseBulk(s) { if (s.active && !s.stopped) s.paused = true; }
+function testResumeBulk(s) { if (s.active && !s.stopped) s.paused = false; }
+function testStopBulk(s) { if (s.active) { s.stopped = true; s.paused = false; } }
+
+bulkState.active = true;
+assert.strictEqual(bulkState.active, true);
+testPauseBulk(bulkState);
+assert.strictEqual(bulkState.paused, true, "Bulk sender should transition to paused");
+testResumeBulk(bulkState);
+assert.strictEqual(bulkState.paused, false, "Bulk sender should resume active state");
+testStopBulk(bulkState);
+assert.strictEqual(bulkState.stopped, true, "Bulk sender should transition to stopped");
+console.log("✓ Test 8 Passed: Bulk Sender Pause, Resume, and Stop State Machine");
+
+// 9. Scheduler State Machine (Arm, Pause, Resume, Stop)
+let schedConfig = { status: 'idle', mode: 'specific' };
+function testPauseScheduler(c) { if (c.status === 'armed' || c.status === 'running') c.status = 'paused'; }
+function testResumeScheduler(c) { if (c.status === 'paused') c.status = (c.mode === 'drip') ? 'running' : 'armed'; }
+function testStopScheduler(c) { c.status = 'idle'; }
+
+schedConfig.status = 'armed';
+testPauseScheduler(schedConfig);
+assert.strictEqual(schedConfig.status, 'paused', "Scheduler should transition to paused");
+testResumeScheduler(schedConfig);
+assert.strictEqual(schedConfig.status, 'armed', "Scheduler should resume to armed");
+testStopScheduler(schedConfig);
+assert.strictEqual(schedConfig.status, 'idle', "Scheduler should transition to idle");
+console.log("✓ Test 9 Passed: Scheduler Arm, Pause, Resume, and Stop State Machine");
+
+console.log("\n🎉 ALL 9 JAVASCRIPT CLIENT-SIDE & SCHEDULER TESTS PASSED!");

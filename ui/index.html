@@ -893,9 +893,26 @@
         ⏱️ Schedule
       </button>
 
+      <!-- Standard Bulk Send Trigger -->
       <button class="apple-btn btn-blue-primary" onclick="sendBulkUnsentQueue()" id="btn-bulk-send">
         Send Unsent in Bulk
       </button>
+
+      <!-- Live Bulk Dispatch Controls (Appears during Bulk Send) -->
+      <div id="bulk-live-controls" style="display: none; align-items: center; gap: 6px;">
+        <span id="bulk-progress-pill" style="font-size: 12px; font-weight: 600; background: #eff6ff; color: #1d4ed8; padding: 5px 10px; border-radius: 6px; border: 1px solid #bfdbfe;">
+          Sending 1/50...
+        </span>
+        <button class="apple-btn btn-plain" id="btn-bulk-pause" onclick="pauseBulkSend()" title="Pause Bulk Dispatch">
+          ⏸️ Pause
+        </button>
+        <button class="apple-btn btn-blue-primary" id="btn-bulk-resume" onclick="resumeBulkSend()" style="display: none;" title="Resume Bulk Dispatch">
+          ▶️ Resume
+        </button>
+        <button class="apple-btn btn-destruct" id="btn-bulk-stop" onclick="stopBulkSend()" title="Stop Bulk Dispatch">
+          ⏹️ Stop
+        </button>
+      </div>
     </div>
   </header>
 
@@ -915,8 +932,9 @@
       </div>
       <div style="display: flex; gap: 8px;">
         <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back to Leads</button>
-        <button class="apple-btn btn-destruct" id="btn-sched-stop" onclick="stopScheduler()" style="display: none;">Stop Schedule</button>
-        <button class="apple-btn btn-plain" id="btn-sched-pause" onclick="togglePauseScheduler()" style="display: none;">Pause</button>
+        <button class="apple-btn btn-destruct" id="btn-sched-stop" onclick="stopScheduler()" style="display: none;">⏹️ Stop Schedule</button>
+        <button class="apple-btn btn-plain" id="btn-sched-pause" onclick="pauseScheduler()" style="display: none;">⏸️ Pause Schedule</button>
+        <button class="apple-btn btn-blue-primary" id="btn-sched-resume" onclick="resumeScheduler()" style="display: none;">▶️ Resume Schedule</button>
         <button class="apple-btn btn-blue-primary" id="btn-sched-arm" onclick="startScheduler()">▶️ Arm & Start Scheduler</button>
       </div>
     </div>
@@ -2739,7 +2757,89 @@ ${contentHtml}
       }
     }
 
-    // BULK SEND ONLY UNSENT LEADS (Deterministic Lead-Array Iteration)
+    // BULK CONTROLLER STATE & METHODS
+    let bulkSenderState = {
+      active: false,
+      paused: false,
+      stopped: false,
+      currentIndex: 0,
+      total: 0,
+      sentCount: 0,
+      currentAbortController: null
+    };
+
+    function pauseBulkSend() {
+      if (!bulkSenderState.active || bulkSenderState.stopped) return;
+      bulkSenderState.paused = true;
+      updateBulkControlsUI("Paused");
+      showAppleToast("⏸️ Bulk outreach paused.");
+    }
+
+    function resumeBulkSend() {
+      if (!bulkSenderState.active || bulkSenderState.stopped) return;
+      bulkSenderState.paused = false;
+      updateBulkControlsUI("Resumed");
+      showAppleToast("▶️ Resuming bulk outreach...");
+    }
+
+    function stopBulkSend() {
+      if (!bulkSenderState.active) return;
+      bulkSenderState.stopped = true;
+      bulkSenderState.paused = false;
+      if (bulkSenderState.currentAbortController) {
+        try { bulkSenderState.currentAbortController.abort(); } catch(e) {}
+      }
+      showAppleToast("⏹️ Stopping bulk outreach...");
+    }
+
+    function updateBulkControlsUI(statusText) {
+      const liveControls = document.getElementById('bulk-live-controls');
+      const btnBulk = document.getElementById('btn-bulk-send');
+      const pill = document.getElementById('bulk-progress-pill');
+      const btnPause = document.getElementById('btn-bulk-pause');
+      const btnResume = document.getElementById('btn-bulk-resume');
+      const btnStop = document.getElementById('btn-bulk-stop');
+
+      if (!liveControls || !btnBulk) return;
+
+      if (!bulkSenderState.active) {
+        liveControls.style.display = 'none';
+        btnBulk.style.display = 'inline-block';
+        btnBulk.disabled = false;
+        const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
+        btnBulk.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
+        return;
+      }
+
+      liveControls.style.display = 'flex';
+      btnBulk.style.display = 'none';
+
+      if (pill) {
+        if (bulkSenderState.paused) {
+          pill.innerText = `⏸️ Paused (${bulkSenderState.currentIndex}/${bulkSenderState.total})`;
+          pill.style.background = '#fef3c7';
+          pill.style.color = '#92400e';
+          pill.style.borderColor = '#fde68a';
+        } else {
+          pill.innerText = statusText || `Sending ${bulkSenderState.currentIndex}/${bulkSenderState.total}...`;
+          pill.style.background = '#eff6ff';
+          pill.style.color = '#1d4ed8';
+          pill.style.borderColor = '#bfdbfe';
+        }
+      }
+
+      if (btnPause && btnResume) {
+        if (bulkSenderState.paused) {
+          btnPause.style.display = 'none';
+          btnResume.style.display = 'inline-block';
+        } else {
+          btnPause.style.display = 'inline-block';
+          btnResume.style.display = 'none';
+        }
+      }
+    }
+
+    // BULK SEND ONLY UNSENT LEADS (With Real-Time Pause, Resume & Stop)
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
@@ -2749,16 +2849,28 @@ ${contentHtml}
 
       if (!confirm(`Dispatch personalized emails to all ${unsentLeads.length} unsent recruiters?`)) return;
 
-      const btn = document.getElementById('btn-bulk-send');
-      btn.disabled = true;
-
-      let sentSuccessCount = 0;
-      const totalToProcess = unsentLeads.length;
+      bulkSenderState.active = true;
+      bulkSenderState.paused = false;
+      bulkSenderState.stopped = false;
+      bulkSenderState.total = unsentLeads.length;
+      bulkSenderState.sentCount = 0;
+      bulkSenderState.currentIndex = 0;
+      updateBulkControlsUI("Starting...");
 
       try {
         for (let k = 0; k < unsentLeads.length; k++) {
+          if (bulkSenderState.stopped) break;
+
+          // Check if paused and wait until resumed or stopped
+          while (bulkSenderState.paused && !bulkSenderState.stopped) {
+            updateBulkControlsUI("Paused");
+            await new Promise(res => setTimeout(res, 250));
+          }
+          if (bulkSenderState.stopped) break;
+
+          bulkSenderState.currentIndex = k + 1;
           const lead = unsentLeads[k];
-          btn.innerText = `Sending (${k + 1}/${totalToProcess}): ${lead.firstName}...`;
+          updateBulkControlsUI(`Sending (${k + 1}/${unsentLeads.length}): ${lead.firstName}...`);
 
           // Select this lead on screen
           const currentIdx = recruiters.findIndex(r => r.email === lead.email);
@@ -2769,7 +2881,8 @@ ${contentHtml}
 
           const payload = buildEmailPayloadForRecruiter(lead);
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 18000);
+          bulkSenderState.currentAbortController = controller;
+          const timeoutId = setTimeout(() => controller.abort(), 20000);
 
           try {
             const res = await fetch('/api/send-outreach', {
@@ -2797,33 +2910,53 @@ ${contentHtml}
                 recruiters[currentIdx].status = 'Sent';
                 recruiters[currentIdx].sentAt = lead.sentAt;
               }
-              sentSuccessCount++;
+              bulkSenderState.sentCount++;
             } else {
               lead.status = 'Failed';
               if (currentIdx !== -1) recruiters[currentIdx].status = 'Failed';
             }
           } catch (e) {
             clearTimeout(timeoutId);
+            if (bulkSenderState.stopped) break;
             lead.status = 'Failed';
             if (currentIdx !== -1) recruiters[currentIdx].status = 'Failed';
+          } finally {
+            bulkSenderState.currentAbortController = null;
           }
 
           // Live queue re-render
           renderQueue();
 
-          // Spacing pause between emails
-          if (k < unsentLeads.length - 1) {
-            btn.innerText = `Spacing 2s (${k + 1}/${totalToProcess})...`;
-            await new Promise(res => setTimeout(res, 2000));
+          // Spacing pause between emails with pause/stop check
+          if (k < unsentLeads.length - 1 && !bulkSenderState.stopped) {
+            const spacingMs = 2000;
+            const stepMs = 200;
+            for (let t = 0; t < spacingMs; t += stepMs) {
+              if (bulkSenderState.stopped) break;
+              while (bulkSenderState.paused && !bulkSenderState.stopped) {
+                updateBulkControlsUI("Paused");
+                await new Promise(res => setTimeout(res, 250));
+              }
+              updateBulkControlsUI(`Spacing 2s (${k + 1}/${unsentLeads.length})...`);
+              await new Promise(res => setTimeout(res, stepMs));
+            }
           }
         }
       } finally {
+        const wasStopped = bulkSenderState.stopped;
+        const totalSent = bulkSenderState.sentCount;
+        bulkSenderState.active = false;
+        bulkSenderState.paused = false;
+        bulkSenderState.stopped = false;
+        updateBulkControlsUI();
+
         await loadLeadsFromDatabase(true);
-        btn.disabled = false;
-        const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
-        btn.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
         renderQueue();
-        showAppleToast(`Bulk dispatch finished: ${sentSuccessCount} sent successfully.`);
+        if (wasStopped) {
+          showAppleToast(`⏹️ Bulk outreach stopped. ${totalSent} sent.`);
+        } else {
+          showAppleToast(`🎉 Bulk dispatch finished: ${totalSent} sent successfully.`);
+        }
       }
     }
 
@@ -3079,26 +3212,39 @@ ${contentHtml}
       return next.getTime();
     }
 
-    function togglePauseScheduler() {
+    function pauseScheduler() {
+      if (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') {
+        schedulerConfig.status = 'paused';
+        addSchedulerLog('⏸️ Scheduler PAUSED by user.', 'warn');
+        showAppleToast('⏸️ Scheduler Paused');
+        renderSchedulerUI();
+      }
+    }
+
+    function resumeScheduler() {
       if (schedulerConfig.status === 'paused') {
         schedulerConfig.status = (schedulerConfig.mode === 'drip') ? 'running' : 'armed';
-        addSchedulerLog('Scheduler Resumed.', 'info');
-        showAppleToast('Scheduler Resumed');
-      } else if (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') {
-        schedulerConfig.status = 'paused';
-        addSchedulerLog('Scheduler Paused by user.', 'warn');
-        showAppleToast('Scheduler Paused');
+        addSchedulerLog('▶️ Scheduler RESUMED by user.', 'info');
+        showAppleToast('▶️ Scheduler Resumed');
+        renderSchedulerUI();
       }
-      renderSchedulerUI();
+    }
+
+    function togglePauseScheduler() {
+      if (schedulerConfig.status === 'paused') {
+        resumeScheduler();
+      } else {
+        pauseScheduler();
+      }
     }
 
     function stopScheduler() {
       schedulerConfig.status = 'idle';
       schedulerRuntime.nextActionTimestamp = null;
       schedulerRuntime.isExecutingBatch = false;
-      addSchedulerLog('Scheduler Stopped.', 'warn');
+      addSchedulerLog('⏹️ Scheduler STOPPED by user.', 'warn');
       renderSchedulerUI();
-      showAppleToast('Scheduler Deactivated');
+      showAppleToast('⏹️ Scheduler Deactivated');
     }
 
     function clearSchedulerLogs() {
@@ -3198,21 +3344,40 @@ ${contentHtml}
 
       for (let i = 0; i < unsent.length; i++) {
         if (schedulerConfig.status === 'idle') break;
+        
+        while (schedulerConfig.status === 'paused') {
+          renderSchedulerCountdown();
+          await new Promise(r => setTimeout(r, 300));
+          if (schedulerConfig.status === 'idle') break;
+        }
+        if (schedulerConfig.status === 'idle') break;
+
         const lead = unsent[i];
         addSchedulerLog(`Sending (${i + 1}/${unsent.length}): ${lead.firstName} @ ${lead.company}...`, 'info');
         await dispatchSingleLeadFromScheduler(lead);
 
         if (i < unsent.length - 1) {
           const pauseSec = schedulerConfig.spacingSeconds || 5;
-          await new Promise(r => setTimeout(r, pauseSec * 1000));
+          for (let s = 0; s < pauseSec * 10; s++) {
+            if (schedulerConfig.status === 'idle') break;
+            while (schedulerConfig.status === 'paused') {
+              renderSchedulerCountdown();
+              await new Promise(r => setTimeout(r, 300));
+              if (schedulerConfig.status === 'idle') break;
+            }
+            await new Promise(r => setTimeout(r, 100));
+          }
         }
       }
 
       schedulerRuntime.isExecutingBatch = false;
-      addSchedulerLog(`🎉 Scheduled batch finished! Session total: ${schedulerRuntime.sessionDispatched} dispatched.`, 'success');
-
-      if (schedulerConfig.mode === 'specific') {
-        stopScheduler();
+      if (schedulerConfig.status === 'idle') {
+        addSchedulerLog(`⏹️ Scheduled batch stopped.`, 'warn');
+      } else {
+        addSchedulerLog(`🎉 Scheduled batch finished! Session total: ${schedulerRuntime.sessionDispatched} dispatched.`, 'success');
+        if (schedulerConfig.mode === 'specific') {
+          stopScheduler();
+        }
       }
 
       if ("Notification" in window && Notification.permission === "granted") {
@@ -3328,6 +3493,7 @@ ${contentHtml}
       const badgeText = document.getElementById('sched-status-text');
       const btnArm = document.getElementById('btn-sched-arm');
       const btnPause = document.getElementById('btn-sched-pause');
+      const btnResume = document.getElementById('btn-sched-resume');
       const btnStop = document.getElementById('btn-sched-stop');
       const headerDot = document.getElementById('scheduler-header-dot');
 
@@ -3340,21 +3506,22 @@ ${contentHtml}
         headerDot.style.display = (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') ? 'inline-block' : 'none';
       }
 
-      if (btnArm && btnPause && btnStop) {
+      if (btnArm && btnStop) {
         if (schedulerConfig.status === 'idle') {
           btnArm.style.display = 'inline-block';
           btnArm.innerText = '▶️ Arm & Start Scheduler';
-          btnPause.style.display = 'none';
+          if (btnPause) btnPause.style.display = 'none';
+          if (btnResume) btnResume.style.display = 'none';
           btnStop.style.display = 'none';
         } else if (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') {
           btnArm.style.display = 'none';
-          btnPause.style.display = 'inline-block';
-          btnPause.innerText = 'Pause';
+          if (btnPause) btnPause.style.display = 'inline-block';
+          if (btnResume) btnResume.style.display = 'none';
           btnStop.style.display = 'inline-block';
         } else if (schedulerConfig.status === 'paused') {
           btnArm.style.display = 'none';
-          btnPause.style.display = 'inline-block';
-          btnPause.innerText = 'Resume';
+          if (btnPause) btnPause.style.display = 'none';
+          if (btnResume) btnResume.style.display = 'inline-block';
           btnStop.style.display = 'inline-block';
         }
       }
