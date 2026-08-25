@@ -1053,13 +1053,13 @@
           <div class="card-content" style="padding: 16px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;">
               <button class="apple-btn btn-tint active" id="sched-mode-btn-specific" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('specific')">
-                ⏱️ Set Date & Time<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Send at a future time</span>
+                Set Date & Time<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Send at a future time</span>
               </button>
               <button class="apple-btn btn-plain" id="sched-mode-btn-drip" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('drip')">
-                💧 Drip (Spread Out)<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">1 email every few mins</span>
+                Drip Sending<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Spaced interval per email</span>
               </button>
               <button class="apple-btn btn-plain" id="sched-mode-btn-recurring" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('recurring')">
-                📅 Daily Schedule<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Send every weekday</span>
+                Daily Schedule<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Send every weekday</span>
               </button>
             </div>
 
@@ -1158,7 +1158,6 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--label-secondary); background: var(--surface-elevated); border: 1px solid var(--border-subtle); padding: 9px 12px; border-radius: var(--radius-sm);">
-              <span style="font-size: 13px;">🛡️</span>
               <span><strong>No Duplicates:</strong> Emails are never sent twice to the same contact.</span>
             </div>
           </div>
@@ -1280,8 +1279,8 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                 <span style="font-size: 11px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('opportunities')">✨ Job Inquiry</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('applied')">📝 Follow Up</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('opportunities')">Job Inquiry</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('applied')">Application Follow-Up</button>
                 <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('standard')">Standard</button>
                 <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('technical')">Technical</button>
               </div>
@@ -1305,11 +1304,11 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                 <span style="font-size: 11px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('opportunities')">✨ Job Inquiry</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('applied')">📝 Follow Up</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('comprehensive')">⚡ Full Stack</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('concise')">🎯 Short</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('backend')">⚙️ Backend</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('opportunities')">Job Inquiry</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('applied')">Application Follow-Up</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('comprehensive')">Full Stack</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('concise')">Short & Direct</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('backend')">Backend Focused</button>
               </div>
               <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                 <button class="token-chip" onclick="insertProfToken('{RecruiterName}')">+ Recruiter</button>
@@ -1530,10 +1529,10 @@
         <div style="padding: 6px 14px; background: var(--card-head-bg); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
           <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
             <span style="font-size: 10.5px; font-weight: 600; color: var(--label-secondary); text-transform: uppercase; margin-right: 2px;">Templates:</span>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('opportunities')">✨ Job Inquiry</button>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('applied')">📝 Follow Up</button>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('comprehensive')">⚡ Full Stack</button>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('concise')">🎯 Short</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('opportunities')">Job Inquiry</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('applied')">Application Follow-Up</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('comprehensive')">Full Stack</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('concise')">Short & Direct</button>
           </div>
           <div style="display: flex; align-items: center; gap: 3px; flex-wrap: wrap;">
             <span style="font-size: 10.5px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase;">Insert:</span>
@@ -1718,7 +1717,7 @@
           </div>
           <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
             <button class="apple-btn ${isAttached ? 'btn-blue-primary' : 'btn-plain'}" style="padding: 3px 8px; font-size: 11px;" onclick="event.stopPropagation(); assignResumeToCurrent('${r.filename}')">
-              ${isAttached ? 'Attached ✓' : 'Attach'}
+              ${isAttached ? 'Attached' : 'Attach'}
             </button>
             <button class="ghost-del-btn" title="Delete resume" onclick="event.stopPropagation(); deleteResume('${r.filename}')">
               &times;
@@ -2317,7 +2316,7 @@ Best regards,
     function saveAndGoToMainPage() {
       saveSenderProfileSilently();
       setStudioTab('queue', null);
-      showAppleToast('✓ Template & Profile applied to all recruiter emails!');
+      showAppleToast('Template and profile saved.');
     }
 
     function resetProfileDefaults() {
@@ -2325,7 +2324,7 @@ Best regards,
       localStorage.removeItem('custom_master_template');
       localStorage.removeItem('custom_master_subject');
       loadSenderProfileToInputs();
-      showAppleToast('Reset to platform default profile and templates.');
+      showAppleToast('Reset to default profile and templates.');
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       } else {
@@ -2405,7 +2404,7 @@ ${contentHtml}
         if (profSub) profSub.value = currentSub;
       }
 
-      showAppleToast('✓ Saved! Custom format set with dynamic {Company} placeholders.');
+      showAppleToast('Saved custom template format.');
       
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
@@ -2925,14 +2924,14 @@ ${contentHtml}
       if (!bulkSenderState.active || bulkSenderState.stopped) return;
       bulkSenderState.paused = true;
       updateBulkControlsUI("Paused");
-      showAppleToast("⏸️ Bulk outreach paused.");
+      showAppleToast("Bulk outreach paused.");
     }
 
     function resumeBulkSend() {
       if (!bulkSenderState.active || bulkSenderState.stopped) return;
       bulkSenderState.paused = false;
       updateBulkControlsUI("Resumed");
-      showAppleToast("▶️ Resuming bulk outreach...");
+      showAppleToast("Resuming bulk outreach...");
     }
 
     function stopBulkSend() {
@@ -2942,7 +2941,7 @@ ${contentHtml}
       if (bulkSenderState.currentAbortController) {
         try { bulkSenderState.currentAbortController.abort(); } catch(e) {}
       }
-      showAppleToast("⏹️ Stopping bulk outreach...");
+      showAppleToast("Stopping bulk outreach...");
     }
 
     function updateBulkControlsUI(statusText) {
@@ -2969,7 +2968,7 @@ ${contentHtml}
 
       if (pill) {
         if (bulkSenderState.paused) {
-          pill.innerText = `⏸️ Paused (${bulkSenderState.currentIndex}/${bulkSenderState.total})`;
+          pill.innerText = `Paused (${bulkSenderState.currentIndex}/${bulkSenderState.total})`;
           pill.style.background = 'var(--accent-amber-tint)';
           pill.style.color = 'var(--accent-amber)';
           pill.style.borderColor = 'var(--accent-amber-border)';
@@ -3106,9 +3105,9 @@ ${contentHtml}
         await loadLeadsFromDatabase(true);
         renderQueue();
         if (wasStopped) {
-          showAppleToast(`⏹️ Bulk outreach stopped. ${totalSent} sent.`);
+          showAppleToast(`Bulk outreach stopped. ${totalSent} sent.`);
         } else {
-          showAppleToast(`🎉 Bulk dispatch finished: ${totalSent} sent successfully.`);
+          showAppleToast(`Bulk outreach complete. ${totalSent} emails sent.`);
         }
       }
     }
@@ -3140,7 +3139,7 @@ ${contentHtml}
     }
 
     // ==========================================================
-    // ⏱️ AUTOMATED OUTREACH SCHEDULER ENGINE (Pure Client Orchestration)
+    // AUTOMATED OUTREACH SCHEDULER ENGINE (Pure Client Orchestration)
     // ==========================================================
     const SCHEDULER_STORAGE_KEY = 'recruiter_outreach_scheduler_cfg_v1';
 
@@ -3368,8 +3367,8 @@ ${contentHtml}
     function pauseScheduler() {
       if (schedulerConfig.status === 'armed' || schedulerConfig.status === 'running') {
         schedulerConfig.status = 'paused';
-        addSchedulerLog('⏸️ Scheduler PAUSED by user.', 'warn');
-        showAppleToast('⏸️ Scheduler Paused');
+        addSchedulerLog('Scheduler paused by user.', 'warn');
+        showAppleToast('Scheduler paused');
         renderSchedulerUI();
       }
     }
@@ -3377,8 +3376,8 @@ ${contentHtml}
     function resumeScheduler() {
       if (schedulerConfig.status === 'paused') {
         schedulerConfig.status = (schedulerConfig.mode === 'drip') ? 'running' : 'armed';
-        addSchedulerLog('▶️ Scheduler RESUMED by user.', 'info');
-        showAppleToast('▶️ Scheduler Resumed');
+        addSchedulerLog('Scheduler resumed by user.', 'info');
+        showAppleToast('Scheduler resumed');
         renderSchedulerUI();
       }
     }
@@ -3395,9 +3394,9 @@ ${contentHtml}
       schedulerConfig.status = 'idle';
       schedulerRuntime.nextActionTimestamp = null;
       schedulerRuntime.isExecutingBatch = false;
-      addSchedulerLog('⏹️ Scheduler STOPPED by user.', 'warn');
+      addSchedulerLog('Scheduler stopped by user.', 'warn');
       renderSchedulerUI();
-      showAppleToast('⏹️ Scheduler Deactivated');
+      showAppleToast('Scheduler stopped');
     }
 
     function clearSchedulerLogs() {
@@ -3444,7 +3443,7 @@ ${contentHtml}
             schedulerRuntime.nextActionTimestamp = null;
             await executeScheduledBatch();
             schedulerRuntime.nextActionTimestamp = computeNextRecurringTimestamp();
-            addSchedulerLog(`Daily Autopilot scheduled for next run at: ${new Date(schedulerRuntime.nextActionTimestamp).toLocaleString()}`, 'info');
+            addSchedulerLog(`Daily schedule next run at: ${new Date(schedulerRuntime.nextActionTimestamp).toLocaleString()}`, 'info');
           }
         }
       }
@@ -3493,7 +3492,7 @@ ${contentHtml}
       }
 
       schedulerRuntime.isExecutingBatch = true;
-      addSchedulerLog(`🚀 LAUNCHING SCHEDULED BATCH: ${unsent.length} leads to process...`, 'info');
+      addSchedulerLog(`Starting batch: ${unsent.length} leads to process...`, 'info');
 
       for (let i = 0; i < unsent.length; i++) {
         if (schedulerConfig.status === 'idle') break;
@@ -3525,9 +3524,9 @@ ${contentHtml}
 
       schedulerRuntime.isExecutingBatch = false;
       if (schedulerConfig.status === 'idle') {
-        addSchedulerLog(`⏹️ Scheduled batch stopped.`, 'warn');
+        addSchedulerLog(`Scheduled batch stopped.`, 'warn');
       } else {
-        addSchedulerLog(`🎉 Scheduled batch finished! Session total: ${schedulerRuntime.sessionDispatched} dispatched.`, 'success');
+        addSchedulerLog(`Scheduled batch finished. ${schedulerRuntime.sessionDispatched} dispatched.`, 'success');
         if (schedulerConfig.mode === 'specific') {
           stopScheduler();
         }
@@ -3544,20 +3543,20 @@ ${contentHtml}
     async function executeDripSingleLead() {
       const unsent = recruiters.filter(r => r.status !== 'Sent');
       if (unsent.length === 0) {
-        addSchedulerLog('All leads in queue sent. Smart Drip completed.', 'success');
+        addSchedulerLog('All leads in queue sent. Drip completed.', 'success');
         stopScheduler();
         return;
       }
 
       const nextLead = unsent[0];
       schedulerRuntime.isExecutingBatch = true;
-      addSchedulerLog(`💧 Drip Dispatch: ${nextLead.firstName} @ ${nextLead.company}...`, 'info');
+      addSchedulerLog(`Drip send: ${nextLead.firstName} @ ${nextLead.company}...`, 'info');
       await dispatchSingleLeadFromScheduler(nextLead);
       schedulerRuntime.isExecutingBatch = false;
 
       const remaining = recruiters.filter(r => r.status !== 'Sent').length;
       if (remaining === 0) {
-        addSchedulerLog('All leads sent! Smart Drip finished.', 'success');
+        addSchedulerLog('All leads sent. Drip finished.', 'success');
         stopScheduler();
         return;
       }
@@ -3599,15 +3598,15 @@ ${contentHtml}
           lead.status = 'Sent';
           lead.sentAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           schedulerRuntime.sessionDispatched++;
-          addSchedulerLog(`✓ Delivered to ${lead.firstName} (${lead.company}) — Gmail ID: ${data.id || 'OK'}`, 'success');
+          addSchedulerLog(`Delivered to ${lead.firstName} (${lead.company}) — Gmail ID: ${data.id || 'OK'}`, 'success');
         } else {
           lead.status = 'Failed';
-          addSchedulerLog(`❌ Failed to send to ${lead.email}: ${data.error || 'Server error'}`, 'err');
+          addSchedulerLog(`Failed to send to ${lead.email}: ${data.error || 'Server error'}`, 'err');
         }
       } catch (err) {
         clearTimeout(timeoutId);
         lead.status = 'Failed';
-        addSchedulerLog(`❌ Delivery error for ${lead.email}: ${err.message}`, 'err');
+        addSchedulerLog(`Delivery error for ${lead.email}: ${err.message}`, 'err');
       } finally {
         await loadLeadsFromDatabase(true);
         renderQueue();
