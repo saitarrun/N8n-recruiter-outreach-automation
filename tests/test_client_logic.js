@@ -260,4 +260,52 @@ assert.strictEqual(mockMultiQueue.length, 2);
 assert.strictEqual(mockMultiQueue.some(r => r.email === "b@koyeb.com"), false);
 console.log("✓ Test 12 Passed: Multi-Select Queue Selection and Bulk Delete State Logic");
 
-console.log("\n🎉 ALL 12 JAVASCRIPT CLIENT-SIDE, RESUME & MULTI-SELECT TESTS PASSED!");
+// 13. Per-Preset Custom Template & Subject Saving / Replacement Logic
+const mockTemplatePresets = {
+  opportunities: "Default Job Inquiry for {Company}",
+  applied: "Default Follow-Up for {Company}"
+};
+const mockSubjectPresets = {
+  opportunities: "Default Inquiry Subject: {Company}",
+  applied: "Default Follow-Up Subject: {Company}"
+};
+
+let mockLocalStorage = {};
+
+function testGetTemplate(key) {
+  const custom = mockLocalStorage['custom_template_' + key];
+  if (custom && custom.trim().length > 5) return custom.trim();
+  return mockTemplatePresets[key] || mockTemplatePresets.opportunities;
+}
+
+function testGetSubject(key) {
+  const custom = mockLocalStorage['custom_subject_' + key];
+  if (custom && custom.trim().length > 2) return custom.trim();
+  return mockSubjectPresets[key] || mockSubjectPresets.opportunities;
+}
+
+// 1. Initial defaults
+assert.strictEqual(testGetTemplate('opportunities'), "Default Job Inquiry for {Company}");
+assert.strictEqual(testGetTemplate('applied'), "Default Follow-Up for {Company}");
+
+// 2. User saves custom Job Inquiry template
+mockLocalStorage['custom_template_opportunities'] = "My Custom Job Inquiry Template for {Company}";
+mockLocalStorage['custom_subject_opportunities'] = "Custom Inquiry: {Company}";
+assert.strictEqual(testGetTemplate('opportunities'), "My Custom Job Inquiry Template for {Company}");
+assert.strictEqual(testGetSubject('opportunities'), "Custom Inquiry: {Company}");
+
+// 3. User saves custom Follow-Up template
+mockLocalStorage['custom_template_applied'] = "My Custom Follow-Up Template for {Company}";
+mockLocalStorage['custom_subject_applied'] = "Custom Follow-Up: {Company}";
+assert.strictEqual(testGetTemplate('applied'), "My Custom Follow-Up Template for {Company}");
+assert.strictEqual(testGetSubject('applied'), "Custom Follow-Up: {Company}");
+
+// 4. Resetting Follow-Up does not affect Job Inquiry
+delete mockLocalStorage['custom_template_applied'];
+delete mockLocalStorage['custom_subject_applied'];
+assert.strictEqual(testGetTemplate('applied'), "Default Follow-Up for {Company}");
+assert.strictEqual(testGetTemplate('opportunities'), "My Custom Job Inquiry Template for {Company}");
+
+console.log("✓ Test 13 Passed: Per-Preset Custom Template & Subject Saving and Replacement");
+
+console.log("\n🎉 ALL 13 JAVASCRIPT CLIENT-SIDE, RESUME & TEMPLATE TESTS PASSED!");

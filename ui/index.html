@@ -330,6 +330,16 @@
       color: #93c5fd;
     }
 
+    .template-preset-btn, .studio-tpl-preset-btn {
+      transition: all 0.12s ease;
+    }
+    .template-preset-btn.active, .studio-tpl-preset-btn.active {
+      background: #0071e3 !important;
+      color: #ffffff !important;
+      border-color: #0071e3 !important;
+      font-weight: 600 !important;
+    }
+
     /* Sleek Recruiter List Rows */
     .recruiter-list-group {
       display: flex;
@@ -1409,11 +1419,12 @@
           <div class="card-content" style="padding: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 11px; font-weight: 500; color: var(--label-secondary);">Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('opportunities')">Job Inquiry</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('applied')">Follow-Up</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('standard')">Standard</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('technical')">Technical</button>
+                <span style="font-size: 11px; font-weight: 500; color: var(--label-secondary);">Template:</span>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn active" data-preset="opportunities" onclick="loadTemplatePreset('opportunities')">Job Inquiry</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="applied" onclick="loadTemplatePreset('applied')">Follow-Up</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="comprehensive" onclick="loadTemplatePreset('comprehensive')">Full Stack</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="concise" onclick="loadTemplatePreset('concise')">Short</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="backend" onclick="loadTemplatePreset('backend')">Backend</button>
               </div>
               <div style="display: flex; gap: 4px;">
                 <button class="token-chip" onclick="insertSubjectToken('{Company}')">Company</button>
@@ -1428,17 +1439,18 @@
         <!-- Master Email Body Card -->
         <div class="apple-card">
           <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="card-head-title">Email Message</span>
+            <span class="card-head-title">Email Message <span id="studio-editing-tpl-label" style="font-size: 11px; font-weight: 400; color: var(--accent-blue); margin-left: 8px;">Editing: Job Inquiry</span></span>
+            <button class="apple-btn btn-plain" style="font-size: 11px; padding: 2px 7px;" onclick="resetSingleTemplatePreset()">Reset This Template</button>
           </div>
           <div class="card-content" style="padding: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 11px; font-weight: 500; color: var(--label-secondary);">Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('opportunities')">Job Inquiry</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('applied')">Follow-Up</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('comprehensive')">Full Stack</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('concise')">Short</button>
-                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('backend')">Backend</button>
+                <span style="font-size: 11px; font-weight: 500; color: var(--label-secondary);">Template:</span>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn active" data-preset="opportunities" onclick="loadTemplatePreset('opportunities')">Job Inquiry</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="applied" onclick="loadTemplatePreset('applied')">Follow-Up</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="comprehensive" onclick="loadTemplatePreset('comprehensive')">Full Stack</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="concise" onclick="loadTemplatePreset('concise')">Short</button>
+                <button class="apple-btn btn-tint studio-tpl-preset-btn" data-preset="backend" onclick="loadTemplatePreset('backend')">Backend</button>
               </div>
               <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                 <button class="token-chip" onclick="insertProfToken('{RecruiterName}')">Recruiter</button>
@@ -1670,12 +1682,13 @@
 
         <!-- Template Presets & Helper Bar -->
         <div style="padding: 6px 14px; background: var(--card-head-bg); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-          <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;" id="composer-template-presets">
             <span style="font-size: 10.5px; font-weight: 500; color: var(--label-secondary); text-transform: uppercase; margin-right: 2px;">Templates:</span>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('opportunities')">Job Inquiry</button>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('applied')">Follow-Up</button>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('comprehensive')">Full Stack</button>
-            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('concise')">Short</button>
+            <button class="apple-btn btn-tint template-preset-btn active" data-preset="opportunities" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('opportunities')">Job Inquiry</button>
+            <button class="apple-btn btn-tint template-preset-btn" data-preset="applied" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('applied')">Follow-Up</button>
+            <button class="apple-btn btn-tint template-preset-btn" data-preset="comprehensive" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('comprehensive')">Full Stack</button>
+            <button class="apple-btn btn-tint template-preset-btn" data-preset="concise" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('concise')">Short</button>
+            <button class="apple-btn btn-tint template-preset-btn" data-preset="backend" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('backend')">Backend</button>
           </div>
           <div style="display: flex; align-items: center; gap: 3px; flex-wrap: wrap;">
             <span style="font-size: 10.5px; font-weight: 500; color: var(--label-tertiary); text-transform: uppercase;">Insert:</span>
@@ -2452,6 +2465,9 @@ Best regards,
     const SUBJECT_PRESETS = {
       opportunities: "Exploring Software Engineering Opportunities at {Company} — {SenderName}",
       applied: "Application Follow-Up: Software Engineer at {Company} — {SenderName}",
+      comprehensive: "Software Engineering Opportunities at {Company} — {SenderName}",
+      concise: "Software Engineering Opportunities at {Company} — {SenderName}",
+      backend: "{SenderTitle} (Backend & Distributed Systems) — {Company} | {SenderName}",
       standard: "Software Engineering Opportunities at {Company} — {SenderName}",
       technical: "{SenderTitle} (Backend & Distributed Systems) — {Company} | {SenderName}",
       inquiry: "Exploring {SenderTitle} Roles at {Company} — {SenderName}"
@@ -2459,12 +2475,43 @@ Best regards,
 
     const DEFAULT_MASTER_SUBJECT = SUBJECT_PRESETS.opportunities;
 
-    function getMasterSubjectTemplate() {
-      const stored = localStorage.getItem('custom_master_subject');
-      if (stored && stored.trim().length > 2) {
-        return stored.trim();
+    let currentActiveTemplateKey = localStorage.getItem('active_template_key') || 'opportunities';
+
+    function getPresetDisplayName(key) {
+      const map = {
+        opportunities: 'Job Inquiry',
+        applied: 'Follow-Up',
+        comprehensive: 'Full Stack',
+        concise: 'Short',
+        backend: 'Backend'
+      };
+      return map[key] || 'Custom';
+    }
+
+    function getTemplateForKey(key) {
+      key = key || currentActiveTemplateKey || 'opportunities';
+      const custom = localStorage.getItem('custom_template_' + key);
+      if (custom && custom.trim().length > 5) {
+        return htmlToPlainText(custom);
       }
-      return DEFAULT_MASTER_SUBJECT;
+      return TEMPLATE_PRESETS[key] || TEMPLATE_PRESETS.opportunities;
+    }
+
+    function getSubjectForKey(key) {
+      key = key || currentActiveTemplateKey || 'opportunities';
+      const custom = localStorage.getItem('custom_subject_' + key);
+      if (custom && custom.trim().length > 2) {
+        return custom.trim();
+      }
+      return SUBJECT_PRESETS[key] || SUBJECT_PRESETS.opportunities;
+    }
+
+    function getMasterSubjectTemplate() {
+      return getSubjectForKey(currentActiveTemplateKey);
+    }
+
+    function getMasterTemplate() {
+      return getTemplateForKey(currentActiveTemplateKey);
     }
 
     function renderSubject(tpl, payload, profile) {
@@ -2490,22 +2537,7 @@ Best regards,
     }
 
     function loadSubjectPreset(key) {
-      const tpl = SUBJECT_PRESETS[key] || SUBJECT_PRESETS.opportunities || SUBJECT_PRESETS.standard;
-      const area = document.getElementById('prof-subject');
-      if (area) {
-        area.value = tpl;
-        saveSenderProfileSilently();
-        onProfileStudioLiveInput();
-        showAppleToast(`Loaded "${key}" subject preset.`);
-      }
-    }
-
-    function getMasterTemplate() {
-      const stored = localStorage.getItem('custom_master_template');
-      if (stored && stored.trim().length > 10) {
-        return htmlToPlainText(stored);
-      }
-      return DEFAULT_MASTER_TEMPLATE;
+      loadTemplatePreset(key);
     }
 
     function insertPlaceholderToken(token) {
@@ -2529,23 +2561,29 @@ Best regards,
     }
 
     function loadTemplatePreset(presetKey) {
-      const tpl = TEMPLATE_PRESETS[presetKey] || TEMPLATE_PRESETS.opportunities || TEMPLATE_PRESETS.comprehensive;
+      currentActiveTemplateKey = presetKey;
+      localStorage.setItem('active_template_key', presetKey);
+
+      document.querySelectorAll('.template-preset-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-preset') === presetKey);
+      });
+      document.querySelectorAll('.studio-tpl-preset-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-preset') === presetKey);
+      });
+
+      const labelEl = document.getElementById('studio-editing-tpl-label');
+      if (labelEl) labelEl.innerText = `Editing: ${getPresetDisplayName(presetKey)}`;
+
+      const tpl = getTemplateForKey(presetKey);
+      const sub = getSubjectForKey(presetKey);
+
       const area = document.getElementById('prof-template');
-      if (area) {
-        area.value = tpl;
-        if (presetKey === 'applied') {
-          loadSubjectPreset('applied');
-        } else if (presetKey === 'opportunities') {
-          loadSubjectPreset('opportunities');
-        } else if (presetKey === 'backend') {
-          loadSubjectPreset('technical');
-        } else if (presetKey === 'concise' || presetKey === 'comprehensive') {
-          loadSubjectPreset('standard');
-        }
-        saveSenderProfileSilently();
-        onProfileStudioLiveInput();
-        showAppleToast(`Loaded "${presetKey}" template preset.`);
-      }
+      if (area) area.value = tpl;
+      const subArea = document.getElementById('prof-subject');
+      if (subArea) subArea.value = sub;
+
+      saveSenderProfileSilently();
+      onProfileStudioLiveInput();
     }
 
     function applyPresetToCurrentView(presetKey) {
@@ -2555,7 +2593,8 @@ Best regards,
       } else {
         updateComposeCanvasForRecruiter(null);
       }
-      showAppleToast(`Applied "${presetKey}" template.`);
+      const hasCustom = !!localStorage.getItem('custom_template_' + presetKey);
+      showAppleToast(`Loaded ${getPresetDisplayName(presetKey)} template${hasCustom ? ' (Custom)' : ''}.`);
     }
 
     function getSenderProfile() {
@@ -2579,8 +2618,15 @@ Best regards,
       setVal('prof-linkedin', p.linkedin);
       setVal('prof-github', p.github);
       setVal('prof-portfolio', p.portfolio);
-      setVal('prof-subject', getMasterSubjectTemplate());
-      setVal('prof-template', htmlToPlainText(getMasterTemplate()));
+      setVal('prof-subject', getSubjectForKey(currentActiveTemplateKey));
+      setVal('prof-template', htmlToPlainText(getTemplateForKey(currentActiveTemplateKey)));
+
+      const labelEl = document.getElementById('studio-editing-tpl-label');
+      if (labelEl) labelEl.innerText = `Editing: ${getPresetDisplayName(currentActiveTemplateKey)}`;
+
+      document.querySelectorAll('.studio-tpl-preset-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-preset') === currentActiveTemplateKey);
+      });
     }
 
     function saveSenderProfileSilently() {
@@ -2599,6 +2645,7 @@ Best regards,
       if (subEl) {
         const subVal = subEl.value.trim();
         if (subVal && subVal.length > 2) {
+          localStorage.setItem('custom_subject_' + currentActiveTemplateKey, subVal);
           localStorage.setItem('custom_master_subject', subVal);
         }
       }
@@ -2606,8 +2653,10 @@ Best regards,
       const tplEl = document.getElementById('prof-template');
       if (tplEl) {
         const tplVal = tplEl.value.trim();
-        if (tplVal && tplVal.length > 10) {
-          localStorage.setItem('custom_master_template', htmlToPlainText(tplVal));
+        if (tplVal && tplVal.length > 5) {
+          const plain = htmlToPlainText(tplVal);
+          localStorage.setItem('custom_template_' + currentActiveTemplateKey, plain);
+          localStorage.setItem('custom_master_template', plain);
         }
       }
 
@@ -2621,7 +2670,7 @@ Best regards,
 
     function saveSenderProfile() {
       saveSenderProfileSilently();
-      showAppleToast('Profile, Subject & Master Template saved!');
+      showAppleToast('Profile & Templates saved.');
     }
 
     function saveAndGoToMainPage() {
@@ -2699,6 +2748,7 @@ ${contentHtml}
       }
 
       if (plain && plain.trim().length > 5) {
+        localStorage.setItem('custom_template_' + currentActiveTemplateKey, plain);
         localStorage.setItem('custom_master_template', plain);
         const profTpl = document.getElementById('prof-template');
         if (profTpl) profTpl.value = plain;
@@ -2710,12 +2760,13 @@ ${contentHtml}
         currentSub = currentSub.replace(compRegex, '{Company}');
       }
       if (currentSub && currentSub.length > 2) {
+        localStorage.setItem('custom_subject_' + currentActiveTemplateKey, currentSub);
         localStorage.setItem('custom_master_subject', currentSub);
         const profSub = document.getElementById('prof-subject');
         if (profSub) profSub.value = currentSub;
       }
 
-      showAppleToast('Saved custom template format.');
+      showAppleToast(`Saved and replaced ${getPresetDisplayName(currentActiveTemplateKey)} template.`);
       
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
@@ -2725,19 +2776,30 @@ ${contentHtml}
     }
 
     function resetBodyToDefault() {
-      localStorage.removeItem('custom_master_template');
-      localStorage.removeItem('custom_master_subject');
+      localStorage.removeItem('custom_template_' + currentActiveTemplateKey);
+      localStorage.removeItem('custom_subject_' + currentActiveTemplateKey);
+
+      const defaultTpl = TEMPLATE_PRESETS[currentActiveTemplateKey] || TEMPLATE_PRESETS.opportunities;
+      const defaultSub = SUBJECT_PRESETS[currentActiveTemplateKey] || SUBJECT_PRESETS.opportunities;
+
+      localStorage.setItem('custom_master_template', defaultTpl);
+      localStorage.setItem('custom_master_subject', defaultSub);
+
       const profTpl = document.getElementById('prof-template');
-      if (profTpl) profTpl.value = DEFAULT_MASTER_TEMPLATE;
+      if (profTpl) profTpl.value = defaultTpl;
       const profSub = document.getElementById('prof-subject');
-      if (profSub) profSub.value = DEFAULT_MASTER_SUBJECT;
+      if (profSub) profSub.value = defaultSub;
 
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
       } else {
         updateComposeCanvasForRecruiter(null);
       }
-      showAppleToast('Reset to platform default template.');
+      showAppleToast(`Reset ${getPresetDisplayName(currentActiveTemplateKey)} to default.`);
+    }
+
+    function resetSingleTemplatePreset() {
+      resetBodyToDefault();
     }
 
     // Updates right Apple Mail Compose Pane without touching Add Lead Form
