@@ -930,21 +930,21 @@
 </head>
 <body>
 
-  <!-- macOS Window Header -->
+  <!-- Topbar Header -->
   <header class="app-header">
     <div class="header-left">
       <div class="app-icon-badge">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="#ffffff"/>
         </svg>
       </div>
       <div>
-        <div class="app-title">Recruiter Outreach Platform</div>
-        <div class="app-sub">Sai Tarrun Pitta • Software Engineer</div>
+        <div class="app-title">Recruiter Outreach</div>
+        <div class="app-sub">Sai Tarrun Pitta</div>
       </div>
     </div>
 
-    <!-- Apple Segmented Navigation -->
+    <!-- Navigation Switcher -->
     <div class="segmented-control">
       <button class="segmented-item active" onclick="setStudioTab('queue', event)">
         Leads (<span id="queue-badge">0</span>)
@@ -953,89 +953,89 @@
         Resumes (<span id="resume-badge">0</span>)
       </button>
       <button class="segmented-item" onclick="setStudioTab('bulk', event)">
-        Bulk Import
+        Import
       </button>
       <button class="segmented-item" onclick="setStudioTab('profile', event)">
-        Templates & Profile
+        Templates
       </button>
       <button class="segmented-item" onclick="setStudioTab('scheduler', event)" id="tab-btn-scheduler">
-        Scheduler <span id="scheduler-header-dot" style="display:none; width:7px; height:7px; border-radius:50%; background:#10b981; margin-left:4px; box-shadow: 0 0 6px #10b981;"></span>
+        Schedule <span id="scheduler-header-dot" style="display:none; width:7px; height:7px; border-radius:50%; background:#22c55e; margin-left:4px;"></span>
       </button>
     </div>
 
     <div class="header-actions">
-      <!-- Real-time n8n Health Badge -->
-      <div class="health-badge" id="n8n-health-badge" title="Real-time engine status and latency">
+      <!-- Status Badge -->
+      <div class="health-badge" id="n8n-health-badge" title="Server status">
         <span class="health-pulse-dot" id="n8n-health-dot"></span>
-        <span id="n8n-health-label">n8n Connected</span>
+        <span id="n8n-health-label">Online</span>
       </div>
 
-      <button class="apple-btn btn-plain" onclick="setStudioTab('scheduler', null)" id="btn-header-scheduler" title="Open Automated Outreach Scheduler">
-        ⏱️ Schedule
+      <button class="apple-btn btn-plain" onclick="setStudioTab('scheduler', null)" id="btn-header-scheduler" title="Open Scheduler">
+        Schedule
       </button>
 
-      <!-- Standard Bulk Send Trigger -->
+      <!-- Bulk Send Button -->
       <button class="apple-btn btn-blue-primary" onclick="sendBulkUnsentQueue()" id="btn-bulk-send">
-        Send Unsent in Bulk
+        Send All
       </button>
 
-      <!-- Live Bulk Dispatch Controls (Appears during Bulk Send) -->
+      <!-- Live Controls -->
       <div id="bulk-live-controls" style="display: none; align-items: center; gap: 6px;">
-        <span id="bulk-progress-pill" style="font-size: 12px; font-weight: 600; background: var(--accent-blue-tint); color: var(--accent-blue); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--accent-blue-border);">
+        <span id="bulk-progress-pill" style="font-size: 11.5px; font-weight: 600; background: var(--accent-blue-tint); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--accent-blue-border);">
           Sending 1/50...
         </span>
-        <button class="apple-btn btn-plain" id="btn-bulk-pause" onclick="pauseBulkSend()" title="Pause Bulk Dispatch">
-          ⏸️ Pause
+        <button class="apple-btn btn-plain" id="btn-bulk-pause" onclick="pauseBulkSend()" title="Pause">
+          Pause
         </button>
-        <button class="apple-btn btn-blue-primary" id="btn-bulk-resume" onclick="resumeBulkSend()" style="display: none;" title="Resume Bulk Dispatch">
-          ▶️ Resume
+        <button class="apple-btn btn-blue-primary" id="btn-bulk-resume" onclick="resumeBulkSend()" style="display: none;" title="Resume">
+          Resume
         </button>
-        <button class="apple-btn btn-destruct" id="btn-bulk-stop" onclick="stopBulkSend()" title="Stop Bulk Dispatch">
-          ⏹️ Stop
+        <button class="apple-btn btn-destruct" id="btn-bulk-stop" onclick="stopBulkSend()" title="Stop">
+          Stop
         </button>
       </div>
     </div>
   </header>
 
-  <!-- FULL-PAGE AUTOMATED OUTREACH SCHEDULER STUDIO -->
+  <!-- SCHEDULE EMAILS STUDIO -->
   <div id="view-scheduler-studio" class="fullpage-studio" style="display: none;">
     <!-- Scheduler Topbar -->
     <div class="studio-topbar">
       <div>
         <div style="display: flex; align-items: center; gap: 10px;">
-          <h2 style="font-size: 20px; font-weight: 700; color: var(--label-primary); margin: 0; letter-spacing: -0.02em;">Automated Outreach Scheduler</h2>
+          <h2 style="font-size: 18px; font-weight: 700; color: var(--label-primary); margin: 0; letter-spacing: -0.01em;">Schedule Emails</h2>
           <span class="scheduler-status-pill scheduler-status-idle" id="sched-status-badge">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>
-            <span id="sched-status-text">Status: Idle</span>
+            <span id="sched-status-text">Idle</span>
           </span>
         </div>
-        <p style="font-size: 13px; color: var(--label-secondary); margin: 4px 0 0 0;">Intelligent time-delayed launches, natural drip intervals, and business-hours auto-pilot without modifying your database.</p>
+        <p style="font-size: 12.5px; color: var(--label-secondary); margin: 4px 0 0 0;">Set up automated sending times and delays between emails.</p>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back to Leads</button>
-        <button class="apple-btn btn-destruct" id="btn-sched-stop" onclick="stopScheduler()" style="display: none;">⏹️ Stop Schedule</button>
-        <button class="apple-btn btn-plain" id="btn-sched-pause" onclick="pauseScheduler()" style="display: none;">⏸️ Pause Schedule</button>
-        <button class="apple-btn btn-blue-primary" id="btn-sched-resume" onclick="resumeScheduler()" style="display: none;">▶️ Resume Schedule</button>
-        <button class="apple-btn btn-blue-primary" id="btn-sched-arm" onclick="startScheduler()">▶️ Arm & Start Scheduler</button>
+        <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back</button>
+        <button class="apple-btn btn-destruct" id="btn-sched-stop" onclick="stopScheduler()" style="display: none;">Stop</button>
+        <button class="apple-btn btn-plain" id="btn-sched-pause" onclick="pauseScheduler()" style="display: none;">Pause</button>
+        <button class="apple-btn btn-blue-primary" id="btn-sched-resume" onclick="resumeScheduler()" style="display: none;">Resume</button>
+        <button class="apple-btn btn-blue-primary" id="btn-sched-arm" onclick="startScheduler()">Start Schedule</button>
       </div>
     </div>
 
     <!-- 4-Box Metrics Bar -->
     <div class="scheduler-stat-grid">
       <div class="scheduler-stat-box">
-        <div class="scheduler-stat-label">Unsent Leads in Queue</div>
+        <div class="scheduler-stat-label">Unsent Leads</div>
         <div class="scheduler-stat-value" id="sched-stat-unsent">0</div>
       </div>
       <div class="scheduler-stat-box">
-        <div class="scheduler-stat-label">Scheduled in Current Run</div>
+        <div class="scheduler-stat-label">Scheduled</div>
         <div class="scheduler-stat-value" id="sched-stat-scheduled" style="color: var(--accent-blue);">0</div>
       </div>
       <div class="scheduler-stat-box">
-        <div class="scheduler-stat-label">Dispatched this Session</div>
+        <div class="scheduler-stat-label">Sent Today</div>
         <div class="scheduler-stat-value" id="sched-stat-sent" style="color: var(--accent-green);">0</div>
       </div>
       <div class="scheduler-stat-box">
-        <div class="scheduler-stat-label">Countdown / Next Action</div>
+        <div class="scheduler-stat-label">Next Send In</div>
         <div class="scheduler-countdown-display" id="sched-countdown-display">--:--:--</div>
       </div>
     </div>
@@ -1048,33 +1048,33 @@
         <!-- Mode Picker Card -->
         <div class="apple-card" style="margin-bottom: 16px;">
           <div class="card-head">
-            <span class="card-head-title">1. Select Scheduling Cadence</span>
+            <span class="card-head-title">1. Choose When to Send</span>
           </div>
           <div class="card-content" style="padding: 16px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;">
               <button class="apple-btn btn-tint active" id="sched-mode-btn-specific" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('specific')">
-                ⏱️ Delayed Launch<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Specific Date & Time</span>
+                ⏱️ Set Date & Time<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Send at a future time</span>
               </button>
               <button class="apple-btn btn-plain" id="sched-mode-btn-drip" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('drip')">
-                💧 Smart Drip<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">1 Email every N mins</span>
+                💧 Drip (Spread Out)<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">1 email every few mins</span>
               </button>
               <button class="apple-btn btn-plain" id="sched-mode-btn-recurring" style="padding: 10px 8px; font-size: 12px; font-weight: 600; text-align: center;" onclick="setSchedulerMode('recurring')">
-                📅 Daily Autopilot<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Optimal Recruiter Hours</span>
+                📅 Daily Schedule<br><span style="font-size: 10.5px; font-weight: 400; color: var(--label-secondary);">Send every weekday</span>
               </button>
             </div>
 
             <!-- MODE 1: Specific Date/Time Launch Settings -->
             <div id="sched-settings-specific" style="display: block;">
-              <label class="form-label-text">Target Launch Date & Time</label>
+              <label class="form-label-text">Send Date & Time</label>
               <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <input type="datetime-local" id="sched-datetime-input" class="apple-input" style="font-size: 13.5px; padding: 8px 12px; font-weight: 500;" onchange="onSchedulerConfigChange()">
+                <input type="datetime-local" id="sched-datetime-input" class="apple-input" style="font-size: 13px; padding: 7px 10px; font-weight: 500;" onchange="onSchedulerConfigChange()">
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
-                <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); align-self: center;">Quick Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('in15m')">+15 Mins</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('in1h')">+1 Hour</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('tomorrow9am')">Tomorrow 9:00 AM</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="setQuickSchedTime('tomorrow2pm')">Tomorrow 2:00 PM</button>
+                <span style="font-size: 11px; font-weight: 600; color: var(--label-secondary); align-self: center;">Presets:</span>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="setQuickSchedTime('in15m')">+15 Mins</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="setQuickSchedTime('in1h')">+1 Hour</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="setQuickSchedTime('tomorrow9am')">Tomorrow 9 AM</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="setQuickSchedTime('tomorrow2pm')">Tomorrow 2 PM</button>
               </div>
             </div>
 
@@ -1082,7 +1082,7 @@
             <div id="sched-settings-drip" style="display: none;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                 <div>
-                  <label class="form-label-text">Interval Between Sends</label>
+                  <label class="form-label-text">Time Between Emails</label>
                   <select id="sched-drip-interval" class="apple-select" onchange="onSchedulerConfigChange()">
                     <option value="1">Every 1 minute</option>
                     <option value="2">Every 2 minutes</option>
@@ -1093,10 +1093,10 @@
                   </select>
                 </div>
                 <div>
-                  <label class="form-label-text">Human Jitter Randomizer</label>
+                  <label class="form-label-text">Natural Random Delay</label>
                   <select id="sched-drip-jitter" class="apple-select" onchange="onSchedulerConfigChange()">
-                    <option value="true" selected>Enabled (± 30s organic variance)</option>
-                    <option value="false">Disabled (Exact strict timer)</option>
+                    <option value="true" selected>Enabled (± 30s variance)</option>
+                    <option value="false">Disabled (exact timer)</option>
                   </select>
                 </div>
               </div>
@@ -1106,17 +1106,17 @@
             <div id="sched-settings-recurring" style="display: none;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                 <div>
-                  <label class="form-label-text">Daily Run Time</label>
+                  <label class="form-label-text">Time of Day</label>
                   <input type="time" id="sched-recurring-time" class="apple-input" value="09:15" onchange="onSchedulerConfigChange()">
                 </div>
                 <div>
-                  <label class="form-label-text">Daily Max Dispatch Cap</label>
+                  <label class="form-label-text">Max Emails per Day</label>
                   <input type="number" id="sched-recurring-cap" class="apple-input" value="20" min="1" max="100" onchange="onSchedulerConfigChange()">
                 </div>
               </div>
               <div style="margin-bottom: 8px;">
-                <label class="form-label-text">Active Days (Peak Response Window)</label>
-                <div style="display: flex; gap: 12px; font-size: 13px; color: var(--label-primary);">
+                <label class="form-label-text">Active Days</label>
+                <div style="display: flex; gap: 12px; font-size: 12.5px; color: var(--label-primary);">
                   <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-1" checked onchange="onSchedulerConfigChange()"> Mon</label>
                   <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-2" checked onchange="onSchedulerConfigChange()"> Tue</label>
                   <label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="sched-day-3" checked onchange="onSchedulerConfigChange()"> Wed</label>
@@ -1132,34 +1132,34 @@
         <!-- Target Scope & Delivery Safety Card -->
         <div class="apple-card" style="margin-bottom: 16px;">
           <div class="card-head">
-            <span class="card-head-title">2. Target Queue & Rate Safeguards</span>
+            <span class="card-head-title">2. Limits & Delays</span>
           </div>
           <div class="card-content" style="padding: 16px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div>
-                <label class="form-label-text">Target Leads Scope</label>
+                <label class="form-label-text">How Many Leads to Send</label>
                 <select id="sched-scope-select" class="apple-select" onchange="onSchedulerConfigChange()">
-                  <option value="all" selected>All Currently Unsent Leads</option>
-                  <option value="5">Limit to Next 5 Unsent Leads</option>
-                  <option value="10">Limit to Next 10 Unsent Leads</option>
-                  <option value="15">Limit to Next 15 Unsent Leads</option>
-                  <option value="25">Limit to Next 25 Unsent Leads</option>
+                  <option value="all" selected>All unsent leads</option>
+                  <option value="5">Next 5 unsent leads</option>
+                  <option value="10">Next 10 unsent leads</option>
+                  <option value="15">Next 15 unsent leads</option>
+                  <option value="25">Next 25 unsent leads</option>
                 </select>
               </div>
               <div>
-                <label class="form-label-text">Intra-Batch Spacing Pause</label>
+                <label class="form-label-text">Delay Between Each Email</label>
                 <select id="sched-spacing-select" class="apple-select" onchange="onSchedulerConfigChange()">
-                  <option value="2">2 seconds (Standard)</option>
+                  <option value="2">2 seconds</option>
                   <option value="5" selected>5 seconds (Recommended)</option>
-                  <option value="10">10 seconds (Cautious)</option>
-                  <option value="20">20 seconds (High Anti-Spam)</option>
+                  <option value="10">10 seconds</option>
+                  <option value="20">20 seconds</option>
                 </select>
               </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--label-secondary); background: var(--surface-elevated); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
-              <span style="font-size: 14px;">🛡️</span>
-              <span><strong>Sent History Protection:</strong> The scheduler strictly excludes all previously sent recruiters, ensuring zero duplicate dispatches.</span>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--label-secondary); background: var(--surface-elevated); border: 1px solid var(--border-subtle); padding: 9px 12px; border-radius: var(--radius-sm);">
+              <span style="font-size: 13px;">🛡️</span>
+              <span><strong>No Duplicates:</strong> Emails are never sent twice to the same contact.</span>
             </div>
           </div>
         </div>
@@ -1167,12 +1167,12 @@
         <!-- Live Scheduler Activity Terminal -->
         <div class="apple-card">
           <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="card-head-title">3. Live Execution & Activity Log</span>
-            <button class="apple-btn btn-plain" style="padding: 2px 8px; font-size: 11px;" onclick="clearSchedulerLogs()">Clear Logs</button>
+            <span class="card-head-title">3. Activity Log</span>
+            <button class="apple-btn btn-plain" style="padding: 2px 8px; font-size: 11px;" onclick="clearSchedulerLogs()">Clear</button>
           </div>
           <div class="card-content" style="padding: 12px;">
             <div class="scheduler-log-terminal" id="scheduler-log-box">
-              <div class="scheduler-log-entry"><span class="scheduler-log-time">[System]</span> <span class="scheduler-log-info">Automated Outreach Scheduler initialized and ready.</span></div>
+              <div class="scheduler-log-entry"><span class="scheduler-log-time">[System]</span> <span class="scheduler-log-info">Scheduler ready.</span></div>
             </div>
           </div>
         </div>
@@ -1183,22 +1183,22 @@
       <div class="studio-preview-pane">
         <div class="apple-card">
           <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="card-head-title">Upcoming Scheduled Dispatches</span>
-            <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 3px 8px;" onclick="testDispatchSingleLead()">⚡ Test Send 1 Lead Now</button>
+            <span class="card-head-title">Upcoming Emails</span>
+            <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="testDispatchSingleLead()">Test Send 1 Lead</button>
           </div>
           <div class="card-content" style="padding: 0; max-height: 540px; overflow-y: auto;">
             <table class="scheduler-queue-table">
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Recruiter & Company</th>
+                  <th>#</th>
+                  <th>Contact & Company</th>
                   <th>Email</th>
-                  <th>Projected Time</th>
+                  <th>Send Time</th>
                 </tr>
               </thead>
               <tbody id="scheduler-queue-tbody">
                 <tr>
-                  <td colspan="4" style="text-align: center; color: var(--label-secondary); padding: 24px;">No upcoming scheduled dispatches.</td>
+                  <td colspan="4" style="text-align: center; color: var(--label-secondary); padding: 24px;">No upcoming emails scheduled.</td>
                 </tr>
               </tbody>
             </table>
@@ -1209,18 +1209,18 @@
     </div>
   </div>
 
-  <!-- FULL-PAGE TEMPLATE & PROFILE STUDIO (Clean, Spacious & Intuitive) -->
+  <!-- TEMPLATES & PROFILE STUDIO -->
   <div id="view-profile-studio" class="fullpage-studio" style="display: none;">
     <!-- Studio Topbar -->
     <div class="studio-topbar">
       <div>
-        <h2 style="font-size: 20px; font-weight: 700; color: var(--label-primary); margin: 0; letter-spacing: -0.02em;">Templates & Sender Profile Studio</h2>
-        <p style="font-size: 13px; color: var(--label-secondary); margin: 4px 0 0 0;">Spacious, distraction-free environment to customize your profile, master subject line, and outreach email copy.</p>
+        <h2 style="font-size: 18px; font-weight: 700; color: var(--label-primary); margin: 0; letter-spacing: -0.01em;">Templates & Profile</h2>
+        <p style="font-size: 12.5px; color: var(--label-secondary); margin: 4px 0 0 0;">Customize your personal details, subject lines, and email messages.</p>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back to Leads</button>
-        <button class="apple-btn btn-plain" onclick="resetProfileDefaults()">Reset Defaults</button>
-        <button class="apple-btn btn-blue-primary" onclick="saveAndGoToMainPage()">Save & Apply to Main Page →</button>
+        <button class="apple-btn btn-plain" onclick="setStudioTab('queue', null)">← Back</button>
+        <button class="apple-btn btn-plain" onclick="resetProfileDefaults()">Reset</button>
+        <button class="apple-btn btn-blue-primary" onclick="saveAndGoToMainPage()">Save Changes →</button>
       </div>
     </div>
 
@@ -1232,7 +1232,7 @@
         <!-- Sender Identity Card -->
         <div class="apple-card" style="margin-bottom: 16px;">
           <div class="card-head">
-            <span class="card-head-title">1. Sender Identity & Contact Info</span>
+            <span class="card-head-title">1. Your Details</span>
           </div>
           <div class="card-content" style="padding: 16px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
@@ -1241,29 +1241,29 @@
                 <input type="text" id="prof-name" class="apple-input" value="Sai Tarrun Pitta" oninput="onProfileStudioLiveInput()">
               </div>
               <div>
-                <label class="form-label-text">Professional Title</label>
+                <label class="form-label-text">Job Title</label>
                 <input type="text" id="prof-title" class="apple-input" value="Software Engineer" oninput="onProfileStudioLiveInput()">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div>
-                <label class="form-label-text">Contact Email</label>
+                <label class="form-label-text">Email</label>
                 <input type="email" id="prof-email" class="apple-input" value="saitarrunpitta@gmail.com" oninput="onProfileStudioLiveInput()">
               </div>
               <div>
-                <label class="form-label-text">LinkedIn Profile URL</label>
+                <label class="form-label-text">LinkedIn Profile</label>
                 <input type="text" id="prof-linkedin" class="apple-input" value="https://linkedin.com/in/saitarrunpitta" oninput="onProfileStudioLiveInput()">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div>
-                <label class="form-label-text">GitHub URL</label>
+                <label class="form-label-text">GitHub Profile</label>
                 <input type="text" id="prof-github" class="apple-input" value="https://github.com/saitarrun" oninput="onProfileStudioLiveInput()">
               </div>
               <div>
-                <label class="form-label-text">Portfolio Website URL</label>
+                <label class="form-label-text">Portfolio Website</label>
                 <input type="text" id="prof-portfolio" class="apple-input" value="https://saitarrunpitta.vercel.app" oninput="onProfileStudioLiveInput()">
               </div>
             </div>
@@ -1273,53 +1273,53 @@
         <!-- Master Subject Line Card -->
         <div class="apple-card" style="margin-bottom: 16px;">
           <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="card-head-title">2. Master Subject Line Template</span>
-            <span style="font-size: 11.5px; color: var(--accent-blue); font-weight: 500;">Supports {Company}, {SenderName}</span>
+            <span class="card-head-title">2. Subject Line</span>
+            <span style="font-size: 11px; color: var(--accent-blue); font-weight: 500;">Supports {Company}, {SenderName}</span>
           </div>
           <div class="card-content" style="padding: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('opportunities')">✨ Role Inquiry</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('applied')">📝 Applied Follow-Up</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('standard')">Standard</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadSubjectPreset('technical')">Technical Focus</button>
+                <span style="font-size: 11px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('opportunities')">✨ Job Inquiry</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('applied')">📝 Follow Up</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('standard')">Standard</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadSubjectPreset('technical')">Technical</button>
               </div>
               <div style="display: flex; gap: 4px;">
-                <button class="token-chip" onclick="insertSubjectToken('{Company}')">+ {Company}</button>
-                <button class="token-chip" onclick="insertSubjectToken('{SenderName}')">+ {SenderName}</button>
-                <button class="token-chip" onclick="insertSubjectToken('{SenderTitle}')">+ {SenderTitle}</button>
+                <button class="token-chip" onclick="insertSubjectToken('{Company}')">+ Company</button>
+                <button class="token-chip" onclick="insertSubjectToken('{SenderName}')">+ Your Name</button>
+                <button class="token-chip" onclick="insertSubjectToken('{SenderTitle}')">+ Your Title</button>
               </div>
             </div>
-            <input type="text" id="prof-subject" class="apple-input" style="font-size: 13.5px; padding: 9px 12px; font-weight: 500;" value="Exploring Software Engineering Opportunities at {Company} — {SenderName}" oninput="onProfileStudioLiveInput()">
+            <input type="text" id="prof-subject" class="apple-input" style="font-size: 13px; padding: 7px 10px; font-weight: 500;" value="Exploring Software Engineering Opportunities at {Company} — {SenderName}" oninput="onProfileStudioLiveInput()">
           </div>
         </div>
 
         <!-- Master Email Body Card -->
         <div class="apple-card">
           <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="card-head-title">3. Master Email Body (Pure Plain Text)</span>
-            <span style="font-size: 11.5px; color: var(--label-secondary);">Type naturally with blank lines between paragraphs</span>
+            <span class="card-head-title">3. Email Message</span>
+            <span style="font-size: 11px; color: var(--label-secondary);">Plain text template</span>
           </div>
           <div class="card-content" style="padding: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('opportunities')">✨ Ask for Available Roles</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('applied')">📝 Applied for Position</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('comprehensive')">⚡ Full Stack / AI</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('concise')">🎯 Concise & Direct</button>
-                <button class="apple-btn btn-tint" style="font-size: 11.5px; padding: 4px 8px;" onclick="loadTemplatePreset('backend')">⚙️ Backend & Systems</button>
+                <span style="font-size: 11px; font-weight: 600; color: var(--label-secondary);">Presets:</span>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('opportunities')">✨ Job Inquiry</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('applied')">📝 Follow Up</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('comprehensive')">⚡ Full Stack</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('concise')">🎯 Short</button>
+                <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="loadTemplatePreset('backend')">⚙️ Backend</button>
               </div>
               <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                <button class="token-chip" onclick="insertProfToken('{RecruiterName}')">+ {RecruiterName}</button>
-                <button class="token-chip" onclick="insertProfToken('{Company}')">+ {Company}</button>
-                <button class="token-chip" onclick="insertProfToken('{SenderName}')">+ {SenderName}</button>
-                <button class="token-chip" onclick="insertProfToken('{SenderTitle}')">+ {SenderTitle}</button>
-                <button class="token-chip" onclick="insertProfToken('{SignatureBlock}')">+ {SignatureBlock}</button>
+                <button class="token-chip" onclick="insertProfToken('{RecruiterName}')">+ Recruiter</button>
+                <button class="token-chip" onclick="insertProfToken('{Company}')">+ Company</button>
+                <button class="token-chip" onclick="insertProfToken('{SenderName}')">+ Your Name</button>
+                <button class="token-chip" onclick="insertProfToken('{SenderTitle}')">+ Your Title</button>
+                <button class="token-chip" onclick="insertProfToken('{SignatureBlock}')">+ Signature</button>
               </div>
             </div>
-            <textarea id="prof-template" class="apple-textarea" rows="18" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; font-size: 13.5px; line-height: 1.6; padding: 14px; border-radius: 8px;" oninput="onProfileStudioLiveInput()"></textarea>
+            <textarea id="prof-template" class="apple-textarea" rows="18" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; font-size: 13px; line-height: 1.6; padding: 12px; border-radius: 6px;" oninput="onProfileStudioLiveInput()"></textarea>
           </div>
         </div>
 
@@ -1327,11 +1327,11 @@
 
       <!-- RIGHT: Real-Time Live Apple Mail Preview -->
       <div class="studio-preview-pane">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--label-secondary); text-transform: uppercase; letter-spacing: 0.04em;">Live Email Preview</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); text-transform: uppercase; letter-spacing: 0.03em;">Live Preview</span>
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 12px; color: var(--label-secondary);">Testing with:</span>
-            <select id="studio-preview-sample-select" class="apple-select" style="padding: 3px 8px; font-size: 12px; width: auto;" onchange="onProfileStudioLiveInput()">
+            <span style="font-size: 11.5px; color: var(--label-secondary);">Preview with:</span>
+            <select id="studio-preview-sample-select" class="apple-select" style="padding: 2px 6px; font-size: 11.5px; width: auto;" onchange="onProfileStudioLiveInput()">
               <option value="Google">Google (Sundar)</option>
               <option value="TikTok">TikTok (Emma)</option>
               <option value="Databricks">Databricks (Alex)</option>
@@ -1347,7 +1347,7 @@
               <span class="mac-dot dot-min"></span>
               <span class="mac-dot dot-max"></span>
             </div>
-            <div style="font-size: 12.5px; color: var(--label-secondary); font-weight: 500;">Preview: Outbound Recruiter Email</div>
+            <div style="font-size: 12px; color: var(--label-secondary); font-weight: 500;">Email Preview</div>
           </div>
 
           <div class="mail-header-fields">
@@ -1357,25 +1357,25 @@
             </div>
             <div class="field-row">
               <span class="field-tag">Subject:</span>
-              <span id="studio-prev-subject" style="font-weight: 600; color: var(--label-primary); font-size: 13px;"></span>
+              <span id="studio-prev-subject" style="font-weight: 600; color: var(--label-primary); font-size: 12.5px;"></span>
             </div>
             <div class="field-row">
               <span class="field-tag">Attach:</span>
               <span class="attachment-pill">
                 <span class="file-tag-badge">PDF</span>
                 <span>Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
-                <span style="color: var(--label-tertiary); font-size: 11px;">(60.3 KB)</span>
+                <span style="color: var(--label-tertiary); font-size: 10.5px;">(60.3 KB)</span>
               </span>
             </div>
           </div>
 
-          <div class="mail-body-canvas" id="studio-prev-body" style="min-height: 420px; padding: 24px;"></div>
+          <div class="mail-body-canvas" id="studio-prev-body" style="min-height: 420px; padding: 20px;"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Main 2-Pane Apple Workspace -->
+  <!-- Main 2-Pane Workspace -->
   <main class="main-workspace">
 
     <!-- LEFT PANE: CONTROLS & INSPECTOR -->
@@ -1385,35 +1385,33 @@
       <div id="tab-queue" class="tab-content active">
         <div class="apple-card">
           <div class="card-head">
-            <span class="card-head-title">Recruiter Details</span>
-            <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="clearForm()">Clear Form</button>
+            <span class="card-head-title">Add Lead</span>
+            <button class="apple-btn btn-plain" style="padding: 2px 7px; font-size: 11px;" onclick="clearForm()">Clear</button>
           </div>
-          <div class="card-content" style="padding: 16px;">
+          <div class="card-content" style="padding: 14px;">
 
-            <!-- ADD LEAD TO QUEUE FORM (ON TOP) -->
-            <div style="margin-bottom: 16px;">
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--label-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em;">Add Lead to Queue</div>
-              
+            <!-- ADD LEAD FORM -->
+            <div style="margin-bottom: 14px;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                <input type="text" id="fn" class="apple-input" placeholder="First Name" style="padding: 7px 10px; font-size: 13px;" oninput="onFormLiveInput()">
-                <input type="text" id="comp" class="apple-input" placeholder="Company" style="padding: 7px 10px; font-size: 13px;" oninput="onFormLiveInput()">
+                <input type="text" id="fn" class="apple-input" placeholder="First Name" style="padding: 6px 9px; font-size: 12.5px;" oninput="onFormLiveInput()">
+                <input type="text" id="comp" class="apple-input" placeholder="Company" style="padding: 6px 9px; font-size: 12.5px;" oninput="onFormLiveInput()">
               </div>
 
               <div style="margin-bottom: 8px;">
-                <input type="email" id="email" class="apple-input" placeholder="recruiter@company.com" style="padding: 7px 10px; font-size: 13px;" oninput="onFormLiveInput()">
+                <input type="email" id="email" class="apple-input" placeholder="recruiter@company.com" style="padding: 6px 9px; font-size: 12.5px;" oninput="onFormLiveInput()">
               </div>
 
               <div style="margin-bottom: 10px;">
-                <select id="resume-select" class="apple-select" style="padding: 6px 10px; font-size: 12px;" onchange="updateResumeFromSelect()"></select>
+                <select id="resume-select" class="apple-select" style="padding: 5px 8px; font-size: 12px;" onchange="updateResumeFromSelect()"></select>
               </div>
 
-              <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 12.5px; padding: 7px 12px;" onclick="addRecruiter()">
-                Add Lead to Queue
+              <button class="apple-btn btn-blue-primary" style="width: 100%; font-size: 12px; padding: 6px 12px;" onclick="addRecruiter()">
+                Add Lead
               </button>
             </div>
 
-            <!-- RECRUITER QUEUE LIST & TABS (BELOW FORM) -->
-            <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+            <!-- LEADS LIST & TABS -->
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
               <div class="queue-subtabs" style="margin-bottom: 10px;">
                 <button class="queue-subtab active" data-filter="all" onclick="setQueueFilter('all')">
                   All (<span id="filter-all-count">0</span>)
@@ -1433,41 +1431,41 @@
         </div>
       </div>
 
-      <!-- TAB 2: RESUME LIBRARY -->
+      <!-- TAB 2: RESUMES -->
       <div id="tab-resumes" class="tab-content">
         <div class="apple-card">
           <div class="card-head">
-            <span class="card-head-title">Resume Library</span>
-            <button class="apple-btn btn-tint" style="padding: 3px 8px; font-size: 11.5px;" onclick="openQuickLookModal()">Quick Look</button>
+            <span class="card-head-title">Resumes</span>
+            <button class="apple-btn btn-tint" style="padding: 2px 7px; font-size: 11px;" onclick="openQuickLookModal()">Preview</button>
           </div>
           <div class="card-content">
             <div class="resume-list-container" id="resume-list-container"></div>
 
-            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
-              <div class="form-label-text">Upload Resume Variant</div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+              <div class="form-label-text">Add New Resume</div>
               <input type="file" id="file-input" accept=".pdf" style="display: none;">
-              <button class="apple-btn btn-plain" style="width: 100%;" onclick="document.getElementById('file-input').click()">
-                Upload PDF Document
+              <button class="apple-btn btn-plain" style="width: 100%; font-size: 12px;" onclick="document.getElementById('file-input').click()">
+                Upload Resume (PDF)
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: BULK IMPORT (EXCEL, WORD, & CSV) -->
+      <!-- TAB 3: IMPORT LEADS -->
       <div id="tab-bulk" class="tab-content">
         <div class="apple-card">
           <div class="card-head">
-            <span class="card-head-title">Bulk Import Leads</span>
+            <span class="card-head-title">Import Leads</span>
           </div>
           <div class="card-content">
             
             <!-- Document Dropzone -->
             <input type="file" id="doc-upload-input" accept=".xlsx, .xls, .csv, .docx, .doc, .txt" style="display: none;" onchange="handleDocumentUpload(this.files)">
             <div class="doc-dropzone" id="doc-dropzone" onclick="document.getElementById('doc-upload-input').click()">
-              <div style="font-size: 12px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">EXCEL OR WORD DOCUMENT</div>
-              <div class="dropzone-title">Upload Excel (.xlsx, .csv) or Word (.docx)</div>
-              <div class="dropzone-desc">Click or drag & drop document to auto-extract leads</div>
+              <div style="font-size: 11px; font-weight: 700; color: var(--accent-blue); margin-bottom: 4px;">UPLOAD FILE</div>
+              <div class="dropzone-title">Drop Excel, CSV, or Word file here</div>
+              <div class="dropzone-desc">Click or drop a file to import contacts</div>
             </div>
 
             <!-- Staged Leads Preview Box -->
@@ -1477,23 +1475,23 @@
                 <span id="staged-file-name" style="font-weight: 500; color: var(--accent-blue);"></span>
               </div>
               <div class="staged-list" id="staged-list"></div>
-              <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 10px;" onclick="confirmStagedImport()">
-                Import All Staged Leads
+              <button class="apple-btn btn-blue-primary" style="width: 100%; margin-top: 8px; font-size: 12px;" onclick="confirmStagedImport()">
+                Add All Leads
               </button>
             </div>
 
-            <div style="margin: 16px 0 10px 0; display: flex; align-items: center; gap: 8px;">
+            <div style="margin: 14px 0 8px 0; display: flex; align-items: center; gap: 8px;">
               <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
-              <span style="font-size: 11px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase;">Or Paste Plain Text</span>
+              <span style="font-size: 10.5px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase;">Or paste text</span>
               <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
             </div>
 
-            <p style="font-size: 12px; color: var(--label-secondary); margin-bottom: 8px;">
-              Format: <code>FirstName, Company, Email</code> (one per line):
+            <p style="font-size: 11.5px; color: var(--label-secondary); margin-bottom: 6px;">
+              Format: <code>Name, Company, Email</code> (one per line):
             </p>
             <textarea id="bulk-text" class="apple-textarea" rows="4" placeholder="Sarah, Stripe, sarah@stripe.com&#10;Alex, Databricks, alex@databricks.com"></textarea>
-            <button class="apple-btn btn-plain" style="width: 100%; margin-top: 10px;" onclick="parseBulkLeads()">
-              Import Text Leads
+            <button class="apple-btn btn-plain" style="width: 100%; margin-top: 8px; font-size: 12px;" onclick="parseBulkLeads()">
+              Import Text
             </button>
           </div>
         </div>
@@ -1501,7 +1499,7 @@
 
     </aside>
 
-    <!-- RIGHT PANE: APPLE MAIL COMPOSE & DIRECT INLINE EDITING -->
+    <!-- RIGHT PANE: EMAIL COMPOSER -->
     <section>
       <div class="mail-window">
         <!-- Window Chrome Toolbar -->
@@ -1510,14 +1508,14 @@
             <span class="mac-dot dot-close"></span>
             <span class="mac-dot dot-min"></span>
             <span class="mac-dot dot-max"></span>
-            <span style="font-size: 12px; color: var(--label-secondary); margin-left: 6px; font-weight: 500;">
-              Click to edit message inline
+            <span style="font-size: 11.5px; color: var(--label-secondary); margin-left: 6px; font-weight: 500;">
+              Click text below to edit
             </span>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="apple-btn btn-plain" style="font-size: 12px;" onclick="saveCurrentCanvasAsTemplate()" title="Save current inline format as master template for all leads">Save as Template</button>
-            <button class="apple-btn btn-plain" style="font-size: 12px;" onclick="resetBodyToDefault()">Reset</button>
-            <button class="apple-btn btn-blue-primary" style="font-size: 12px;" onclick="sendOutreach()" id="btn-send-single">
+          <div style="display: flex; gap: 6px;">
+            <button class="apple-btn btn-plain" style="font-size: 11.5px;" onclick="saveCurrentCanvasAsTemplate()" title="Save current message as default template">Save Template</button>
+            <button class="apple-btn btn-plain" style="font-size: 11.5px;" onclick="resetBodyToDefault()">Reset</button>
+            <button class="apple-btn btn-blue-primary" style="font-size: 11.5px;" onclick="sendOutreach()" id="btn-send-single">
               Send Email
             </button>
           </div>
@@ -1525,23 +1523,23 @@
 
         <!-- Dispatched Notice Banner -->
         <div class="sent-notice-banner" id="sent-notice-banner">
-          <span id="sent-notice-text">This email was already dispatched and is preserved in Sent History.</span>
+          <span id="sent-notice-text">This email was already sent.</span>
         </div>
 
-        <!-- Template Presets & Placeholder Helper Bar -->
-        <div style="padding: 8px 16px; background: var(--card-head-bg); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-            <span style="font-size: 11px; font-weight: 600; color: var(--label-secondary); text-transform: uppercase; margin-right: 2px;">Templates:</span>
-            <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="applyPresetToCurrentView('opportunities')">✨ Ask for Available Roles</button>
-            <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="applyPresetToCurrentView('applied')">📝 Applied for Position</button>
-            <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="applyPresetToCurrentView('comprehensive')">⚡ Full-Stack / AI</button>
-            <button class="apple-btn btn-tint" style="font-size: 11px; padding: 3px 8px;" onclick="applyPresetToCurrentView('concise')">🎯 Concise</button>
+        <!-- Template Presets & Helper Bar -->
+        <div style="padding: 6px 14px; background: var(--card-head-bg); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+            <span style="font-size: 10.5px; font-weight: 600; color: var(--label-secondary); text-transform: uppercase; margin-right: 2px;">Templates:</span>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('opportunities')">✨ Job Inquiry</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('applied')">📝 Follow Up</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('comprehensive')">⚡ Full Stack</button>
+            <button class="apple-btn btn-tint" style="font-size: 10.5px; padding: 2px 7px;" onclick="applyPresetToCurrentView('concise')">🎯 Short</button>
           </div>
-          <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-            <span style="font-size: 11px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase;">Insert:</span>
-            <button class="token-chip" onclick="insertPlaceholderToken('{RecruiterName}')" title="Insert Recruiter Name placeholder">+ {RecruiterName}</button>
-            <button class="token-chip" onclick="insertPlaceholderToken('{Company}')" title="Insert Target Company placeholder">+ {Company}</button>
-            <button class="token-chip" onclick="insertPlaceholderToken('{Email}')" title="Insert Recruiter Email placeholder">+ {Email}</button>
+          <div style="display: flex; align-items: center; gap: 3px; flex-wrap: wrap;">
+            <span style="font-size: 10.5px; font-weight: 600; color: var(--label-tertiary); text-transform: uppercase;">Insert:</span>
+            <button class="token-chip" onclick="insertPlaceholderToken('{RecruiterName}')" title="Insert Recruiter Name placeholder">+ Name</button>
+            <button class="token-chip" onclick="insertPlaceholderToken('{Company}')" title="Insert Company placeholder">+ Company</button>
+            <button class="token-chip" onclick="insertPlaceholderToken('{Email}')" title="Insert Email placeholder">+ Email</button>
           </div>
         </div>
 
@@ -1560,12 +1558,12 @@
             <span class="attachment-pill" id="prev-attach">
               <span class="file-tag-badge">PDF</span>
               <span id="prev-attach-name">Sai_Tarrun_Pitta_Backend_Resume.pdf</span>
-              <span style="color: var(--label-tertiary); font-size: 11px;" id="prev-attach-size">(73.4 KB)</span>
+              <span style="color: var(--label-tertiary); font-size: 10.5px;" id="prev-attach-size">(73.4 KB)</span>
             </span>
           </div>
         </div>
 
-        <!-- Mail Body (Directly In-place Editable) -->
+        <!-- Mail Body (In-place Editable) -->
         <div class="mail-body-canvas" id="prev-body" contenteditable="true" spellcheck="false">
           <p>Hi <span id="dyn-lead-name">{RecruiterName}</span>,</p>
           <p>I hope you're doing well.</p>
@@ -1591,12 +1589,12 @@
 
   </main>
 
-  <!-- PDF Quick Look Modal -->
+  <!-- PDF Preview Modal -->
   <div class="pdf-modal" id="pdf-modal" onclick="closeQuickLookModal(event)">
     <div class="pdf-modal-card" onclick="event.stopPropagation()">
       <div class="pdf-modal-head">
-        <span style="font-weight: 600; font-size: 14px;" id="modal-pdf-title">Quick Look</span>
-        <button class="apple-btn btn-plain" onclick="closeQuickLookModal()">Done</button>
+        <span style="font-weight: 600; font-size: 13px;" id="modal-pdf-title">Resume Preview</span>
+        <button class="apple-btn btn-plain" style="padding: 3px 8px; font-size: 11.5px;" onclick="closeQuickLookModal()">Done</button>
       </div>
       <iframe id="pdf-modal-frame" class="pdf-frame-embed" src=""></iframe>
     </div>
@@ -1897,7 +1895,7 @@
 
       const bulkBtn = document.getElementById('btn-bulk-send');
       if (bulkBtn && !bulkBtn.disabled) {
-        bulkBtn.innerText = `Send Unsent (${unsentCount}) in Bulk`;
+        bulkBtn.innerText = unsentCount > 0 ? `Send All (${unsentCount})` : 'Send All';
       }
 
       let filteredRecruiters = recruiters.map((r, originalIdx) => ({ ...r, originalIdx }));
@@ -2962,7 +2960,7 @@ ${contentHtml}
         btnBulk.style.display = 'inline-block';
         btnBulk.disabled = false;
         const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
-        btnBulk.innerText = `Send Unsent (${remainingUnsent}) in Bulk`;
+        btnBulk.innerText = remainingUnsent > 0 ? `Send All (${remainingUnsent})` : 'Send All';
         return;
       }
 
@@ -3664,7 +3662,7 @@ ${contentHtml}
       if (btnArm && btnStop) {
         if (schedulerConfig.status === 'idle') {
           btnArm.style.display = 'inline-block';
-          btnArm.innerText = '▶️ Arm & Start Scheduler';
+          btnArm.innerText = 'Start Schedule';
           if (btnPause) btnPause.style.display = 'none';
           if (btnResume) btnResume.style.display = 'none';
           btnStop.style.display = 'none';
