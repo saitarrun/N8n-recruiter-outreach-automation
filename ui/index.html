@@ -2629,6 +2629,59 @@ Best regards,
       });
     }
 
+    let databaseTemplates = [];
+
+    async function loadTemplatesFromDatabase() {
+      try {
+        const res = await fetch('/api/templates?_t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          databaseTemplates = data.templates || [];
+          
+          // Populate local storage cache from SQLite database
+          databaseTemplates.forEach(t => {
+            if (t.id && t.body) {
+              localStorage.setItem('custom_template_' + t.id, t.body);
+            }
+            if (t.id && t.subject) {
+              localStorage.setItem('custom_subject_' + t.id, t.subject);
+            }
+          });
+
+          // Refresh current active view
+          const tpl = getTemplateForKey(currentActiveTemplateKey);
+          const sub = getSubjectForKey(currentActiveTemplateKey);
+          const profTpl = document.getElementById('prof-template');
+          if (profTpl) profTpl.value = tpl;
+          const profSub = document.getElementById('prof-subject');
+          if (profSub) profSub.value = sub;
+
+          if (recruiters.length > 0 && recruiters[selectedIndex]) {
+            updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load templates from database, falling back to local cache', err);
+      }
+    }
+
+    async function saveTemplateToDatabase(key, name, subject, body) {
+      try {
+        await fetch('/api/templates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: key,
+            name: name || getPresetDisplayName(key),
+            subject: subject,
+            body: body
+          })
+        });
+      } catch (err) {
+        console.warn('Failed to persist template to SQLite database', err);
+      }
+    }
+
     function saveSenderProfileSilently() {
       const getVal = (id, def) => { const el = document.getElementById(id); return (el && el.value.trim()) || def; };
       const updated = {
@@ -2642,8 +2695,9 @@ Best regards,
       localStorage.setItem('sender_profile', JSON.stringify(updated));
 
       const subEl = document.getElementById('prof-subject');
+      let subVal = "";
       if (subEl) {
-        const subVal = subEl.value.trim();
+        subVal = subEl.value.trim();
         if (subVal && subVal.length > 2) {
           localStorage.setItem('custom_subject_' + currentActiveTemplateKey, subVal);
           localStorage.setItem('custom_master_subject', subVal);
@@ -2651,13 +2705,24 @@ Best regards,
       }
 
       const tplEl = document.getElementById('prof-template');
+      let tplVal = "";
       if (tplEl) {
-        const tplVal = tplEl.value.trim();
+        tplVal = tplEl.value.trim();
         if (tplVal && tplVal.length > 5) {
           const plain = htmlToPlainText(tplVal);
           localStorage.setItem('custom_template_' + currentActiveTemplateKey, plain);
           localStorage.setItem('custom_master_template', plain);
+          tplVal = plain;
         }
+      }
+
+      if (tplVal || subVal) {
+        saveTemplateToDatabase(
+          currentActiveTemplateKey,
+          getPresetDisplayName(currentActiveTemplateKey),
+          subVal || getSubjectForKey(currentActiveTemplateKey),
+          tplVal || getTemplateForKey(currentActiveTemplateKey)
+        );
       }
 
       // Immediately synchronize main compose canvas
@@ -2766,6 +2831,13 @@ ${contentHtml}
         if (profSub) profSub.value = currentSub;
       }
 
+      saveTemplateToDatabase(
+        currentActiveTemplateKey,
+        getPresetDisplayName(currentActiveTemplateKey),
+        currentSub || getSubjectForKey(currentActiveTemplateKey),
+        plain || getTemplateForKey(currentActiveTemplateKey)
+      );
+
       showAppleToast(`Saved and replaced ${getPresetDisplayName(currentActiveTemplateKey)} template.`);
       
       if (recruiters.length > 0) {
@@ -2789,6 +2861,13 @@ ${contentHtml}
       if (profTpl) profTpl.value = defaultTpl;
       const profSub = document.getElementById('prof-subject');
       if (profSub) profSub.value = defaultSub;
+
+      saveTemplateToDatabase(
+        currentActiveTemplateKey,
+        getPresetDisplayName(currentActiveTemplateKey),
+        defaultSub,
+        defaultTpl
+      );
 
       if (recruiters.length > 0) {
         updateComposeCanvasForRecruiter(recruiters[selectedIndex]);
@@ -4127,6 +4206,7 @@ ${contentHtml}
     loadResumes();
     onFormLiveInput();
     loadLeadsFromDatabase();
+    loadTemplatesFromDatabase();
     initScheduler();
 
     // Initial check & real-time polling every 4 seconds

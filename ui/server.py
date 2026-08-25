@@ -24,6 +24,103 @@ else:
 
 DB_PATH = os.path.join(DIRECTORY, "leads.db")
 
+DEFAULT_TEMPLATES_SEED = [
+    ("opportunities", "Job Inquiry", "Exploring Software Engineering Opportunities at {Company} — {SenderName}", 
+     """Hi {RecruiterName},
+
+I hope you're having a great week.
+
+My name is **{SenderName}**, and I'm a {SenderTitle} with strong experience across **backend engineering, distributed systems, cloud infrastructure, and AI-powered workflows**.
+
+I've been following the innovative engineering work at **{Company}** and wanted to reach out directly to inquire about current or upcoming software engineering opportunities on your team.
+
+Previously, I've designed and scaled production microservices and cloud infrastructure at companies like **Uber, Pacific Life, Cognizant, and California State University, Fullerton**, working with **Python, Java, TypeScript, AWS, PostgreSQL, Redis, Docker, and Kubernetes**.
+
+If there are any active or upcoming roles that align with my background, I would welcome the opportunity to connect for an introductory conversation. If another recruiter or hiring manager is handling relevant engineering teams, I'd greatly appreciate it if you could connect us or share my profile.
+
+I've attached my resume for your reference. Thank you for your time and consideration!
+
+Best regards,
+
+{SignatureBlock}""", 1),
+
+    ("applied", "Follow-Up", "Application Follow-Up: Software Engineer at {Company} — {SenderName}",
+     """Hi {RecruiterName},
+
+I hope this email finds you well.
+
+I recently submitted my application for a **Software Engineering** role at **{Company}** and wanted to follow up with you directly to express my strong interest in the team.
+
+As a {SenderTitle} with experience at **Uber, Pacific Life, Cognizant, and California State University, Fullerton**, I have built high-throughput backend services, distributed systems, and AI-powered pipelines using **Python, Java, TypeScript, AWS, PostgreSQL, Redis, Docker, and Kubernetes**.
+
+Given my track record in architecting resilient microservices and shipping production-grade software, I am confident I can make an immediate positive impact at **{Company}**.
+
+I've attached my resume here for your convenience alongside my formal application. I would love the chance to connect with you or the hiring team to discuss how my skill set aligns with your engineering goals.
+
+Thank you so much for your time and consideration!
+
+Best regards,
+
+{SignatureBlock}""", 0),
+
+    ("comprehensive", "Full Stack", "Software Engineering Opportunities at {Company} — {SenderName}",
+     """Hi {RecruiterName},
+
+I hope you're doing well.
+
+My name is **{SenderName}**, and I'm a {SenderTitle} with experience across **backend engineering, full-stack development, distributed systems, cloud infrastructure, and AI-powered applications**.
+
+I've previously worked with **Uber, Pacific Life, Cognizant, and California State University, Fullerton**, contributing to production systems across scalable backend services, full-stack applications, distributed systems, cloud infrastructure, AI/LLM workflows, RAG systems, and agent-based applications.
+
+My technical background includes **Python, Java, TypeScript, JavaScript, React, FastAPI, Spring Boot, AWS, PostgreSQL, Redis, Docker, Kubernetes, LangChain, RAG, LLMs, AI Agents, APIs, microservices, and distributed systems**.
+
+I'm currently exploring **Software Engineering opportunities at {Company}**.
+
+If there are any current or upcoming positions that align with my background, I would greatly appreciate it if you could review my profile and consider me for the interview process.
+
+I've attached my resume for reference. Thank you for your time and consideration.
+
+Best regards,
+
+{SignatureBlock}""", 0),
+
+    ("concise", "Short", "Software Engineering Opportunities at {Company} — {SenderName}",
+     """Hi {RecruiterName},
+
+I hope you're having a great week.
+
+I'm **{SenderName}**, a {SenderTitle} specializing in scalable backend services, distributed systems, and AI/LLM applications.
+
+I've previously built high-performance microservices and cloud infrastructure at companies like **Uber, Pacific Life, and Cognizant** with a core stack in **Python, Java, TypeScript, AWS, Docker, Kubernetes, and PostgreSQL**.
+
+I'm currently exploring **Software Engineering roles at {Company}** and would love to connect to discuss how my engineering background aligns with your team's upcoming hiring priorities.
+
+I've attached my resume for reference. If there is a better person to speak with regarding engineering roles at {Company}, please let me know!
+
+Best regards,
+
+{SignatureBlock}""", 0),
+
+    ("backend", "Backend", "{SenderTitle} (Backend & Distributed Systems) — {Company} | {SenderName}",
+     """Hi {RecruiterName},
+
+I hope this finds you well.
+
+My name is **{SenderName}**, and I'm a {SenderTitle} focused on **high-throughput distributed systems, scalable backend infrastructure, and cloud data platforms**.
+
+Across my work with **Uber, Pacific Life, and Cognizant**, I've designed resilient microservices, optimized SQL/NoSQL data pipelines, and architected cloud-native systems using **Python, Java, Spring Boot, FastAPI, AWS, Redis, Docker, and Kubernetes**.
+
+I've been following the engineering innovations at **{Company}** and am very interested in contributing to your distributed systems and infrastructure teams.
+
+I've attached my resume and would welcome the opportunity to connect for an interview or introduction to the relevant engineering manager.
+
+Thank you for your time and consideration.
+
+Best regards,
+
+{SignatureBlock}""", 0)
+]
+
 def init_sqlite_db():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -38,6 +135,18 @@ def init_sqlite_db():
         status TEXT NOT NULL DEFAULT 'Pending',
         sent_at TEXT,
         created_at TEXT NOT NULL
+    )
+    ''')
+
+    cur.execute('''
+    CREATE TABLE IF NOT EXISTS templates (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        body TEXT NOT NULL,
+        is_default INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
     
@@ -55,6 +164,16 @@ def init_sqlite_db():
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', default_leads)
         conn.commit()
+
+    cur.execute("SELECT COUNT(*) FROM templates")
+    tpl_count = cur.fetchone()[0]
+    if tpl_count == 0:
+        cur.executemany('''
+        INSERT OR IGNORE INTO templates (id, name, subject, body, is_default)
+        VALUES (?, ?, ?, ?, ?)
+        ''', DEFAULT_TEMPLATES_SEED)
+        conn.commit()
+
     conn.close()
 
 init_sqlite_db()
@@ -158,6 +277,38 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"resumes": resumes}).encode('utf-8'))
             return
+
+        # 4. Get all templates from SQLite
+        elif parsed.path == "/api/templates":
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                cur = conn.cursor()
+                cur.execute("SELECT id, name, subject, body, is_default, updated_at FROM templates ORDER BY is_default DESC, id ASC")
+                rows = cur.fetchall()
+                conn.close()
+
+                templates = []
+                for r in rows:
+                    templates.append({
+                        "id": r[0],
+                        "name": r[1],
+                        "subject": r[2],
+                        "body": r[3],
+                        "isDefault": bool(r[4]),
+                        "updatedAt": r[5]
+                    })
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"templates": templates}).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
+                return
 
         # 4. View specific resume PDF
         elif parsed.path == "/api/resume-pdf":
@@ -287,6 +438,42 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
                 return
+
+        # 3. Save or Update Template in SQLite
+        elif parsed.path == "/api/templates":
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = json.loads(self.rfile.read(content_length).decode('utf-8'))
+            tpl_id = body.get('id', '').strip()
+            name = body.get('name', '').strip()
+            subject = body.get('subject', '').strip()
+            tpl_body = body.get('body', '').strip()
+            is_default = 1 if body.get('isDefault') else 0
+
+            if not tpl_id:
+                tpl_id = name.lower().replace(' ', '_')[:32] or f"tpl_{int(time.time())}"
+
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                cur = conn.cursor()
+                now_str = time.strftime('%Y-%m-%d %H:%M:%S')
+                cur.execute('''
+                INSERT INTO templates (id, name, subject, body, is_default, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    name=excluded.name,
+                    subject=excluded.subject,
+                    body=excluded.body,
+                    is_default=excluded.is_default,
+                    updated_at=excluded.updated_at
+                ''', (tpl_id, name, subject, tpl_body, is_default, now_str))
+                conn.commit()
+                conn.close()
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "id": tpl_id}).encode('utf-8'))
+                return
             except Exception as e:
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
@@ -294,7 +481,58 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
                 return
 
-        # 3. Mark Lead as Sent in SQLite
+        # 4. Delete Template from SQLite
+        elif parsed.path == "/api/delete-template":
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = json.loads(self.rfile.read(content_length).decode('utf-8'))
+            tpl_id = body.get('id')
+
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                cur = conn.cursor()
+                if tpl_id:
+                    cur.execute("DELETE FROM templates WHERE id=?", (tpl_id,))
+                conn.commit()
+                conn.close()
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(b'{"success": true}')
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+                return
+
+        # 5. Reset Templates in SQLite to System Defaults
+        elif parsed.path == "/api/reset-templates":
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                cur = conn.cursor()
+                cur.execute("DELETE FROM templates")
+                cur.executemany('''
+                INSERT INTO templates (id, name, subject, body, is_default)
+                VALUES (?, ?, ?, ?, ?)
+                ''', DEFAULT_TEMPLATES_SEED)
+                conn.commit()
+                conn.close()
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(b'{"success": true}')
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+                return
+
+        # 6. Mark Lead as Sent in SQLite
         elif parsed.path == "/api/mark-sent":
             content_length = int(self.headers.get('Content-Length', 0))
             body = json.loads(self.rfile.read(content_length).decode('utf-8'))

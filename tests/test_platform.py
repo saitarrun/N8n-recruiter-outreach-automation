@@ -230,5 +230,45 @@ class TestRecruiterOutreachPlatform(unittest.TestCase):
             self.assertTrue(os.path.exists(sp), f"{s} must exist")
             self.assertTrue(os.access(sp, os.X_OK), f"{s} must be executable")
 
+    def test_12_templates_crud_lifecycle(self):
+        """Test SQLite Template Creation, Reading, Updating, and Deletion Lifecycle"""
+        # 1. Read existing templates
+        req = urllib.request.Request(f"{BASE_UI_URL}/api/templates")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.getcode(), 200)
+            data = json.loads(resp.read().decode())
+            self.assertIn("templates", data)
+            self.assertTrue(len(data["templates"]) > 0)
+
+        # 2. Save/Update a custom template
+        test_tpl_id = f"test_tpl_{int(time.time())}"
+        save_payload = {
+            "id": test_tpl_id,
+            "name": "Automated Test Template",
+            "subject": "Custom Subject for {Company} — {SenderName}",
+            "body": "Hi {RecruiterName},\n\nThis is a test template.\n\n{SignatureBlock}"
+        }
+        save_req = urllib.request.Request(f"{BASE_UI_URL}/api/templates", method="POST")
+        save_req.add_header("Content-Type", "application/json")
+        save_req.data = json.dumps(save_payload).encode()
+        with urllib.request.urlopen(save_req, timeout=5) as resp:
+            self.assertEqual(resp.getcode(), 200)
+            save_res = json.loads(resp.read().decode())
+            self.assertTrue(save_res.get("success"))
+
+        # 3. Verify it was saved in SQLite
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode())
+            found = next((t for t in data["templates"] if t["id"] == test_tpl_id), None)
+            self.assertIsNotNone(found)
+            self.assertEqual(found["name"], "Automated Test Template")
+
+        # 4. Clean up / delete the test template
+        del_req = urllib.request.Request(f"{BASE_UI_URL}/api/delete-template", method="POST")
+        del_req.add_header("Content-Type", "application/json")
+        del_req.data = json.dumps({"id": test_tpl_id}).encode()
+        with urllib.request.urlopen(del_req, timeout=5) as resp:
+            self.assertEqual(resp.getcode(), 200)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
