@@ -891,6 +891,62 @@
       animation: none;
     }
 
+    /* Floating Bulk Outreach Control Dock */
+    .bulk-floating-dock {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(18, 18, 24, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bulk-floating-dock.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .bulk-dock-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 200px;
+    }
+    .bulk-dock-text {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #f4f4f5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+    .bulk-dock-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: #27272a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .bulk-dock-bar-fill {
+      height: 100%;
+      background: #0071e3;
+      width: 0%;
+      transition: width 0.2s ease;
+      border-radius: 2px;
+    }
+
     /* Full-Page Studio Layout */
     .fullpage-studio {
       max-width: 1380px;
@@ -1062,7 +1118,7 @@
 
       <!-- Live Controls -->
       <div id="bulk-live-controls" style="display: none; align-items: center; gap: 6px;">
-        <span id="bulk-progress-pill" style="font-size: 11.5px; font-weight: 600; background: var(--accent-blue-tint); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--accent-blue-border);">
+        <span id="bulk-progress-pill" style="font-size: 11.5px; font-weight: 500; background: var(--accent-blue-tint); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--accent-blue-border);">
           Sending 1/50...
         </span>
         <button class="apple-btn btn-plain" id="btn-bulk-pause" onclick="pauseBulkSend()" title="Pause">
@@ -1071,8 +1127,8 @@
         <button class="apple-btn btn-blue-primary" id="btn-bulk-resume" onclick="resumeBulkSend()" style="display: none;" title="Resume">
           Resume
         </button>
-        <button class="apple-btn btn-destruct" id="btn-bulk-stop" onclick="stopBulkSend()" title="Stop">
-          Stop
+        <button class="apple-btn btn-destruct" id="btn-bulk-stop" onclick="stopBulkSend()" title="Abort">
+          Abort
         </button>
       </div>
     </div>
@@ -1504,6 +1560,7 @@
                   <span id="queue-selected-count-label">Select All</span>
                 </label>
                 <div style="display: flex; gap: 5px; align-items: center;">
+                  <button class="apple-btn btn-blue-primary" id="btn-send-selected" style="padding: 2px 7px; font-size: 11px; display: none;" onclick="sendSelectedLeads()">Send (<span id="selected-send-num">0</span>)</button>
                   <button class="apple-btn btn-destruct" id="btn-delete-selected" style="padding: 2px 7px; font-size: 11px; display: none;" onclick="deleteSelectedLeads()">Delete (<span id="selected-lead-num">0</span>)</button>
                   <button class="apple-btn btn-plain" id="btn-clear-unsent" style="padding: 2px 7px; font-size: 11px;" onclick="clearAllUnsentLeads()">Clear Unsent</button>
                 </div>
@@ -1683,6 +1740,19 @@
       </div>
       <iframe id="pdf-modal-frame" class="pdf-frame-embed" src=""></iframe>
     </div>
+  </div>
+
+  <!-- Floating Bulk Outreach Dock -->
+  <div id="bulk-floating-dock" class="bulk-floating-dock">
+    <div class="bulk-dock-progress">
+      <div class="bulk-dock-text" id="bulk-dock-status">Sending 1 of 50...</div>
+      <div class="bulk-dock-bar-bg">
+        <div class="bulk-dock-bar-fill" id="bulk-dock-progress-bar"></div>
+      </div>
+    </div>
+    <button class="apple-btn btn-plain" id="btn-dock-pause" onclick="pauseBulkSend()" style="padding: 3px 9px; font-size: 11.5px;">Pause</button>
+    <button class="apple-btn btn-blue-primary" id="btn-dock-resume" onclick="resumeBulkSend()" style="display: none; padding: 3px 9px; font-size: 11.5px;">Resume</button>
+    <button class="apple-btn btn-destruct" id="btn-dock-abort" onclick="stopBulkSend()" style="padding: 3px 9px; font-size: 11.5px;">Abort</button>
   </div>
 
   <!-- Apple Toast -->
@@ -2044,6 +2114,8 @@
       const countLabel = document.getElementById('queue-selected-count-label');
       const deleteBtn = document.getElementById('btn-delete-selected');
       const numSpan = document.getElementById('selected-lead-num');
+      const sendBtn = document.getElementById('btn-send-selected');
+      const sendNumSpan = document.getElementById('selected-send-num');
 
       if (selectAllCb) {
         selectAllCb.checked = visibleLeads.length > 0 && selectedVisibleCount === visibleLeads.length;
@@ -2060,6 +2132,26 @@
           deleteBtn.style.display = 'none';
         }
       }
+
+      if (sendBtn && sendNumSpan) {
+        const selectedUnsent = recruiters.filter(r => selectedLeadEmails.has(r.email) && r.status !== 'Sent');
+        if (selectedUnsent.length > 0) {
+          sendBtn.style.display = 'inline-block';
+          sendNumSpan.innerText = selectedUnsent.length;
+        } else {
+          sendBtn.style.display = 'none';
+        }
+      }
+    }
+
+    async function sendSelectedLeads() {
+      const selectedLeads = recruiters.filter(r => selectedLeadEmails.has(r.email) && r.status !== 'Sent');
+      if (selectedLeads.length === 0) {
+        showAppleToast('No unsent leads selected.');
+        return;
+      }
+      if (!confirm(`Dispatch emails to ${selectedLeads.length} selected lead${selectedLeads.length > 1 ? 's' : ''}?`)) return;
+      await runBulkSendQueue(selectedLeads);
     }
 
     async function deleteSelectedLeads() {
@@ -3147,6 +3239,13 @@ ${contentHtml}
       showAppleToast("Bulk outreach paused.");
     }
 
+    function pauseBulkSend() {
+      if (!bulkSenderState.active || bulkSenderState.stopped) return;
+      bulkSenderState.paused = true;
+      updateBulkControlsUI("Paused");
+      showAppleToast("Bulk sending paused.");
+    }
+
     function resumeBulkSend() {
       if (!bulkSenderState.active || bulkSenderState.stopped) return;
       bulkSenderState.paused = false;
@@ -3161,10 +3260,11 @@ ${contentHtml}
       if (bulkSenderState.currentAbortController) {
         try { bulkSenderState.currentAbortController.abort(); } catch(e) {}
       }
-      showAppleToast("Stopping bulk outreach...");
+      showAppleToast("Bulk sending aborted.");
+      updateBulkControlsUI("Aborted");
     }
 
-    function updateBulkControlsUI(statusText) {
+    function updateBulkControlsUI(statusText, currentLead) {
       const liveControls = document.getElementById('bulk-live-controls');
       const btnBulk = document.getElementById('btn-bulk-send');
       const pill = document.getElementById('bulk-progress-pill');
@@ -3172,68 +3272,90 @@ ${contentHtml}
       const btnResume = document.getElementById('btn-bulk-resume');
       const btnStop = document.getElementById('btn-bulk-stop');
 
-      if (!liveControls || !btnBulk) return;
+      const dock = document.getElementById('bulk-floating-dock');
+      const dockStatus = document.getElementById('bulk-dock-status');
+      const dockBar = document.getElementById('bulk-dock-progress-bar');
+      const dockPause = document.getElementById('btn-dock-pause');
+      const dockResume = document.getElementById('btn-dock-resume');
 
       if (!bulkSenderState.active) {
-        liveControls.style.display = 'none';
-        btnBulk.style.display = 'inline-block';
-        btnBulk.disabled = false;
-        const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
-        btnBulk.innerText = remainingUnsent > 0 ? `Send All (${remainingUnsent})` : 'Send All';
+        if (liveControls) liveControls.style.display = 'none';
+        if (btnBulk) {
+          btnBulk.style.display = 'inline-block';
+          btnBulk.disabled = false;
+          const remainingUnsent = recruiters.filter(r => r.status !== 'Sent').length;
+          btnBulk.innerText = remainingUnsent > 0 ? `Send All (${remainingUnsent})` : 'Send All';
+        }
+        if (dock) dock.classList.remove('active');
         return;
       }
 
-      liveControls.style.display = 'flex';
-      btnBulk.style.display = 'none';
+      if (liveControls) liveControls.style.display = 'flex';
+      if (btnBulk) btnBulk.style.display = 'none';
+      if (dock) dock.classList.add('active');
 
-      if (pill) {
-        if (bulkSenderState.paused) {
-          pill.innerText = `Paused (${bulkSenderState.currentIndex}/${bulkSenderState.total})`;
+      const percent = bulkSenderState.total > 0
+        ? Math.min(100, Math.round((bulkSenderState.currentIndex / bulkSenderState.total) * 100))
+        : 0;
+
+      if (dockBar) dockBar.style.width = `${percent}%`;
+
+      if (bulkSenderState.paused) {
+        const pausedLabel = `Paused (${bulkSenderState.currentIndex}/${bulkSenderState.total})`;
+        if (pill) {
+          pill.innerText = pausedLabel;
           pill.style.background = 'var(--accent-amber-tint)';
           pill.style.color = 'var(--accent-amber)';
           pill.style.borderColor = 'var(--accent-amber-border)';
-        } else {
-          pill.innerText = statusText || `Sending ${bulkSenderState.currentIndex}/${bulkSenderState.total}...`;
+        }
+        if (dockStatus) dockStatus.innerText = pausedLabel;
+        if (btnPause) btnPause.style.display = 'none';
+        if (btnResume) btnResume.style.display = 'inline-block';
+        if (dockPause) dockPause.style.display = 'none';
+        if (dockResume) dockResume.style.display = 'inline-block';
+      } else {
+        const leadInfo = currentLead ? ` • ${currentLead.firstName} (${currentLead.company})` : '';
+        const activeLabel = statusText || `Sending ${bulkSenderState.currentIndex}/${bulkSenderState.total}${leadInfo}`;
+        if (pill) {
+          pill.innerText = `Sending ${bulkSenderState.currentIndex}/${bulkSenderState.total}...`;
           pill.style.background = 'var(--accent-blue-tint)';
           pill.style.color = 'var(--accent-blue)';
           pill.style.borderColor = 'var(--accent-blue-border)';
         }
-      }
-
-      if (btnPause && btnResume) {
-        if (bulkSenderState.paused) {
-          btnPause.style.display = 'none';
-          btnResume.style.display = 'inline-block';
-        } else {
-          btnPause.style.display = 'inline-block';
-          btnResume.style.display = 'none';
-        }
+        if (dockStatus) dockStatus.innerText = activeLabel;
+        if (btnPause) btnPause.style.display = 'inline-block';
+        if (btnResume) btnResume.style.display = 'none';
+        if (dockPause) dockPause.style.display = 'inline-block';
+        if (dockResume) dockResume.style.display = 'none';
       }
     }
 
-    // BULK SEND ONLY UNSENT LEADS (With Real-Time Pause, Resume & Stop)
     async function sendBulkUnsentQueue() {
       const unsentLeads = recruiters.filter(r => r.status !== 'Sent');
       if (unsentLeads.length === 0) {
         alert('All leads in your queue have already been sent.');
         return;
       }
-
       if (!confirm(`Dispatch personalized emails to all ${unsentLeads.length} unsent recruiters?`)) return;
+      await runBulkSendQueue(unsentLeads);
+    }
+
+    async function runBulkSendQueue(targetLeads) {
+      if (!targetLeads || targetLeads.length === 0) return;
 
       bulkSenderState.active = true;
       bulkSenderState.paused = false;
       bulkSenderState.stopped = false;
-      bulkSenderState.total = unsentLeads.length;
+      bulkSenderState.total = targetLeads.length;
       bulkSenderState.sentCount = 0;
       bulkSenderState.currentIndex = 0;
       updateBulkControlsUI("Starting...");
 
       try {
-        for (let k = 0; k < unsentLeads.length; k++) {
+        for (let k = 0; k < targetLeads.length; k++) {
           if (bulkSenderState.stopped) break;
 
-          // Check if paused and wait until resumed or stopped
+          // Check if paused and wait until resumed or aborted
           while (bulkSenderState.paused && !bulkSenderState.stopped) {
             updateBulkControlsUI("Paused");
             await new Promise(res => setTimeout(res, 250));
@@ -3241,8 +3363,8 @@ ${contentHtml}
           if (bulkSenderState.stopped) break;
 
           bulkSenderState.currentIndex = k + 1;
-          const lead = unsentLeads[k];
-          updateBulkControlsUI(`Sending (${k + 1}/${unsentLeads.length}): ${lead.firstName}...`);
+          const lead = targetLeads[k];
+          updateBulkControlsUI(`Sending (${k + 1}/${targetLeads.length})`, lead);
 
           // Select this lead on screen
           const currentIdx = recruiters.findIndex(r => r.email === lead.email);
@@ -3299,8 +3421,8 @@ ${contentHtml}
           // Live queue re-render
           renderQueue();
 
-          // Spacing pause between emails with pause/stop check
-          if (k < unsentLeads.length - 1 && !bulkSenderState.stopped) {
+          // Spacing pause between emails with pause/abort check
+          if (k < targetLeads.length - 1 && !bulkSenderState.stopped) {
             const spacingMs = 2000;
             const stepMs = 200;
             for (let t = 0; t < spacingMs; t += stepMs) {
@@ -3309,7 +3431,7 @@ ${contentHtml}
                 updateBulkControlsUI("Paused");
                 await new Promise(res => setTimeout(res, 250));
               }
-              updateBulkControlsUI(`Spacing 2s (${k + 1}/${unsentLeads.length})...`);
+              updateBulkControlsUI(`Spacing 2s (${k + 1}/${targetLeads.length})...`, lead);
               await new Promise(res => setTimeout(res, stepMs));
             }
           }
@@ -3325,7 +3447,7 @@ ${contentHtml}
         await loadLeadsFromDatabase(true);
         renderQueue();
         if (wasStopped) {
-          showAppleToast(`Bulk outreach stopped. ${totalSent} sent.`);
+          showAppleToast(`Bulk outreach aborted. ${totalSent} sent.`);
         } else {
           showAppleToast(`Bulk outreach complete. ${totalSent} emails sent.`);
         }
