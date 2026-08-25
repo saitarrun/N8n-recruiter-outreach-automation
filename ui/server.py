@@ -115,7 +115,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                         "company": r[2],
                         "email": r[3],
                         "focus": r[4] or "",
-                        "resumeFile": r[5] or "Sai_Tarrun_Pitta_Backend_Resume.pdf",
+                        "resumeFile": r[5] or "PittaSaiTarrun_SoftwareEngineer_Resume.pdf",
                         "status": r[6],
                         "sentAt": r[7] or "",
                         "createdAt": r[8]
@@ -162,7 +162,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         # 4. View specific resume PDF
         elif parsed.path == "/api/resume-pdf":
             params = urllib.parse.parse_qs(parsed.query)
-            target_file = params.get('file', ['Sai_Tarrun_Pitta_Resume.pdf'])[0]
+            target_file = params.get('file', ['PittaSaiTarrun_SoftwareEngineer_Resume.pdf'])[0]
             safe_filename = os.path.basename(target_file)
             
             found_fp = None
@@ -209,7 +209,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     comp = lead.get('company', '').strip()
                     em = lead.get('email', '').strip()
                     focus = lead.get('focus', '')
-                    res_file = lead.get('resumeFile', 'Sai_Tarrun_Pitta_Backend_Resume.pdf')
+                    res_file = lead.get('resumeFile') or 'PittaSaiTarrun_SoftwareEngineer_Resume.pdf'
                     status = lead.get('status', 'Pending')
                     sent_at = lead.get('sentAt', '')
 
@@ -248,12 +248,14 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
                 return
 
-        # 2. Delete Lead or Clear Unsent Leads from SQLite
+        # 2. Delete Lead or Clear Unsent Leads from SQLite (supports single, batch ids, batch emails, and clearUnsent)
         elif parsed.path == "/api/delete-lead":
             content_length = int(self.headers.get('Content-Length', 0))
             body = json.loads(self.rfile.read(content_length).decode('utf-8'))
             lead_id = body.get('id')
             email = body.get('email')
+            lead_ids = body.get('ids', [])
+            emails = body.get('emails', [])
             clear_unsent = body.get('clearUnsent', False)
 
             try:
@@ -261,6 +263,12 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 cur = conn.cursor()
                 if clear_unsent:
                     cur.execute("DELETE FROM leads WHERE status != 'Sent'")
+                elif lead_ids:
+                    placeholders = ','.join('?' for _ in lead_ids)
+                    cur.execute(f"DELETE FROM leads WHERE id IN ({placeholders})", tuple(lead_ids))
+                elif emails:
+                    placeholders = ','.join('?' for _ in emails)
+                    cur.execute(f"DELETE FROM leads WHERE email IN ({placeholders})", tuple(emails))
                 elif lead_id:
                     cur.execute("DELETE FROM leads WHERE id=?", (lead_id,))
                 elif email:
@@ -272,6 +280,12 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(b'{"success": true}')
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
                 return
             except Exception as e:
                 self.send_response(500)
@@ -481,13 +495,15 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                             cur = conn.cursor()
                             sent_time_str = time.strftime('%b %d, %Y %I:%M %p')
                             now_str = time.strftime('%Y-%m-%d %H:%M:%S')
+                            actual_res_file = req_data.get('resumeFileName') or res_file or 'PittaSaiTarrun_SoftwareEngineer_Resume.pdf'
                             cur.execute('''
                             INSERT INTO leads (first_name, company, email, focus, resume_file, status, sent_at, created_at)
                             VALUES (?, ?, ?, ?, ?, 'Sent', ?, ?)
                             ON CONFLICT(email) DO UPDATE SET
+                                resume_file=?,
                                 status='Sent',
                                 sent_at=?
-                            ''', (fn, comp, em, focus, res_file, sent_time_str, now_str, sent_time_str))
+                            ''', (fn, comp, em, focus, actual_res_file, sent_time_str, now_str, actual_res_file, sent_time_str))
                             conn.commit()
                             conn.close()
                         except Exception as db_err:

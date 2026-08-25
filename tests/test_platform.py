@@ -133,10 +133,17 @@ class TestRecruiterOutreachPlatform(unittest.TestCase):
             res_data = json.loads(resp.read().decode())
             self.assertTrue(res_data.get("success"))
 
-        # 4. Delete lead
+        # 4. Batch Delete leads by emails array
+        batch_email_2 = f"test.batch2.{int(time.time())}@auditcorp.com"
+        req = urllib.request.Request(f"{BASE_UI_URL}/api/leads", method="POST")
+        req.add_header("Content-Type", "application/json")
+        req.data = json.dumps({"leads": [{"firstName": "Batch2", "company": "AuditCorp", "email": batch_email_2}]}).encode()
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.getcode(), 200)
+
         req = urllib.request.Request(f"{BASE_UI_URL}/api/delete-lead", method="POST")
         req.add_header("Content-Type", "application/json")
-        req.data = json.dumps({"email": test_email}).encode()
+        req.data = json.dumps({"emails": [test_email, batch_email_2]}).encode()
         with urllib.request.urlopen(req, timeout=5) as resp:
             self.assertEqual(resp.getcode(), 200)
             res_data = json.loads(resp.read().decode())

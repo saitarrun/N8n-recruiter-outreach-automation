@@ -197,4 +197,67 @@ assert.strictEqual(appSub, "Application Follow-Up: Software Engineer at Stripe �
 
 console.log("✓ Test 10 Passed: Opportunities Inquiry & Application Follow-Up Template Presets");
 
-console.log("\n🎉 ALL 10 JAVASCRIPT CLIENT-SIDE & SCHEDULER TESTS PASSED!");
+// 11. Active Resume Resolution & Fallback Logic
+const mockLibrary = [
+  { filename: "PittaSaiTarrun_SoftwareEngineer_Resume.pdf", size: "74.0 KB" },
+  { filename: "Sai_Tarrun_Pitta_Frontend_Resume.pdf", size: "68.2 KB" }
+];
+
+function testGetActiveResumeFile(lead, activeSelected, lib) {
+  if (lead && lead.resumeFile && lib.some(r => r.filename === lead.resumeFile)) {
+    return lead.resumeFile;
+  }
+  if (activeSelected && lib.some(r => r.filename === activeSelected)) {
+    return activeSelected;
+  }
+  if (lib.length > 0) {
+    return lib[0].filename;
+  }
+  return "PittaSaiTarrun_SoftwareEngineer_Resume.pdf";
+}
+
+const leadWithValidResume = { resumeFile: "Sai_Tarrun_Pitta_Frontend_Resume.pdf" };
+assert.strictEqual(testGetActiveResumeFile(leadWithValidResume, "PittaSaiTarrun_SoftwareEngineer_Resume.pdf", mockLibrary), "Sai_Tarrun_Pitta_Frontend_Resume.pdf");
+
+const leadWithStaleResume = { resumeFile: "NonExistent_Old_Resume.pdf" };
+assert.strictEqual(testGetActiveResumeFile(leadWithStaleResume, "PittaSaiTarrun_SoftwareEngineer_Resume.pdf", mockLibrary), "PittaSaiTarrun_SoftwareEngineer_Resume.pdf");
+
+const leadWithoutResume = {};
+assert.strictEqual(testGetActiveResumeFile(leadWithoutResume, null, mockLibrary), "PittaSaiTarrun_SoftwareEngineer_Resume.pdf");
+console.log("✓ Test 11 Passed: Active Resume Resolution, Fallback & Library Validation");
+
+// 12. Multi-Select Queue Selection and Bulk Delete State Logic
+let mockMultiQueue = [
+  { email: "a@wnco.com", status: "Pending" },
+  { email: "b@koyeb.com", status: "Pending" },
+  { email: "c@clerk.dev", status: "Sent" }
+];
+
+let selectedEmails = new Set();
+function toggleLead(em, checked) { if (checked) selectedEmails.add(em); else selectedEmails.delete(em); }
+function toggleAllVisible(leads, checked) {
+  leads.forEach(l => { if (checked) selectedEmails.add(l.email); else selectedEmails.delete(l.email); });
+}
+
+// Filter unsent
+const unsentOnly = mockMultiQueue.filter(r => r.status !== 'Sent');
+assert.strictEqual(unsentOnly.length, 2);
+
+toggleAllVisible(unsentOnly, true);
+assert.strictEqual(selectedEmails.size, 2);
+assert.strictEqual(selectedEmails.has("a@wnco.com"), true);
+assert.strictEqual(selectedEmails.has("b@koyeb.com"), true);
+assert.strictEqual(selectedEmails.has("c@clerk.dev"), false);
+
+// Deselect one
+toggleLead("a@wnco.com", false);
+assert.strictEqual(selectedEmails.size, 1);
+
+// Bulk delete action removes selected items
+mockMultiQueue = mockMultiQueue.filter(r => !selectedEmails.has(r.email));
+selectedEmails.clear();
+assert.strictEqual(mockMultiQueue.length, 2);
+assert.strictEqual(mockMultiQueue.some(r => r.email === "b@koyeb.com"), false);
+console.log("✓ Test 12 Passed: Multi-Select Queue Selection and Bulk Delete State Logic");
+
+console.log("\n🎉 ALL 12 JAVASCRIPT CLIENT-SIDE, RESUME & MULTI-SELECT TESTS PASSED!");
