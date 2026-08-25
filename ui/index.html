@@ -646,25 +646,47 @@
       color: var(--label-primary);
     }
 
-    /* Mail Editor Body */
+    /* Mail Editor Body & High-Contrast Typography */
     .mail-body-canvas {
       padding: 26px 30px;
       font-size: 14.5px;
-      line-height: 1.68;
-      color: #f5f5f7;
+      line-height: 1.75;
+      color: #9d9da6;
       background: #0b0b0e;
       min-height: 480px;
       outline: none;
       overflow-y: auto;
+      font-weight: 400;
     }
-    .mail-body-canvas p { margin-bottom: 14px; }
+    .mail-body-canvas p {
+      margin-bottom: 14px;
+      color: #9d9da6;
+    }
+    .mail-body-canvas strong,
+    .mail-body-canvas b,
+    #studio-prev-body strong,
+    #studio-prev-body b {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.01em;
+    }
+    .mail-body-canvas #dyn-lead-name,
+    .mail-body-canvas #dyn-lead-comp,
+    .mail-body-canvas #dyn-lead-comp-2 {
+      color: #70b7ff;
+      font-weight: 700;
+    }
     .mail-signature-block {
       margin-top: 24px;
       padding-top: 16px;
       border-top: 1px solid var(--border-subtle);
       font-size: 13.5px;
-      color: var(--label-secondary);
-      line-height: 1.5;
+      color: #8e8e93;
+      line-height: 1.55;
+    }
+    .mail-signature-block strong {
+      color: #f5f5f7;
+      font-weight: 700;
     }
     .mail-signature-block a {
       color: var(--accent-blue);
