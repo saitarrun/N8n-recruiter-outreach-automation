@@ -179,4 +179,22 @@ testStopScheduler(schedConfig);
 assert.strictEqual(schedConfig.status, 'idle', "Scheduler should transition to idle");
 console.log("✓ Test 9 Passed: Scheduler Arm, Pause, Resume, and Stop State Machine");
 
-console.log("\n🎉 ALL 9 JAVASCRIPT CLIENT-SIDE & SCHEDULER TESTS PASSED!");
+// 10. Opportunities & Applied Job Follow-Up Template Presets
+const opportunitiesTpl = "Hi {RecruiterName}, exploring opportunities at {Company}. From {SenderName}.";
+const appliedTpl = "Hi {RecruiterName}, I recently applied for a Software Engineering role at {Company}. Best, {SenderName}.";
+
+const renderedOpp = renderTemplate(opportunitiesTpl, mockLead, mockProfile);
+assert.strictEqual(renderedOpp, "Hi Sarah, exploring opportunities at Stripe. From Sai Tarrun Pitta.");
+
+const renderedApp = renderTemplate(appliedTpl, mockLead, mockProfile);
+assert.strictEqual(renderedApp, "Hi Sarah, I recently applied for a Software Engineering role at Stripe. Best, Sai Tarrun Pitta.");
+
+const oppSub = renderSubject("Exploring Software Engineering Opportunities at {Company} — {SenderName}", mockLead, mockProfile);
+assert.strictEqual(oppSub, "Exploring Software Engineering Opportunities at Stripe — Sai Tarrun Pitta");
+
+const appSub = renderSubject("Application Follow-Up: Software Engineer at {Company} — {SenderName}", mockLead, mockProfile);
+assert.strictEqual(appSub, "Application Follow-Up: Software Engineer at Stripe — Sai Tarrun Pitta");
+
+console.log("✓ Test 10 Passed: Opportunities Inquiry & Application Follow-Up Template Presets");
+
+console.log("\n🎉 ALL 10 JAVASCRIPT CLIENT-SIDE & SCHEDULER TESTS PASSED!");
