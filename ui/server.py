@@ -764,11 +764,35 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     if err_body:
                         err_msg = err_body
                 
-                # Check for Google OAuth token revocation / expiry
+                # Check for Google OAuth token revocation / expiry in response or n8n database
                 err_lower = (err_msg + " " + err_body).lower()
                 if "reconnect" in err_lower or "revoked" in err_lower or "expired" in err_lower or "invalid_grant" in err_lower or "credential" in err_lower:
                     is_oauth_error = True
                     err_msg = "Gmail OAuth token expired or revoked. Reconnect Gmail in n8n (http://localhost:5678/home/credentials) to continue sending."
+                elif "error in workflow" in err_lower:
+                    # Query n8n database for exact execution error
+                    try:
+                        n8n_db = os.path.expanduser('~/.n8n/database.sqlite')
+                        if os.path.exists(n8n_db):
+                            nconn = sqlite3.connect(n8n_db)
+                            ncur = nconn.cursor()
+                            ncur.execute('SELECT id, status FROM execution_entity ORDER BY id DESC LIMIT 1')
+                            nrow = ncur.fetchone()
+                            if nrow and nrow[1] == 'error':
+                                eid = nrow[0]
+                                ncur.execute('SELECT data FROM execution_data WHERE executionId=?', (eid,))
+                                nd_row = ncur.fetchone()
+                                if nd_row:
+                                    nd = json.loads(nd_row[0])
+                                    for item in nd:
+                                        s = json.dumps(item)
+                                        if 'reconnect' in s.lower() or 'revoked' in s.lower() or 'expired' in s.lower() or 'invalid_grant' in s.lower() or 'credential' in s.lower():
+                                            is_oauth_error = True
+                                            err_msg = "Gmail OAuth token expired or revoked. Reconnect Gmail in n8n (http://localhost:5678/home/credentials) to continue sending."
+                                            break
+                            nconn.close()
+                    except Exception:
+                        pass
 
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
