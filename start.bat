@@ -89,7 +89,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 set N8N_PORT=5678
 set N8N_PROTOCOL=http
 set N8N_HOST=localhost
-set WEBHOOK_URL=http://localhost:5678/
+set N8N_EDITOR_BASE_URL=http://localhost:5678
+set N8N_WEBHOOK_URL=http://localhost:5678
+set WEBHOOK_URL=http://localhost:5678
 set N8N_DEFAULT_BINARY_DATA_MODE=default
 set N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
 set NODE_FUNCTION_ALLOW_BUILTIN=fs,path,os,crypto
