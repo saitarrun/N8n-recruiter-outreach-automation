@@ -768,7 +768,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 err_lower = (err_msg + " " + err_body).lower()
                 if "reconnect" in err_lower or "revoked" in err_lower or "expired" in err_lower or "invalid_grant" in err_lower or "credential" in err_lower:
                     is_oauth_error = True
-                    err_msg = "Gmail OAuth token expired or revoked. Reconnect Gmail in n8n (http://localhost:5678/credential/7fLoFGrSYD2DCo0i) to continue sending."
+                    err_msg = "Gmail OAuth token expired or revoked. Reconnect Gmail in n8n (http://localhost:5678/home/credentials) to continue sending."
 
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
