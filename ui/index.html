@@ -1144,7 +1144,19 @@
     </div>
   </header>
 
-  <!-- SCHEDULE EMAILS STUDIO -->
+  <!-- OAuth Alert Banner -->
+  <div id="oauth-alert-banner" style="display: none; background: #261313; border-bottom: 1px solid #4a1d1d; padding: 9px 20px; align-items: center; justify-content: space-between; gap: 12px; z-index: 999; position: relative;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+      <span style="font-size: 12px; color: #fca5a5; font-weight: 500;" id="oauth-alert-text">Gmail OAuth token needs to be reconnected in n8n.</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <a href="http://localhost:5678/credential/7fLoFGrSYD2DCo0i" target="_blank" class="apple-btn btn-blue-primary" style="font-size: 11.5px; padding: 3px 10px; text-decoration: none;">
+        Reconnect Gmail in n8n
+      </a>
+      <button class="apple-btn btn-plain" style="font-size: 11px; padding: 3px 8px;" onclick="dismissOAuthAlert()">Dismiss</button>
+    </div>
+  </div>
   <div id="view-scheduler-studio" class="fullpage-studio" style="display: none;">
     <!-- Scheduler Topbar -->
     <div class="studio-topbar">
@@ -1562,6 +1574,9 @@
                 </button>
                 <button class="queue-subtab" data-filter="sent" onclick="setQueueFilter('sent')">
                   Sent (<span id="filter-sent-count">0</span>)
+                </button>
+                <button class="queue-subtab" id="filter-failed-tab" style="display: none; color: #f87171;" onclick="resetFailedLeads()" title="Reset failed leads to Ready">
+                  Retry (<span id="filter-failed-count">0</span>)
                 </button>
               </div>
 
@@ -2198,6 +2213,7 @@
 
       const unsentCount = recruiters.filter(r => r.status !== 'Sent').length;
       const sentCount = recruiters.filter(r => r.status === 'Sent').length;
+      const failedCount = recruiters.filter(r => r.status === 'Failed').length;
 
       const qBadge = document.getElementById('queue-badge');
       if (qBadge) qBadge.innerText = recruiters.length;
@@ -2210,6 +2226,17 @@
 
       const fSent = document.getElementById('filter-sent-count');
       if (fSent) fSent.innerText = sentCount;
+
+      const fFailedTab = document.getElementById('filter-failed-tab');
+      const fFailedCount = document.getElementById('filter-failed-count');
+      if (fFailedTab && fFailedCount) {
+        if (failedCount > 0) {
+          fFailedTab.style.display = 'inline-block';
+          fFailedCount.innerText = failedCount;
+        } else {
+          fFailedTab.style.display = 'none';
+        }
+      }
 
       const bulkBtn = document.getElementById('btn-bulk-send');
       if (bulkBtn && !bulkBtn.disabled) {
@@ -3347,8 +3374,12 @@ ${contentHtml}
         if (res.ok && (data.id || data.threadId || data.success !== false)) {
           r.status = 'Sent';
           await loadLeadsFromDatabase(true);
+          dismissOAuthAlert();
           showAppleToast(`Sent to ${r.firstName} (${r.company}) & saved to DB.`);
         } else {
+          if (data.isOAuthError || (data.error && data.error.includes("OAuth"))) {
+            triggerOAuthAlert(data.error);
+          }
           r.status = 'Failed';
           showAppleToast(`Delivery failed for ${r.email}: ${data.error || 'Server error'}`);
         }
@@ -3547,8 +3578,17 @@ ${contentHtml}
               }
               bulkSenderState.sentCount++;
             } else {
-              lead.status = 'Failed';
-              if (currentIdx !== -1) recruiters[currentIdx].status = 'Failed';
+              if (data.isOAuthError || (data.error && (data.error.includes("OAuth") || data.error.includes("reconnect")))) {
+                lead.status = 'Pending';
+                if (currentIdx !== -1) recruiters[currentIdx].status = 'Pending';
+                triggerOAuthAlert(data.error);
+                showAppleToast('Gmail OAuth token expired. Bulk send stopped.');
+                bulkSenderState.stopped = true;
+                break;
+              } else {
+                lead.status = 'Failed';
+                if (currentIdx !== -1) recruiters[currentIdx].status = 'Failed';
+              }
             }
           } catch (e) {
             clearTimeout(timeoutId);
@@ -3600,6 +3640,34 @@ ${contentHtml}
       t.innerText = msg;
       t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+
+    function triggerOAuthAlert(msg) {
+      const banner = document.getElementById('oauth-alert-banner');
+      const text = document.getElementById('oauth-alert-text');
+      if (banner) {
+        banner.style.display = 'flex';
+        if (text && msg) text.innerText = msg;
+      }
+    }
+
+    function dismissOAuthAlert() {
+      const banner = document.getElementById('oauth-alert-banner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    async function resetFailedLeads() {
+      const failed = recruiters.filter(r => r.status === 'Failed');
+      if (failed.length === 0) {
+        showAppleToast('No failed leads to reset.');
+        return;
+      }
+      failed.forEach(r => {
+        r.status = 'Pending';
+      });
+      await saveRecruitersState(recruiters);
+      renderQueue();
+      showAppleToast(`Reset ${failed.length} failed lead(s) back to Ready.`);
     }
 
     async function checkN8nHealth() {
@@ -4081,10 +4149,18 @@ ${contentHtml}
           lead.status = 'Sent';
           lead.sentAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           schedulerRuntime.sessionDispatched++;
+          dismissOAuthAlert();
           addSchedulerLog(`Delivered to ${lead.firstName} (${lead.company}) — Gmail ID: ${data.id || 'OK'}`, 'success');
         } else {
-          lead.status = 'Failed';
-          addSchedulerLog(`Failed to send to ${lead.email}: ${data.error || 'Server error'}`, 'err');
+          if (data.isOAuthError || (data.error && (data.error.includes("OAuth") || data.error.includes("reconnect")))) {
+            lead.status = 'Pending';
+            triggerOAuthAlert(data.error);
+            addSchedulerLog(`Gmail OAuth token expired. Stopping schedule. Please reconnect Gmail in n8n.`, 'err');
+            stopScheduler();
+          } else {
+            lead.status = 'Failed';
+            addSchedulerLog(`Failed to send to ${lead.email}: ${data.error || 'Server error'}`, 'err');
+          }
         }
       } catch (err) {
         clearTimeout(timeoutId);

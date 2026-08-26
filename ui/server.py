@@ -752,11 +752,34 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(resp_data)
                     return
+            except urllib.error.HTTPError as he:
+                err_body = ""
+                err_msg = str(he)
+                is_oauth_error = False
+                try:
+                    err_body = he.read().decode('utf-8', errors='ignore')
+                    err_json = json.loads(err_body)
+                    err_msg = err_json.get('message') or err_json.get('error') or err_body
+                except Exception:
+                    if err_body:
+                        err_msg = err_body
+                
+                # Check for Google OAuth token revocation / expiry
+                err_lower = (err_msg + " " + err_body).lower()
+                if "reconnect" in err_lower or "revoked" in err_lower or "expired" in err_lower or "invalid_grant" in err_lower or "credential" in err_lower:
+                    is_oauth_error = True
+                    err_msg = "Gmail OAuth token expired or revoked. Reconnect Gmail in n8n (http://localhost:5678/credential/7fLoFGrSYD2DCo0i) to continue sending."
+
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": err_msg, "isOAuthError": is_oauth_error}).encode('utf-8'))
+                return
             except Exception as e:
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": False, "error": str(e), "isOAuthError": False}).encode('utf-8'))
                 return
 
         else:
